@@ -6,8 +6,8 @@ import "./globals.css"
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "AgrochainhHub - Intelligent Agricultural Chemical Procurement Platform",
-  description: "Connect with premium Chinese agricultural chemical suppliers through our AI-powered B2B platform",
+  title: "ArgoChainHub - 智慧农化采购平台",
+  description: "连接优质农化供应商与采购商的智能化B2B平台，助力农业供应链数字化转型",
     generator: 'v0.dev'
 }
 
