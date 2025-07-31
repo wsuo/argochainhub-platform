@@ -1,0 +1,65 @@
+{
+  "common": {
+    "welcome": "欢迎来到AgroChainHub",
+    "tagline": "您的智慧农化采购伙伴",
+    "buyerPortal": "采购商门户",
+    "supplierPortal": "供应商门户",
+    "signOut": "退出登录",
+    "profile": "个人资料",
+    "profileSettings": "个人设置",
+    "companyInfo": "公司信息",
+    "membership": "会员资格",
+    "upgradeMembership": "升级会员",
+    "getMorePrivileges": "升级获得更多权限"
+  },
+  "userType": {
+    "buyer": "采购商",
+    "supplier": "供应商",
+    "buyerCenter": "采购商中心",
+    "supplierCenter": "供应商中心",
+    "buyerTagline": "智能采购，高效对接",
+    "supplierTagline": "精准推广，订单转化"
+  },
+  "navigation": {
+    "aiQuery": "AI农药查询",
+    "aiQueryDesc": "智能问答服务",
+    "productDatabase": "农药产品库",
+    "productDatabaseDesc": "浏览所有产品",
+    "shoppingCart": "购物车",
+    "shoppingCartDesc": "临时产品列表",
+    "inquiryManagement": "询价管理",
+    "inquiryManagementDesc": "管理询价单",
+    "sampleManagement": "样品管理",
+    "sampleManagementDesc": "管理样品申请",
+    "registrationManagement": "登记管理",
+    "registrationManagementDesc": "管理登记申请",
+    "supplierList": "供应商列表",
+    "supplierListDesc": "查看供应商",
+    "top100Suppliers": "Top 100供应商",
+    "top100SuppliersDesc": "优质供应商排名",
+    "myProducts": "我的产品库",
+    "myProductsDesc": "管理我的产品",
+    "inquiryResponse": "询价响应",
+    "inquiryResponseDesc": "处理询价请求",
+    "sampleResponse": "样品响应",
+    "sampleResponseDesc": "处理样品申请",
+    "registrationResponse": "登记响应",
+    "registrationResponseDesc": "协助登记申请",
+    "customerManagement": "客户管理",
+    "customerManagementDesc": "管理客户关系"
+  },
+  "features": {
+    "coreBuyerFeatures": "核心采购功能",
+    "coreSupplierFeatures": "核心供应商功能"
+  },
+  "stats": {
+    "products": "农药产品",
+    "suppliers": "优质供应商",
+    "countries": "覆盖国家",
+    "responseTime": "平均响应时间"
+  },
+  "home": {
+    "buyerView": "采购商视图",
+    "supplierView": "供应商视图"
+  }
+}

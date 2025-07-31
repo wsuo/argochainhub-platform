@@ -1,0 +1,65 @@
+{
+  "common": {
+    "welcome": "Bienvenido a AgroChainHub",
+    "tagline": "Su Socio Inteligente de Adquisición de Productos Químicos Agrícolas",
+    "buyerPortal": "Portal del Comprador",
+    "supplierPortal": "Portal del Proveedor",
+    "signOut": "Cerrar sesión",
+    "profile": "Perfil",
+    "profileSettings": "Configuración del perfil",
+    "companyInfo": "Información de la empresa",
+    "membership": "Membresía",
+    "upgradeMembership": "Actualizar ahora",
+    "getMorePrivileges": "Actualice para obtener más privilegios"
+  },
+  "userType": {
+    "buyer": "Comprador",
+    "supplier": "Proveedor",
+    "buyerCenter": "Centro del Comprador",
+    "supplierCenter": "Centro del Proveedor",
+    "buyerTagline": "Adquisición inteligente, conexión eficiente",
+    "supplierTagline": "Marketing preciso, conversión de pedidos"
+  },
+  "navigation": {
+    "aiQuery": "Consulta de Pesticidas con IA",
+    "aiQueryDesc": "Servicio inteligente de Q&A",
+    "productDatabase": "Base de datos de productos",
+    "productDatabaseDesc": "Ver todos los productos",
+    "shoppingCart": "Carrito de compras",
+    "shoppingCartDesc": "Lista temporal de productos",
+    "inquiryManagement": "Gestión de consultas",
+    "inquiryManagementDesc": "Administrar consultas",
+    "sampleManagement": "Gestión de muestras",
+    "sampleManagementDesc": "Administrar solicitudes de muestras",
+    "registrationManagement": "Gestión de registros",
+    "registrationManagementDesc": "Administrar solicitudes de registro",
+    "supplierList": "Lista de proveedores",
+    "supplierListDesc": "Ver proveedores",
+    "top100Suppliers": "Top 100 Proveedores",
+    "top100SuppliersDesc": "Clasificación de proveedores premium",
+    "myProducts": "Mis productos",
+    "myProductsDesc": "Administrar mis productos",
+    "inquiryResponse": "Respuesta a consultas",
+    "inquiryResponseDesc": "Manejar solicitudes de consulta",
+    "sampleResponse": "Respuesta de muestras",
+    "sampleResponseDesc": "Procesar solicitudes de muestras",
+    "registrationResponse": "Respuesta de registro",
+    "registrationResponseDesc": "Ayudar con solicitudes de registro",
+    "customerManagement": "Gestión de clientes",
+    "customerManagementDesc": "Administrar relaciones con clientes"
+  },
+  "features": {
+    "coreBuyerFeatures": "Funciones principales del comprador",
+    "coreSupplierFeatures": "Funciones principales del proveedor"
+  },
+  "stats": {
+    "products": "Productos pesticidas",
+    "suppliers": "Proveedores de calidad",
+    "countries": "Países cubiertos",
+    "responseTime": "Tiempo de respuesta promedio"
+  },
+  "home": {
+    "buyerView": "Vista de comprador",
+    "supplierView": "Vista de proveedor"
+  }
+}

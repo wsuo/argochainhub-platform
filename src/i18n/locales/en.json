@@ -1,0 +1,65 @@
+{
+  "common": {
+    "welcome": "Welcome to AgroChainHub",
+    "tagline": "Your Smart Agricultural Chemical Procurement Partner",
+    "buyerPortal": "Buyer Portal",
+    "supplierPortal": "Supplier Portal",
+    "signOut": "Sign Out",
+    "profile": "Profile",
+    "profileSettings": "Profile Settings",
+    "companyInfo": "Company Info",
+    "membership": "Membership",
+    "upgradeMembership": "Upgrade Now",
+    "getMorePrivileges": "Upgrade for more privileges"
+  },
+  "userType": {
+    "buyer": "Buyer",
+    "supplier": "Supplier",
+    "buyerCenter": "Buyer Center",
+    "supplierCenter": "Supplier Center",
+    "buyerTagline": "Smart Procurement, Efficient Connection",
+    "supplierTagline": "Precise Marketing, Order Conversion"
+  },
+  "navigation": {
+    "aiQuery": "AI Pesticide Query",
+    "aiQueryDesc": "Intelligent Q&A Service",
+    "productDatabase": "Product Database",
+    "productDatabaseDesc": "Browse All Products",
+    "shoppingCart": "Shopping Cart",
+    "shoppingCartDesc": "Temporary Product List",
+    "inquiryManagement": "Inquiry Management",
+    "inquiryManagementDesc": "Manage Inquiries",
+    "sampleManagement": "Sample Management",
+    "sampleManagementDesc": "Manage Sample Requests",
+    "registrationManagement": "Registration Management",
+    "registrationManagementDesc": "Manage Registration Applications",
+    "supplierList": "Supplier List",
+    "supplierListDesc": "View Suppliers",
+    "top100Suppliers": "Top 100 Suppliers",
+    "top100SuppliersDesc": "Premium Supplier Rankings",
+    "myProducts": "My Products",
+    "myProductsDesc": "Manage My Products",
+    "inquiryResponse": "Inquiry Response",
+    "inquiryResponseDesc": "Handle Inquiry Requests",
+    "sampleResponse": "Sample Response",
+    "sampleResponseDesc": "Process Sample Applications",
+    "registrationResponse": "Registration Response",
+    "registrationResponseDesc": "Assist Registration Applications",
+    "customerManagement": "Customer Management",
+    "customerManagementDesc": "Manage Customer Relations"
+  },
+  "features": {
+    "coreBuyerFeatures": "Core Buyer Features",
+    "coreSupplierFeatures": "Core Supplier Features"
+  },
+  "stats": {
+    "products": "Pesticide Products",
+    "suppliers": "Quality Suppliers",
+    "countries": "Countries Covered",
+    "responseTime": "Avg Response Time"
+  },
+  "home": {
+    "buyerView": "Buyer View",
+    "supplierView": "Supplier View"
+  }
+}
