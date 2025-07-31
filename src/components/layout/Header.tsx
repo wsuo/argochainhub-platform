@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Bell, Globe, User, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -9,19 +8,19 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
+import { useTranslation } from "react-i18next";
+import { useLanguage } from "@/hooks/useLanguage";
+import { SUPPORTED_LANGUAGES } from "@/i18n/config";
 
 interface HeaderProps {
   userType: "buyer" | "supplier";
 }
 
 export const Header = ({ userType }: HeaderProps) => {
-  const [language, setLanguage] = useState("EN");
+  const { t } = useTranslation();
+  const { currentLanguage, changeLanguage } = useLanguage();
   
-  const languages = [
-    { code: "EN", name: "English" },
-    { code: "中", name: "中文" },
-    { code: "ES", name: "Español" }
-  ];
+  const currentLangData = SUPPORTED_LANGUAGES.find(lang => lang.code === currentLanguage) || SUPPORTED_LANGUAGES[0];
 
   return (
     <header className="h-16 bg-background border-b border-border px-6 flex items-center justify-between">
@@ -34,7 +33,7 @@ export const Header = ({ userType }: HeaderProps) => {
           <h1 className="text-xl font-bold text-foreground">AgroChainHub</h1>
         </div>
         <Badge variant="outline" className="text-xs">
-          {userType === "buyer" ? "Buyer Portal" : "Supplier Portal"}
+          {userType === "buyer" ? t('common.buyerPortal') : t('common.supplierPortal')}
         </Badge>
       </div>
 
@@ -45,16 +44,16 @@ export const Header = ({ userType }: HeaderProps) => {
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="sm" className="flex items-center space-x-1">
               <Globe className="w-4 h-4" />
-              <span>{language}</span>
+              <span>{currentLangData.shortName}</span>
               <ChevronDown className="w-3 h-3" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            {languages.map((lang) => (
+            {SUPPORTED_LANGUAGES.map((lang) => (
               <DropdownMenuItem
                 key={lang.code}
-                onClick={() => setLanguage(lang.code)}
-                className={language === lang.code ? "bg-accent" : ""}
+                onClick={() => changeLanguage(lang.code)}
+                className={currentLanguage === lang.code ? "bg-accent" : ""}
               >
                 {lang.name}
               </DropdownMenuItem>
@@ -80,12 +79,12 @@ export const Header = ({ userType }: HeaderProps) => {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-48">
-            <DropdownMenuItem>Profile Settings</DropdownMenuItem>
-            <DropdownMenuItem>Company Info</DropdownMenuItem>
-            <DropdownMenuItem>Membership</DropdownMenuItem>
+            <DropdownMenuItem>{t('common.profileSettings')}</DropdownMenuItem>
+            <DropdownMenuItem>{t('common.companyInfo')}</DropdownMenuItem>
+            <DropdownMenuItem>{t('common.membership')}</DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem className="text-destructive">
-              Sign Out
+              {t('common.signOut')}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
