@@ -129,6 +129,11 @@ All colors MUST be HSL.
 
 /* Custom animations */
 @layer utilities {
+  /* 径向渐变工具类 */
+  .bg-gradient-radial {
+    background-image: radial-gradient(circle, var(--tw-gradient-stops));
+  }
+
   @keyframes sparkle {
     0%, 100% {
       opacity: 1;

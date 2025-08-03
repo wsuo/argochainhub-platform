@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Send, Sparkles, Bot, User, MinusCircle } from "lucide-react";
+import { Send, Sparkles, Bot, User, MinusCircle, ChevronDown, ChevronUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
@@ -23,6 +23,7 @@ export const ChatInterface = ({ onToggle }: ChatInterfaceProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [isFocused, setIsFocused] = useState(false);
+  const [showExamples, setShowExamples] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
 
@@ -248,7 +249,7 @@ export const ChatInterface = ({ onToggle }: ChatInterfaceProps) => {
 
   // 折叠状态的AI查询框
   return (
-    <Card className="p-6 bg-background border border-border shadow-sm rounded-lg">
+    <Card className="p-6 bg-background border border-border shadow-sm rounded-xl">
       {/* 头部区域 */}
       <div className="flex items-center space-x-3 mb-4">
         <div className="relative w-10 h-10 bg-gradient-to-br from-primary to-agro-blue rounded-lg flex items-center justify-center">
@@ -258,13 +259,9 @@ export const ChatInterface = ({ onToggle }: ChatInterfaceProps) => {
         </div>
         <div>
           <h3 className="text-lg font-semibold text-foreground">AI农药智能查询</h3>
-          <p className="text-sm text-muted-foreground">智能助手在线</p>
+          <p className="text-sm text-muted-foreground">专业问答</p>
         </div>
       </div>
-      
-      <p className="text-muted-foreground mb-6 text-sm">
-        基于专业农药知识库，为您提供精准、快速的智能问答服务
-      </p>
       
       <div className="space-y-4">
         {/* 输入区域 */}
@@ -314,55 +311,42 @@ export const ChatInterface = ({ onToggle }: ChatInterfaceProps) => {
         
         {/* 示例查询区域 */}
         <div className="border-t border-border pt-4">
-          <div className="text-sm text-muted-foreground mb-3">常用查询示例</div>
-          <div className="grid grid-cols-2 gap-3">
-            {exampleQueries.map((example, index) => (
-              <Button
-                key={index}
-                variant="outline"
-                size="sm"
-                className="justify-start h-auto p-3 text-left border-border hover:bg-muted/50 hover:border-primary/50"
-                onClick={() => {
-                  setQuery(example);
-                  // 延迟执行确保query已更新
-                  setTimeout(() => {
-                    if (example.trim()) {
-                      // 首次发送消息时展开聊天界面
-                      if (!isExpanded) {
-                        setIsExpanded(true);
-                        onToggle?.(true);
-                      }
-                      
-                      const userMessage: Message = {
-                        id: Date.now().toString(),
-                        content: example.trim(),
-                        sender: 'user',
-                        timestamp: new Date()
-                      };
-
-                      setMessages(prev => [...prev, userMessage]);
-                      setQuery("");
-                      setIsLoading(true);
-
-                      // 模拟AI响应延迟
-                      setTimeout(() => {
-                        const aiResponse: Message = {
-                          id: (Date.now() + 1).toString(),
-                          content: simulateAIResponse(userMessage.content),
-                          sender: 'ai',
-                          timestamp: new Date()
-                        };
-                        setMessages(prev => [...prev, aiResponse]);
-                        setIsLoading(false);
-                      }, 1500);
-                    }
-                  }, 50);
-                }}
-              >
-                <div className="text-sm text-foreground">{example}</div>
-              </Button>
-            ))}
-          </div>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setShowExamples(!showExamples)}
+            className="w-full justify-between text-sm text-muted-foreground hover:text-foreground p-0 h-auto"
+          >
+            <span>常用查询示例</span>
+            {showExamples ? (
+              <ChevronUp className="w-4 h-4" />
+            ) : (
+              <ChevronDown className="w-4 h-4" />
+            )}
+          </Button>
+          
+          {showExamples && (
+            <div className="grid grid-cols-2 gap-3 mt-3">
+              {exampleQueries.map((example, index) => (
+                <Button
+                  key={index}
+                  variant="outline"
+                  size="sm"
+                  className="justify-start h-auto p-3 text-left border-border hover:bg-muted/50 hover:border-primary/50"
+                  onClick={() => {
+                    setQuery(example);
+                    setShowExamples(false); // 选择后自动收起
+                    // 可选：聚焦到输入框
+                    setTimeout(() => {
+                      textareaRef.current?.focus();
+                    }, 100);
+                  }}
+                >
+                  <div className="text-sm text-foreground">{example}</div>
+                </Button>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </Card>
