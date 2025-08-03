@@ -1,24 +1,36 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import AuthService, { 
+  User, 
+  UserType as ApiUserType, 
+  RegisterRequest,
+  LoginRequest,
+  ApiError 
+} from '@/services/authService';
+import { processApiError, NetworkStatus } from '@/lib/errorHandler';
 
+// 为了保持向后兼容，映射API类型到前端类型
 export type UserType = 'buyer' | 'supplier';
 
-export interface User {
-  id: string;
-  email: string;
+// 扩展注册参数接口
+export interface RegisterParams extends Omit<RegisterRequest, 'userType' | 'userName'> {
   name: string;
   userType: UserType;
-  isLoggedIn: boolean;
 }
 
 interface AuthContextType {
   user: User | null;
   isLoggedIn: boolean;
   currentUserType: UserType;
+  isLoading: boolean;
+  error: string | null;
+  isOnline: boolean;
   login: (email: string, password: string, userType: UserType) => Promise<boolean>;
-  register: (email: string, password: string, name: string, userType: UserType) => Promise<boolean>;
+  register: (params: RegisterParams) => Promise<boolean>;
   logout: () => void;
   switchUserType: (userType: UserType) => void;
   canSwitchToSupplier: boolean;
+  clearError: () => void;
+  retryLastOperation: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -34,90 +46,242 @@ export const useAuth = () => {
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [currentUserType, setCurrentUserType] = useState<UserType>('buyer');
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [isOnline, setIsOnline] = useState(NetworkStatus.isOnline());
+  const [lastFailedOperation, setLastFailedOperation] = useState<(() => Promise<any>) | null>(null);
 
-  // 从localStorage加载用户状态
+  // 监听网络状态变化
   useEffect(() => {
-    const savedUser = localStorage.getItem('agro_user');
-    const savedUserType = localStorage.getItem('agro_user_type') as UserType;
-    
-    if (savedUser) {
-      try {
-        const parsedUser = JSON.parse(savedUser);
-        setUser(parsedUser);
-        setCurrentUserType(savedUserType || parsedUser.userType || 'buyer');
-      } catch (error) {
-        console.error('Failed to parse saved user:', error);
-        localStorage.removeItem('agro_user');
-        localStorage.removeItem('agro_user_type');
+    const unsubscribe = NetworkStatus.subscribe((online) => {
+      setIsOnline(online);
+      if (!online) {
+        setError('网络连接已断开，请检查网络设置');
+      } else if (error === '网络连接已断开，请检查网络设置') {
+        setError(null);
       }
-    } else {
-      // 默认用户类型为采购商
-      setCurrentUserType('buyer');
-    }
-  }, []);
+    });
 
-  // 模拟登录
-  const login = async (email: string, password: string, userType: UserType): Promise<boolean> => {
-    // 模拟API调用延迟
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    return unsubscribe;
+  }, [error]);
+
+  // 统一错误处理函数
+  const handleError = (error: any, operation?: () => Promise<any>) => {
+    const processedError = processApiError(error);
+    setError(processedError.message);
     
-    // 简单的模拟验证（任何邮箱+密码都能登录）
-    if (email && password) {
-      const newUser: User = {
-        id: Date.now().toString(),
-        email,
-        name: email.split('@')[0] || '用户',
-        userType,
-        isLoggedIn: true
-      };
-      
-      setUser(newUser);
-      setCurrentUserType(userType);
-      
-      // 保存到localStorage
-      localStorage.setItem('agro_user', JSON.stringify(newUser));
-      localStorage.setItem('agro_user_type', userType);
-      
-      return true;
+    // 如果错误可以重试，保存操作以便稍后重试
+    if (processedError.shouldRetry && operation) {
+      setLastFailedOperation(() => operation);
+    } else {
+      setLastFailedOperation(null);
     }
     
-    return false;
+    console.error('Auth operation failed:', processedError);
   };
 
-  // 模拟注册
-  const register = async (email: string, password: string, name: string, userType: UserType): Promise<boolean> => {
-    // 模拟API调用延迟
-    await new Promise(resolve => setTimeout(resolve, 1200));
+  // 重试上次失败的操作
+  const retryLastOperation = async () => {
+    if (!lastFailedOperation) return;
     
-    // 简单的模拟验证
-    if (email && password && name) {
-      const newUser: User = {
-        id: Date.now().toString(),
-        email,
-        name,
-        userType,
-        isLoggedIn: true
-      };
+    if (!isOnline) {
+      setError('网络连接不可用，请检查网络设置');
+      return;
+    }
+
+    setIsLoading(true);
+    setError(null);
+    
+    try {
+      await lastFailedOperation();
+      setLastFailedOperation(null);
+    } catch (error) {
+      handleError(error, lastFailedOperation);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // 类型转换辅助函数
+  const mapApiUserTypeToFrontend = (apiUserType: ApiUserType): UserType => {
+    switch (apiUserType) {
+      case 'individual_buyer':
+        return 'buyer';
+      case 'supplier':
+        return 'supplier';
+      default:
+        return 'buyer';
+    }
+  };
+
+  const mapFrontendUserTypeToApi = (userType: UserType): ApiUserType => {
+    switch (userType) {
+      case 'buyer':
+        return 'individual_buyer';
+      case 'supplier':
+        return 'supplier';
+      default:
+        return 'individual_buyer';
+    }
+  };
+
+  // 初始化：检查token和加载用户信息
+  useEffect(() => {
+    const initializeAuth = async () => {
+      setIsLoading(true);
+      setError(null);
+
+      try {
+        // 首先检查localStorage中的用户类型设置
+        const savedUserType = localStorage.getItem('agro_user_type') as UserType;
+        if (savedUserType) {
+          setCurrentUserType(savedUserType);
+        }
+
+        // 检查是否有有效token
+        if (AuthService.hasValidToken()) {
+          try {
+            const userData = await AuthService.getCurrentUser();
+            setUser(userData);
+            
+            // 如果没有保存的用户类型设置，使用用户实际类型
+            if (!savedUserType) {
+              const frontendUserType = mapApiUserTypeToFrontend(userData.userType);
+              setCurrentUserType(frontendUserType);
+              localStorage.setItem('agro_user_type', frontendUserType);
+            }
+          } catch (error) {
+            // Token可能过期或无效，清理本地存储
+            console.error('Failed to get user info:', error);
+            AuthService.logout();
+          }
+        }
+      } catch (error) {
+        console.error('Auth initialization error:', error);
+        setError('初始化认证状态失败');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    // 监听unauthorized事件，自动登出
+    const handleUnauthorized = () => {
+      console.log('Unauthorized detected, logging out...');
+      logout();
+      setError('登录已过期，请重新登录');
+    };
+
+    window.addEventListener('auth:unauthorized', handleUnauthorized);
+    
+    initializeAuth();
+
+    // 清理事件监听器
+    return () => {
+      window.removeEventListener('auth:unauthorized', handleUnauthorized);
+    };
+  }, []);
+
+  // 登录
+  const login = async (email: string, password: string, userType: UserType): Promise<boolean> => {
+    if (!isOnline) {
+      setError('网络连接不可用，请检查网络设置');
+      return false;
+    }
+
+    const loginOperation = async () => {
+      const loginData: LoginRequest = { email, password };
+      const response = await AuthService.login(loginData);
       
-      setUser(newUser);
+      setUser(response.user);
       setCurrentUserType(userType);
       
-      // 保存到localStorage
-      localStorage.setItem('agro_user', JSON.stringify(newUser));
+      // 保存用户类型到localStorage
       localStorage.setItem('agro_user_type', userType);
       
       return true;
+    };
+
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const result = await loginOperation();
+      setLastFailedOperation(null);
+      return result;
+    } catch (error) {
+      handleError(error, loginOperation);
+      return false;
+    } finally {
+      setIsLoading(false);
     }
-    
-    return false;
+  };
+
+  // 注册
+  const register = async (params: RegisterParams): Promise<boolean> => {
+    if (!isOnline) {
+      setError('网络连接不可用，请检查网络设置');
+      return false;
+    }
+
+    const registerOperation = async () => {
+      // 构建注册请求数据
+      const registerData: RegisterRequest = {
+        email: params.email,
+        password: params.password,
+        userName: params.name,
+        userType: mapFrontendUserTypeToApi(params.userType),
+        // 企业相关字段（供应商注册时使用）
+        ...(params.userType === 'supplier' && {
+          companyName: params.companyName,
+          companyType: params.companyType,
+          country: params.country,
+          businessCategories: params.businessCategories,
+          businessScope: params.businessScope,
+          companySize: params.companySize,
+          mainProducts: params.mainProducts,
+          mainSuppliers: params.mainSuppliers,
+          annualImportExportValue: params.annualImportExportValue,
+          registrationNumber: params.registrationNumber,
+          taxNumber: params.taxNumber,
+          businessLicenseUrl: params.businessLicenseUrl,
+          companyPhotosUrls: params.companyPhotosUrls,
+        }),
+      };
+
+      const response = await AuthService.register(registerData);
+      
+      // 注册成功后，如果是个人采购商，直接登录
+      if (params.userType === 'buyer') {
+        // 个人采购商注册后立即可用，尝试自动登录
+        return await login(params.email, params.password, params.userType);
+      } else {
+        // 供应商需要审核，不自动登录
+        setError(`注册成功！${response.message}`);
+        return true;
+      }
+    };
+
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const result = await registerOperation();
+      setLastFailedOperation(null);
+      return result;
+    } catch (error) {
+      handleError(error, registerOperation);
+      return false;
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   // 登出
   const logout = () => {
+    AuthService.logout();
     setUser(null);
     setCurrentUserType('buyer'); // 重置为默认的采购商
-    localStorage.removeItem('agro_user');
-    localStorage.removeItem('agro_user_type');
+    setError(null);
   };
 
   // 切换用户类型
@@ -126,19 +290,31 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.setItem('agro_user_type', userType);
   };
 
+  // 清除错误
+  const clearError = () => {
+    setError(null);
+  };
+
   // 判断是否可以切换到供应商模式
   // 规则：供应商注册的用户可以体验采购商模式，但采购商注册的用户不能切换到供应商
-  const canSwitchToSupplier = user ? user.userType === 'supplier' : true;
+  const canSwitchToSupplier = user ? 
+    mapApiUserTypeToFrontend(user.userType) === 'supplier' : 
+    true;
 
   const value: AuthContextType = {
     user,
     isLoggedIn: !!user,
     currentUserType,
+    isLoading,
+    error,
+    isOnline,
     login,
     register,
     logout,
     switchUserType,
-    canSwitchToSupplier
+    canSwitchToSupplier,
+    clearError,
+    retryLastOperation,
   };
 
   return (

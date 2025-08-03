@@ -102,12 +102,6 @@ Current routes are minimal:
 
 When adding new routes, always place them above the catch-all `*` route.
 
-## Component Conventions
-
-- Use TypeScript interfaces for props
-- Follow shadcn/ui patterns for new UI components
-- Maintain user type props for mode-specific behavior
-- Use the established folder structure for component organization
 
 #### Standard Background Pattern
 All new pages should use the following background pattern for consistency:
