@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/contexts/MockAuthContext";
 
 interface SidebarProps {
   userType: "buyer" | "supplier";
@@ -19,6 +20,7 @@ interface SidebarProps {
 }
 
 export const Sidebar = ({ userType, activeItem, onItemClick }: SidebarProps) => {
+  const { user, isLoggedIn } = useAuth();
   const buyerMenuItems = [
     {
       id: "ai-query",
@@ -113,12 +115,27 @@ export const Sidebar = ({ userType, activeItem, onItemClick }: SidebarProps) => 
 
   return (
     <aside className="w-64 bg-card border-r border-border h-[calc(100vh-4rem)] flex flex-col">
-      <div className="p-4 border-b border-border flex justify-center items-center">
-        <img 
-          src="/logo.png" 
-          alt="AgroChainHub Logo" 
-          className="w-4/5 h-auto object-contain"
-        />
+      {/* Logo and Company Info - 从Header移过来 */}
+      <div className="p-4 border-b border-border">
+        <div className="flex items-center space-x-3 mb-2">
+          <div className="w-9 h-9 bg-gradient-to-br from-primary to-agro-blue rounded-lg flex items-center justify-center flex-shrink-0">
+            <span className="text-white font-bold text-sm">A</span>
+          </div>
+          <div className="flex flex-col">
+            <h1 className="text-lg font-bold text-foreground leading-tight">
+              {userType === "buyer" ? "采购商中心" : "供应商中心"}
+            </h1>
+            <p className="text-xs text-muted-foreground leading-tight">
+              智慧农化采购平台
+            </p>
+          </div>
+        </div>
+        
+        {isLoggedIn && (
+          <div className="text-xs text-muted-foreground bg-muted/50 rounded px-2 py-1">
+            欢迎回来，{user?.name}
+          </div>
+        )}
       </div>
       
       <nav className="flex-1 p-4 space-y-2">

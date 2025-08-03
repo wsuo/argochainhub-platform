@@ -126,3 +126,160 @@ All colors MUST be HSL.
     @apply bg-background text-foreground;
   }
 }
+
+/* Custom animations */
+@layer utilities {
+  @keyframes sparkle {
+    0%, 100% {
+      opacity: 1;
+      box-shadow: 0 0 10px hsl(152 60% 35% / 0.3);
+    }
+    50% {
+      opacity: 0.8;
+      box-shadow: 0 0 20px hsl(152 60% 35% / 0.6), 0 0 30px hsl(210 100% 50% / 0.4);
+    }
+  }
+
+  @keyframes twinkle {
+    0%, 100% {
+      opacity: 0.2;
+      transform: scale(0.8);
+    }
+    50% {
+      opacity: 1;
+      transform: scale(1.2);
+    }
+  }
+
+  @keyframes shimmer {
+    0% {
+      transform: translateX(-100%);
+    }
+    50% {
+      transform: translateX(100%);
+    }
+    100% {
+      transform: translateX(100%);
+    }
+  }
+
+  @keyframes border-glow {
+    0% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+    100% {
+      background-position: 0% 50%;
+    }
+  }
+
+  @keyframes border-trace-smooth {
+    0% {
+      offset-distance: 0%;
+    }
+    100% {
+      offset-distance: 100%;
+    }
+  }
+
+  /* 发光边框效果 */
+  .glow-border {
+    position: relative;
+    border: 2px solid transparent;
+    border-radius: 0.75rem;
+    background: linear-gradient(white, white) padding-box,
+                linear-gradient(45deg, 
+                  hsl(214 32% 91% / 0.8),
+                  hsl(152 60% 35% / 0.6),
+                  hsl(210 100% 50% / 0.8),
+                  hsl(152 60% 35% / 0.6),
+                  hsl(214 32% 91% / 0.8)
+                ) border-box;
+    background-size: 100% 100%, 400% 400%;
+    animation: border-glow-pulse 3s ease-in-out infinite;
+  }
+
+  .glow-border::before {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    border-radius: 0.75rem;
+    padding: 1px;
+    background: linear-gradient(45deg, 
+      hsl(152 60% 35% / 0.3),
+      hsl(210 100% 50% / 0.5),
+      hsl(152 60% 35% / 0.8),
+      hsl(210 100% 50% / 0.5),
+      hsl(152 60% 35% / 0.3)
+    );
+    background-size: 400% 400%;
+    animation: border-glow-rotate 4s linear infinite;
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask-composite: xor;
+    pointer-events: none;
+    z-index: -1;
+  }
+
+  @keyframes border-glow-pulse {
+    0%, 100% {
+      box-shadow: 
+        0 0 5px hsl(152 60% 35% / 0.3),
+        0 0 10px hsl(210 100% 50% / 0.2);
+    }
+    50% {
+      box-shadow: 
+        0 0 15px hsl(152 60% 35% / 0.6),
+        0 0 25px hsl(210 100% 50% / 0.4),
+        0 0 35px hsl(152 60% 35% / 0.2);
+    }
+  }
+
+  @keyframes border-glow-rotate {
+    0% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+    100% {
+      background-position: 0% 50%;
+    }
+  }
+
+  .glow-border-focused {
+    animation: border-glow-pulse 1.5s ease-in-out infinite;
+  }
+
+  .glow-border-focused::before {
+    animation: border-glow-rotate 2s linear infinite;
+    background: linear-gradient(45deg, 
+      hsl(152 60% 35% / 0.5),
+      hsl(210 100% 50% / 0.8),
+      hsl(152 60% 35% / 1),
+      hsl(210 100% 50% / 0.8),
+      hsl(152 60% 35% / 0.5)
+    );
+  }
+
+  .animate-sparkle {
+    animation: sparkle 3s ease-in-out infinite;
+  }
+
+  .animate-twinkle {
+    animation: twinkle 2s ease-in-out infinite;
+  }
+
+  .animate-shimmer {
+    animation: shimmer 2s ease-in-out infinite;
+  }
+
+  .animate-border-glow {
+    animation: border-glow 3s ease-in-out infinite;
+  }
+
+  .animate-border-glow-move {
+    animation: border-glow-move 4s linear infinite;
+  }
+}

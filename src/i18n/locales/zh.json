@@ -10,7 +10,32 @@
     "companyInfo": "公司信息",
     "membership": "会员资格",
     "upgradeMembership": "升级会员",
-    "getMorePrivileges": "升级获得更多权限"
+    "getMorePrivileges": "升级获得更多权限",
+    "login": "登录",
+    "register": "注册",
+    "loginRegister": "登录/注册"
+  },
+  "auth": {
+    "welcomeTitle": "欢迎来到AgroChainHub",
+    "welcomeSubtitle": "您的智慧农化采购伙伴",
+    "iAmSupplier": "我是供应商",
+    "loginTab": "登录",
+    "registerTab": "注册",
+    "name": "姓名",
+    "nameRequired": "请输入您的姓名",
+    "emailPhone": "邮箱/手机号",
+    "emailPhoneRequired": "请输入邮箱或手机号",
+    "password": "密码",
+    "passwordRequired": "请输入密码",
+    "loginButton": "立即登录",
+    "registerButton": "立即注册",
+    "loggingIn": "登录中...",
+    "registering": "注册中...",
+    "termsAndConditions": "服务条款",
+    "privacyPolicy": "隐私政策",
+    "agreementText": "继续使用即表示您同意我们的",
+    "and": "和",
+    "backToHome": "← 返回主页"
   },
   "userType": {
     "buyer": "采购商",
@@ -18,7 +43,12 @@
     "buyerCenter": "采购商中心",
     "supplierCenter": "供应商中心",
     "buyerTagline": "智能采购，高效对接",
-    "supplierTagline": "精准推广，订单转化"
+    "supplierTagline": "精准推广，订单转化",
+    "buyerExperience": "采购商体验",
+    "supplierView": "供应商视图",
+    "backToSupplierCenter": "返回供应商中心",
+    "experiencingBuyerMode": "正在体验采购商模式",
+    "canSwitchBack": "您可以随时切换回供应商中心"
   },
   "navigation": {
     "aiQuery": "AI农药查询",
@@ -51,6 +81,19 @@
   "features": {
     "coreBuyerFeatures": "核心采购功能",
     "coreSupplierFeatures": "核心供应商功能"
+  },
+  "chat": {
+    "aiQueryTitle": "AI农药智能查询",
+    "aiQuerySubtitle": "基于专业农药知识库的智能问答",
+    "aiQueryDescription": "基于专业农药知识库，为您提供精准、快速的智能问答服务",
+    "inputPlaceholder": "请输入您的问题，例如：推荐用于小麦锈病的杀菌剂...",
+    "chatPlaceholder": "请输入您的问题...",
+    "sendQuery": "发送查询",
+    "querying": "查询中...",
+    "aiReady": "AI助手已就绪",
+    "aiReadyDesc": "请输入您的农药相关问题，我会为您提供专业解答",
+    "exampleQueries": "常用查询示例：",
+    "keyboardShortcut": "按Enter发送，Shift+Enter换行"
   },
   "stats": {
     "products": "农药产品",
