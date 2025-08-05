@@ -44,3 +44,5 @@ export const ConversationHistoryPage = () => {
     </main>
   );
 };
+
+export default ConversationHistoryPage;

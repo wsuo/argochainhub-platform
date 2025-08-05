@@ -1,6 +1,8 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+本文件提供Claude Code (claude.ai/code)在处理本项目代码时的指导。
+
+本系统是面向C端用户的，请你永远都要将用户体验放在第一位。界面UI、组件设计语言都要统一。
 
 本项目全局支持 中文/英语/西语 三种语言类型的切换，新开发内容需要考虑多语言 @/hooks/useLanguage。
 单个文件的行数不要太长，尽量不要超过一千行代码，如果超出了，考虑拆分代码。
@@ -188,3 +190,34 @@ Ensure `bg-gradient-radial` is available in your CSS:
    - Use dot notation: `section.subsection.item`
    - Be descriptive: `navigation.aiQuery` not `nav.ai`
    - Group related translations together
+
+## Dictionary Service (字典服务)
+
+### Usage
+The project includes a unified dictionary service for fetching standardized data from backend dictionary APIs.
+
+```typescript
+import { dictionaryService } from '@/services/dictionaryService';
+
+// Get dictionary data by type
+const categories = await dictionaryService.getDictionary('product_category');
+
+// Shorthand for product categories
+const productCategories = await dictionaryService.getProductCategories();
+```
+
+### Integration with TanStack Query
+```typescript
+const { data: categoryDict = [] } = useQuery({
+  queryKey: ['product-categories-dict'],
+  queryFn: () => dictionaryService.getProductCategories(),
+  staleTime: 10 * 60 * 1000, // 10min cache for dictionary data
+});
+```
+
+### API Convention
+- **Endpoint**: `GET /api/v1/dictionaries/{dictType}`
+- **Dictionary types**: `product_category`, etc.
+- **Usage**: Use `key` for API queries, `label` for display text
+
+See implementation in `ProductsPage.tsx` for complete usage example.

@@ -27,11 +27,15 @@ i18n
   // Init i18next
   .init({
     resources,
-    fallbackLng: 'en',
-    debug: false,
+    fallbackLng: 'zh',
+    debug: false, // 关闭调试模式
     
     interpolation: {
-      escapeValue: false // React already escapes values
+      escapeValue: false, // React already escapes values
+      format: function(value, format, lng) {
+        if (format === 'number') return new Intl.NumberFormat(lng).format(value);
+        return value;
+      }
     },
     
     detection: {

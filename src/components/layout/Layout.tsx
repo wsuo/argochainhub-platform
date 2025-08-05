@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Header } from "./Header";
 import { Sidebar } from "./Sidebar";
 import { ConversationHistoryPage } from "@/pages/ConversationHistoryPage";
@@ -10,8 +11,46 @@ interface LayoutProps {
 
 export const Layout = ({ children, userType = "buyer" }: LayoutProps) => {
   const [activeItem, setActiveItem] = useState("ai-query");
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  // 根据当前路径确定活跃菜单项
+  const getActiveItemFromPath = (pathname: string) => {
+    if (pathname.startsWith('/products')) return 'products';
+    if (pathname === '/conversation-history') return 'conversation-history';
+    return 'ai-query';
+  };
+
+  const handleItemClick = (itemId: string) => {
+    setActiveItem(itemId);
+    
+    // 处理路由导航
+    switch (itemId) {
+      case 'products':
+        navigate('/products');
+        break;
+      case 'conversation-history':
+        navigate('/conversation-history');
+        break;
+      case 'ai-query':
+        navigate('/');
+        break;
+      default:
+        // 其他菜单项暂时保持在当前页面
+        console.log(`Menu item clicked: ${itemId}`);
+        break;
+    }
+  };
+
+  // 如果是特定路由，直接渲染children，不使用Layout的内部路由逻辑
+  const isExternalRoute = location.pathname.startsWith('/products') || location.pathname === '/auth' || location.pathname === '/supplier' || location.pathname === '/conversation-history';
+  const currentActiveItem = getActiveItemFromPath(location.pathname);
 
   const renderContent = () => {
+    if (isExternalRoute) {
+      return children;
+    }
+
     switch (activeItem) {
       case "conversation-history":
         return <ConversationHistoryPage />;
@@ -38,8 +77,8 @@ export const Layout = ({ children, userType = "buyer" }: LayoutProps) => {
       <div className="flex h-[calc(100vh-4rem)]">
         <Sidebar 
           userType={userType} 
-          activeItem={activeItem}
-          onItemClick={setActiveItem}
+          activeItem={isExternalRoute ? currentActiveItem : activeItem}
+          onItemClick={handleItemClick}
         />
         {renderContent()}
       </div>

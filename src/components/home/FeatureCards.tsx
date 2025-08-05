@@ -1,6 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Database, FileText, TestTube, ClipboardList, ShoppingCart, Building2 } from "lucide-react";
+import { Link } from "react-router-dom";
 import aiIcon from "@/assets/ai-icon.jpg";
 import productsIcon from "@/assets/products-icon.jpg";
 import inquiryIcon from "@/assets/inquiry-icon.jpg";
@@ -18,7 +19,8 @@ export const FeatureCards = ({ userType }: FeatureCardsProps) => {
       icon: Database,
       image: productsIcon,
       stats: "20,000+ 产品",
-      buttonText: "浏览产品"
+      buttonText: "浏览产品",
+      link: "/products"
     },
     {
       id: "inquiries",
@@ -138,9 +140,19 @@ export const FeatureCards = ({ userType }: FeatureCardsProps) => {
                 variant="outline"
                 size="sm"
                 className="w-full group-hover:bg-primary group-hover:text-primary-foreground group-hover:border-primary transition-all text-xs h-7 lg:h-8 mt-auto"
+                asChild={!!feature.link}
               >
-                <span className="truncate">{feature.buttonText}</span>
-                <ArrowRight className="w-3 h-3 ml-1 group-hover:translate-x-1 transition-transform flex-shrink-0" />
+                {feature.link ? (
+                  <Link to={feature.link}>
+                    <span className="truncate">{feature.buttonText}</span>
+                    <ArrowRight className="w-3 h-3 ml-1 group-hover:translate-x-1 transition-transform flex-shrink-0" />
+                  </Link>
+                ) : (
+                  <>
+                    <span className="truncate">{feature.buttonText}</span>
+                    <ArrowRight className="w-3 h-3 ml-1 group-hover:translate-x-1 transition-transform flex-shrink-0" />
+                  </>
+                )}
               </Button>
             </CardContent>
           </Card>
