@@ -10,19 +10,22 @@ interface MessageContentProps {
 }
 
 export const MessageContent = ({ content, isStreaming, sender, useTypewriter = false }: MessageContentProps) => {
+  // 确保 content 不为空
+  const safeContent = content || '';
+  
   // 只有明确指定使用打字机效果且正在流式传输时才使用
-  const shouldUseTypewriter = useTypewriter && sender === 'ai' && isStreaming && content.length > 0;
+  const shouldUseTypewriter = useTypewriter && sender === 'ai' && isStreaming && safeContent.length > 0;
   
   const { displayedText, isTyping } = useTypewriterEffect(
-    shouldUseTypewriter ? content : '',
+    shouldUseTypewriter ? safeContent : '',
     {
       speed: 15, // 打字速度，越小越快 - 优化后的速度
-      chunkSize: content.length > 500 ? 8 : 3, // 长文本使用更大的分块
+      chunkSize: safeContent.length > 500 ? 8 : 3, // 长文本使用更大的分块
     }
   );
   
   // 当不使用打字机效果时显示原文，使用打字机效果时显示逐步显示的文本
-  const textToShow = shouldUseTypewriter ? displayedText : content;
+  const textToShow = shouldUseTypewriter ? displayedText : safeContent;
 
   // 用户消息使用普通文本，AI消息使用Markdown渲染
   if (sender === 'user') {

@@ -103,24 +103,24 @@ export const FeatureCards = ({ userType }: FeatureCardsProps) => {
   const features = userType === "buyer" ? buyerFeatures : supplierFeatures;
 
   return (
-    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+    <div className="grid grid-cols-3 lg:grid-cols-3 gap-2 lg:gap-3">
       {features.map((feature) => {
         const Icon = feature.icon;
         
         return (
-          <Card key={feature.id} className="group hover:shadow-lg transition-all duration-300 border-border/50 hover:border-primary/30">
-            <CardHeader className="pb-2">
+          <Card key={feature.id} className="group hover:shadow-lg transition-all duration-300 border-border/50 hover:border-primary/30 flex flex-col">
+            <CardHeader className="pb-1 p-2 lg:p-4">
               <div className="flex items-start justify-between">
-                <div className="flex items-center space-x-3">
-                  <div className="w-8 h-8 bg-gradient-to-br from-primary/20 to-agro-blue/20 rounded-lg flex items-center justify-center group-hover:from-primary/30 group-hover:to-agro-blue/30 transition-colors">
-                    <Icon className="w-4 h-4 text-primary" />
+                <div className="flex items-center space-x-2 min-w-0">
+                  <div className="w-6 h-6 lg:w-8 lg:h-8 bg-gradient-to-br from-primary/20 to-agro-blue/20 rounded-lg flex items-center justify-center group-hover:from-primary/30 group-hover:to-agro-blue/30 transition-colors flex-shrink-0">
+                    <Icon className="w-3 h-3 lg:w-4 lg:h-4 text-primary" />
                   </div>
-                  <div>
-                    <CardTitle className="text-base group-hover:text-primary transition-colors">
+                  <div className="min-w-0">
+                    <CardTitle className="text-xs lg:text-sm group-hover:text-primary transition-colors truncate">
                       {feature.title}
                     </CardTitle>
                     {feature.stats && (
-                      <div className="text-xs text-agro-blue font-medium mt-0.5">
+                      <div className="text-xs text-agro-blue font-medium mt-0.5 truncate">
                         {feature.stats}
                       </div>
                     )}
@@ -129,18 +129,18 @@ export const FeatureCards = ({ userType }: FeatureCardsProps) => {
               </div>
             </CardHeader>
             
-            <CardContent className="space-y-3 pt-0">
-              <CardDescription className="text-sm leading-relaxed">
+            <CardContent className="pt-0 p-2 lg:p-4 lg:pt-0 flex-1 flex flex-col">
+              <CardDescription className="text-xs leading-relaxed line-clamp-2 hidden lg:block flex-1">
                 {feature.description}
               </CardDescription>
               
               <Button
                 variant="outline"
                 size="sm"
-                className="w-full group-hover:bg-primary group-hover:text-primary-foreground group-hover:border-primary transition-all"
+                className="w-full group-hover:bg-primary group-hover:text-primary-foreground group-hover:border-primary transition-all text-xs h-7 lg:h-8 mt-auto"
               >
-                {feature.buttonText}
-                <ArrowRight className="w-3 h-3 ml-2 group-hover:translate-x-1 transition-transform" />
+                <span className="truncate">{feature.buttonText}</span>
+                <ArrowRight className="w-3 h-3 ml-1 group-hover:translate-x-1 transition-transform flex-shrink-0" />
               </Button>
             </CardContent>
           </Card>

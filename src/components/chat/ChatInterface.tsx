@@ -467,19 +467,19 @@ export const ChatInterface = ({ onToggle }: ChatInterfaceProps) => {
   if (isExpanded) {
     // 展开的聊天界面
     return (
-      <div className="h-[80vh] flex flex-col">
+      <div className="h-[70vh] md:h-[75vh] xl:h-[80vh] flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-border">
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-primary to-agro-blue rounded-lg flex items-center justify-center">
-              <Sparkles className="w-5 h-5 text-white" />
+        <div className="flex items-center justify-between p-3 md:p-4 border-b border-border">
+          <div className="flex items-center space-x-2 md:space-x-3 min-w-0">
+            <div className="w-8 h-8 md:w-10 md:h-10 bg-gradient-to-br from-primary to-agro-blue rounded-lg flex items-center justify-center flex-shrink-0">
+              <Sparkles className="w-4 h-4 md:w-5 md:h-5 text-white" />
             </div>
-            <div>
-              <h3 className="text-lg font-semibold text-foreground">AI农药智能查询</h3>
-              <p className="text-sm text-muted-foreground">基于专业农药知识库的智能问答</p>
+            <div className="min-w-0">
+              <h3 className="text-base md:text-lg font-semibold text-foreground truncate">AI农药智能查询</h3>
+              <p className="text-xs md:text-sm text-muted-foreground truncate">基于专业农药知识库的智能问答</p>
             </div>
           </div>
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-1 md:space-x-2 flex-shrink-0">
             {messages.length > 0 && (
               <Button
                 variant="ghost"
@@ -505,17 +505,17 @@ export const ChatInterface = ({ onToggle }: ChatInterfaceProps) => {
         {/* Messages */}
         <ScrollArea 
           ref={scrollAreaRef} 
-          className="flex-1 p-4"
+          className="flex-1 p-3 md:p-4"
           style={{ scrollBehavior: 'auto' }}
         >
-          <div className="space-y-4">
+          <div className="space-y-3 md:space-y-4">
             {messages.length === 0 && !isLoadingHistory && (
-              <div className="text-center py-8">
-                <div className="w-16 h-16 bg-gradient-to-br from-primary/20 to-agro-blue/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Bot className="w-8 h-8 text-primary" />
+              <div className="text-center py-6 md:py-8">
+                <div className="w-12 h-12 md:w-16 md:h-16 bg-gradient-to-br from-primary/20 to-agro-blue/20 rounded-full flex items-center justify-center mx-auto mb-3 md:mb-4">
+                  <Bot className="w-6 h-6 md:w-8 md:h-8 text-primary" />
                 </div>
-                <h4 className="text-lg font-medium text-foreground mb-2">AI助手已就绪</h4>
-                <p className="text-muted-foreground mb-6">请输入您的农药相关问题，我会为您提供专业解答</p>
+                <h4 className="text-base md:text-lg font-medium text-foreground mb-2">AI助手已就绪</h4>
+                <p className="text-sm text-muted-foreground mb-4 md:mb-6">请输入您的农药相关问题，我会为您提供专业解答</p>
                 
                 {/* 示例查询 */}
                 <div className="space-y-2">
@@ -551,16 +551,16 @@ export const ChatInterface = ({ onToggle }: ChatInterfaceProps) => {
                 key={message.id}
                 className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
               >
-                <div className={`flex items-start space-x-2 max-w-[80%] ${message.sender === 'user' ? 'flex-row-reverse space-x-reverse' : ''}`}>
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                <div className={`flex items-start space-x-2 max-w-[85%] md:max-w-[80%] ${message.sender === 'user' ? 'flex-row-reverse space-x-reverse' : ''}`}>
+                  <div className={`w-6 h-6 md:w-8 md:h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
                     message.sender === 'user' 
                       ? 'bg-primary text-primary-foreground' 
                       : 'bg-muted'
                   }`}>
                     {message.sender === 'user' ? (
-                      <User className="w-4 h-4" />
+                      <User className="w-3 h-3 md:w-4 md:h-4" />
                     ) : (
-                      <Bot className="w-4 h-4" />
+                      <Bot className="w-3 h-3 md:w-4 md:h-4" />
                     )}
                   </div>
                   <div className="flex flex-col space-y-2">
@@ -573,7 +573,7 @@ export const ChatInterface = ({ onToggle }: ChatInterfaceProps) => {
                     )}
                     {/* 只有当showBubble为true时才显示气泡内容 */}
                     {(message.sender === 'user' || message.showBubble !== false) && (
-                      <div className={`rounded-lg p-3 ${
+                      <div className={`rounded-lg p-2 md:p-3 ${
                         message.sender === 'user'
                           ? 'bg-primary text-primary-foreground'
                           : 'bg-muted'
@@ -627,14 +627,14 @@ export const ChatInterface = ({ onToggle }: ChatInterfaceProps) => {
         )}
 
         {/* Input */}
-        <div className="p-4 border-t border-border">
+        <div className="p-3 md:p-4 border-t border-border">
           <div className="flex space-x-2">
             <Textarea
               ref={textareaRef}
               placeholder="请输入您的问题..."
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              className="min-h-[44px] resize-none border-primary/30 focus:border-primary"
+              className="min-h-[40px] md:min-h-[44px] resize-none border-primary/30 focus:border-primary text-sm md:text-base"
               onKeyPress={(e) => {
                 if (e.key === 'Enter' && !e.shiftKey) {
                   e.preventDefault();
@@ -645,9 +645,10 @@ export const ChatInterface = ({ onToggle }: ChatInterfaceProps) => {
             <Button 
               onClick={handleSubmit}
               disabled={!query.trim() || isLoading}
-              className="bg-gradient-to-r from-primary to-primary-dark hover:from-primary-dark hover:to-primary"
+              className="bg-gradient-to-r from-primary to-primary-dark hover:from-primary-dark hover:to-primary flex-shrink-0"
+              size="sm"
             >
-              <Send className="w-4 h-4" />
+              <Send className="w-3 h-3 md:w-4 md:h-4" />
             </Button>
           </div>
           <div className="text-xs text-muted-foreground mt-2">
@@ -660,18 +661,18 @@ export const ChatInterface = ({ onToggle }: ChatInterfaceProps) => {
 
   // 折叠状态的AI查询框
   return (
-    <Card className="p-6 bg-background border border-border shadow-sm rounded-xl">
+    <Card className="p-4 md:p-6 bg-background border border-border shadow-sm rounded-xl">
       {/* 头部区域 */}
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center space-x-3">
-          <div className="relative w-10 h-10 bg-gradient-to-br from-primary to-agro-blue rounded-lg flex items-center justify-center">
-            <Sparkles className="w-5 h-5 text-white" />
+      <div className="flex items-center justify-between mb-3 md:mb-4">
+        <div className="flex items-center space-x-2 md:space-x-3 min-w-0">
+          <div className="relative w-8 h-8 md:w-10 md:h-10 bg-gradient-to-br from-primary to-agro-blue rounded-lg flex items-center justify-center flex-shrink-0">
+            <Sparkles className="w-4 h-4 md:w-5 md:h-5 text-white" />
             {/* 简化的闪亮效果 */}
             <div className="absolute -top-1 -right-1 w-2 h-2 bg-yellow-400 rounded-full animate-pulse"></div>
           </div>
-          <div>
-            <h3 className="text-lg font-semibold text-foreground">AI农药智能查询</h3>
-            <p className="text-sm text-muted-foreground">专业问答</p>
+          <div className="min-w-0">
+            <h3 className="text-base md:text-lg font-semibold text-foreground truncate">AI农药智能查询</h3>
+            <p className="text-xs md:text-sm text-muted-foreground truncate">专业问答</p>
           </div>
         </div>
         
@@ -684,15 +685,15 @@ export const ChatInterface = ({ onToggle }: ChatInterfaceProps) => {
               setIsExpanded(true);
               onToggle?.(true);
             }}
-            className="text-primary hover:bg-primary/10 border-primary/30"
+            className="text-primary hover:bg-primary/10 border-primary/30 flex-shrink-0"
           >
             <MessageSquare className="w-4 h-4 mr-2" />
-            查看对话
+            <span className="hidden sm:inline">查看对话</span>
           </Button>
         )}
       </div>
       
-      <div className="space-y-4">
+      <div className="space-y-3 md:space-y-4">
         {/* 输入区域 */}
         <div>
           <div className={cn(
@@ -706,7 +707,7 @@ export const ChatInterface = ({ onToggle }: ChatInterfaceProps) => {
               onChange={(e) => setQuery(e.target.value)}
               onFocus={() => setIsFocused(true)}
               onBlur={() => setIsFocused(false)}
-              className="w-full min-h-[100px] resize-none border-0 bg-transparent rounded-xl focus:ring-0 focus:outline-none transition-all duration-300"
+              className="w-full min-h-[80px] md:min-h-[100px] resize-none border-0 bg-transparent rounded-xl focus:ring-0 focus:outline-none transition-all duration-300 text-sm md:text-base"
               onKeyPress={(e) => {
                 if (e.key === 'Enter' && !e.shiftKey) {
                   e.preventDefault();
@@ -724,14 +725,15 @@ export const ChatInterface = ({ onToggle }: ChatInterfaceProps) => {
             <Button 
               onClick={handleSubmit}
               disabled={!query.trim() || isLoading}
-              className="bg-gradient-to-r from-primary to-agro-blue hover:from-primary/90 hover:to-agro-blue/90 h-10 px-4 rounded-xl self-end"
+              className="bg-gradient-to-r from-primary to-agro-blue hover:from-primary/90 hover:to-agro-blue/90 h-8 md:h-10 px-3 md:px-4 rounded-xl self-end"
+              size="sm"
             >
               {isLoading ? (
-                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                <div className="w-3 h-3 md:w-4 md:h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
               ) : (
                 <>
-                  <Send className="w-4 h-4 mr-2" />
-                  发送查询
+                  <Send className="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-2" />
+                  <span className="text-xs md:text-sm">发送查询</span>
                 </>
               )}
             </Button>
@@ -739,7 +741,7 @@ export const ChatInterface = ({ onToggle }: ChatInterfaceProps) => {
         </div>
         
         {/* 示例查询区域 */}
-        <div className="border-t border-border pt-4">
+        <div className="border-t border-border pt-3 md:pt-4">
           <Button
             variant="ghost"
             size="sm"
@@ -755,7 +757,7 @@ export const ChatInterface = ({ onToggle }: ChatInterfaceProps) => {
           </Button>
           
           {showExamples && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-3 max-h-32 overflow-y-auto">
+            <div className="grid grid-cols-1 gap-2 mt-3 max-h-28 md:max-h-32 overflow-y-auto">
               {exampleQueries.map((example, index) => (
                 <Button
                   key={index}

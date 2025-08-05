@@ -66,8 +66,17 @@ export const ConversationDetailView = ({
   };
 
   // 格式化费用
-  const formatCost = (cost: number) => {
-    return cost > 0 ? `$${cost.toFixed(4)}` : '免费';
+  const formatCost = (cost: number | string | null | undefined) => {
+    // 确保 cost 是有效数字
+    const numericCost = typeof cost === 'number' ? cost : parseFloat(String(cost || '0'));
+    return (!isNaN(numericCost) && numericCost > 0) ? `$${numericCost.toFixed(4)}` : '免费';
+  };
+
+  // 格式化延迟
+  const formatLatency = (latency: number | string | null | undefined) => {
+    // 确保 latency 是有效数字
+    const numericLatency = typeof latency === 'number' ? latency : parseFloat(String(latency || '0'));
+    return !isNaN(numericLatency) ? `${numericLatency.toFixed(2)}s` : '未知';
   };
 
   // 组件挂载时加载数据
@@ -113,16 +122,16 @@ export const ConversationDetailView = ({
   }
 
   return (
-    <div className={className}>
-      {/* 头部 */}
-      <div className="flex items-center justify-between mb-6">
+    <div className={`${className} flex flex-col`}>
+      {/* 头部 - 固定不滚动 */}
+      <div className="flex items-center justify-between mb-4 lg:mb-6 flex-shrink-0">
         <div className="flex items-center">
           <Button variant="ghost" size="sm" onClick={onBack} className="mr-3">
             <ArrowLeft className="w-4 h-4 mr-2" />
             返回
           </Button>
           <div>
-            <h2 className="text-xl font-semibold text-foreground">
+            <h2 className="text-lg lg:text-xl font-semibold text-foreground">
               {conversation.title || "AI对话详情"}
             </h2>
             <p className="text-sm text-muted-foreground">
@@ -132,9 +141,12 @@ export const ConversationDetailView = ({
         </div>
       </div>
 
-      {/* 统计信息卡片 */}
-      <Card className="p-4 mb-6">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      {/* 可滚动内容区域 */}
+      <div className="flex-1 overflow-y-auto space-y-4 lg:space-y-6 pr-2">{/* 添加右边距避免滚动条遮挡内容 */}
+
+        {/* 统计信息卡片 */}
+        <Card className="p-3 lg:p-4">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4">
           <div className="text-center">
             <div className="flex items-center justify-center w-10 h-10 bg-primary/10 rounded-lg mx-auto mb-2">
               <MessageSquare className="w-5 h-5 text-primary" />
@@ -166,36 +178,36 @@ export const ConversationDetailView = ({
         </div>
       </Card>
 
-      {/* 对话消息 */}
-      <Card className="flex-1">
-        <div className="p-4 border-b border-border">
-          <h3 className="font-medium text-foreground">对话内容</h3>
-        </div>
-        <ScrollArea className="h-[600px]">
-          <div className="p-4 space-y-4">
+        {/* 对话消息 */}
+        <Card className="flex-1 min-h-0">
+          <div className="p-3 lg:p-4 border-b border-border">
+            <h3 className="font-medium text-foreground">对话内容</h3>
+          </div>
+          <ScrollArea className="h-[50vh] lg:h-[60vh]">
+            <div className="p-3 lg:p-4 space-y-3 lg:space-y-4">
             {conversation.messages.map((message, index) => (
               <div
                 key={message.id}
                 className={`flex ${message.messageType === 'user_query' ? 'justify-end' : 'justify-start'}`}
               >
-                <div className={`flex items-start space-x-2 max-w-[80%] ${
+                <div className={`flex items-start space-x-2 max-w-[85%] lg:max-w-[80%] ${
                   message.messageType === 'user_query' ? 'flex-row-reverse space-x-reverse' : ''
                 }`}>
                   {/* 头像 */}
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                  <div className={`w-6 h-6 lg:w-8 lg:h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
                     message.messageType === 'user_query' 
                       ? 'bg-primary text-primary-foreground' 
                       : 'bg-muted'
                   }`}>
                     {message.messageType === 'user_query' ? (
-                      <User className="w-4 h-4" />
+                      <User className="w-3 h-3 lg:w-4 lg:h-4" />
                     ) : (
-                      <Bot className="w-4 h-4" />
+                      <Bot className="w-3 h-3 lg:w-4 lg:h-4" />
                     )}
                   </div>
                   
                   {/* 消息内容 */}
-                  <div className={`rounded-lg p-3 ${
+                  <div className={`rounded-lg p-2 lg:p-3 ${
                     message.messageType === 'user_query'
                       ? 'bg-primary text-primary-foreground'
                       : 'bg-muted'
@@ -225,7 +237,7 @@ export const ConversationDetailView = ({
           <div className="p-4">
             {conversation.usageStatistics.map((usage, index) => (
               <div key={usage.id} className="mb-4 last:mb-0">
-                <div className="grid grid-cols-2 md:grid-cols-5 gap-3 text-sm">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-2 lg:gap-3 text-xs lg:text-sm">
                   <div>
                     <span className="text-muted-foreground">输入Tokens:</span>
                     <span className="ml-2 font-medium">{usage.promptTokens}</span>
@@ -240,11 +252,11 @@ export const ConversationDetailView = ({
                   </div>
                   <div>
                     <span className="text-muted-foreground">费用:</span>
-                    <span className="ml-2 font-medium">${usage.totalPrice.toFixed(4)}</span>
+                    <span className="ml-2 font-medium">{formatCost(usage.totalPrice)}</span>
                   </div>
                   <div>
                     <span className="text-muted-foreground">延迟:</span>
-                    <span className="ml-2 font-medium">{usage.latency.toFixed(2)}s</span>
+                    <span className="ml-2 font-medium">{formatLatency(usage.latency)}</span>
                   </div>
                 </div>
                 {index < conversation.usageStatistics.length - 1 && (
@@ -255,6 +267,8 @@ export const ConversationDetailView = ({
           </div>
         </Card>
       )}
+      
+      </div> {/* 结束滚动容器 */}
     </div>
   );
 };

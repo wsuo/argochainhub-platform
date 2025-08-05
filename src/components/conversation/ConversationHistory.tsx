@@ -93,8 +93,10 @@ export const ConversationHistory = ({ onViewConversation, className }: Conversat
   };
 
   // 格式化费用
-  const formatCost = (cost: number) => {
-    return cost > 0 ? `$${cost.toFixed(4)}` : '免费';
+  const formatCost = (cost: number | string | null | undefined) => {
+    // 确保 cost 是有效数字
+    const numericCost = typeof cost === 'number' ? cost : parseFloat(String(cost || '0'));
+    return (!isNaN(numericCost) && numericCost > 0) ? `$${numericCost.toFixed(4)}` : '免费';
   };
 
   // 组件挂载时加载数据

@@ -127,18 +127,18 @@ export const Sidebar = ({ userType, activeItem, onItemClick }: SidebarProps) => 
   const menuItems = userType === "buyer" ? buyerMenuItems : supplierMenuItems;
 
   return (
-    <aside className="w-64 bg-card border-r border-border h-[calc(100vh-4rem)] flex flex-col">
-      {/* Logo and Company Info - 从Header移过来 */}
-      <div className="p-4 border-b border-border">
-        <div className="flex items-center space-x-3 mb-2">
-          <div className="w-9 h-9 bg-gradient-to-br from-primary to-agro-blue rounded-lg flex items-center justify-center flex-shrink-0">
-            <span className="text-white font-bold text-sm">A</span>
+    <aside className="w-48 lg:w-56 2xl:w-64 bg-card border-r border-border h-[calc(100vh-4rem)] flex flex-col">
+      {/* Logo and Company Info - 响应式调整 */}
+      <div className="p-3 lg:p-4 border-b border-border">
+        <div className="flex items-center space-x-2 lg:space-x-3 mb-2">
+          <div className="w-8 h-8 lg:w-9 lg:h-9 bg-gradient-to-br from-primary to-agro-blue rounded-lg flex items-center justify-center flex-shrink-0">
+            <span className="text-white font-bold text-xs lg:text-sm">A</span>
           </div>
-          <div className="flex flex-col">
-            <h1 className="text-lg font-bold text-foreground leading-tight">
+          <div className="flex flex-col min-w-0">
+            <h1 className="text-sm lg:text-lg font-bold text-foreground leading-tight truncate">
               {userType === "buyer" ? "采购商中心" : "供应商中心"}
             </h1>
-            <p className="text-xs text-muted-foreground leading-tight">
+            <p className="text-xs text-muted-foreground leading-tight truncate">
               智慧农化采购平台
             </p>
           </div>
@@ -146,12 +146,12 @@ export const Sidebar = ({ userType, activeItem, onItemClick }: SidebarProps) => 
         
         {isLoggedIn && (
           <div className="text-xs text-muted-foreground bg-muted/50 rounded px-2 py-1">
-            欢迎回来，{user?.name}
+            <span className="truncate block">欢迎回来，{user?.name}</span>
           </div>
         )}
       </div>
       
-      <nav className="flex-1 p-4 space-y-2">
+      <nav className="flex-1 p-2 lg:p-4 space-y-1 lg:space-y-2 overflow-y-auto">
         {menuItems.map((item) => {
           const Icon = item.icon;
           const isActive = activeItem === item.id;
@@ -161,16 +161,16 @@ export const Sidebar = ({ userType, activeItem, onItemClick }: SidebarProps) => 
               key={item.id}
               variant={isActive ? "default" : "ghost"}
               className={cn(
-                "w-full justify-start h-auto p-3 transition-all duration-200",
+                "w-full justify-start h-7 lg:h-8 2xl:h-auto p-2 lg:p-3 transition-all duration-200 text-left",
                 isActive && "shadow-sm"
               )}
               onClick={() => onItemClick(item.id)}
             >
-              <div className="flex items-center space-x-3 w-full">
+              <div className="flex items-center space-x-2 lg:space-x-3 w-full min-w-0">
                 <Icon className="w-4 h-4 shrink-0" />
-                <div className="text-left">
-                  <div className="font-medium">{item.label}</div>
-                  <div className="text-xs opacity-70">{item.description}</div>
+                <div className="min-w-0 flex-1">
+                  <div className="font-medium text-xs lg:text-sm truncate">{item.label}</div>
+                  <div className="text-xs opacity-70 truncate hidden 2xl:block">{item.description}</div>
                 </div>
               </div>
             </Button>
@@ -178,13 +178,13 @@ export const Sidebar = ({ userType, activeItem, onItemClick }: SidebarProps) => 
         })}
       </nav>
       
-      <div className="p-4 border-t border-border">
-        <div className="bg-gradient-to-r from-primary/10 to-agro-blue/10 rounded-lg p-3">
-          <div className="text-sm font-medium text-foreground">会员计划</div>
-          <div className="text-xs text-muted-foreground mt-1">
+      <div className="p-2 lg:p-4 border-t border-border">
+        <div className="bg-gradient-to-r from-primary/10 to-agro-blue/10 rounded-lg p-2 lg:p-3">
+          <div className="text-xs lg:text-sm font-medium text-foreground">会员计划</div>
+          <div className="text-xs text-muted-foreground mt-1 hidden 2xl:block">
             升级获得更多权限
           </div>
-          <Button size="sm" className="mt-2 w-full">
+          <Button size="sm" className="mt-2 w-full text-xs">
             立即升级
           </Button>
         </div>
