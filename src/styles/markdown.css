@@ -1,0 +1,101 @@
+/* AI消息Markdown样式增强 */
+.ai-message-content {
+  /* 基础样式重置 */
+  @apply text-sm leading-relaxed;
+}
+
+.ai-message-content h1,
+.ai-message-content h2,
+.ai-message-content h3,
+.ai-message-content h4 {
+  @apply text-foreground font-semibold;
+}
+
+.ai-message-content h1 {
+  @apply text-base border-b border-border pb-1 mb-3;
+}
+
+.ai-message-content h2 {
+  @apply text-sm mb-2;
+}
+
+.ai-message-content h3 {
+  @apply text-sm mb-2 text-primary;
+}
+
+.ai-message-content h4 {
+  @apply text-xs mb-1 text-muted-foreground uppercase tracking-wide;
+}
+
+.ai-message-content p {
+  @apply mb-2 text-foreground;
+}
+
+.ai-message-content ul,
+.ai-message-content ol {
+  @apply mb-3 pl-4;
+}
+
+.ai-message-content li {
+  @apply mb-1 text-foreground;
+}
+
+.ai-message-content strong {
+  @apply font-semibold text-foreground;
+}
+
+.ai-message-content em {
+  @apply italic text-muted-foreground;
+}
+
+.ai-message-content code {
+  @apply bg-secondary text-secondary-foreground px-1 py-0.5 rounded text-xs font-mono;
+}
+
+.ai-message-content pre {
+  @apply bg-secondary p-3 rounded-md text-xs overflow-x-auto mb-3;
+}
+
+.ai-message-content blockquote {
+  @apply border-l-4 border-primary/30 pl-3 py-1 bg-muted/30 rounded-r text-muted-foreground italic mb-3;
+}
+
+.ai-message-content table {
+  @apply w-full border-collapse mb-3 text-xs;
+}
+
+.ai-message-content th {
+  @apply border border-border px-2 py-1 bg-muted font-medium text-left;
+}
+
+.ai-message-content td {
+  @apply border border-border px-2 py-1;
+}
+
+.ai-message-content hr {
+  @apply border-border my-3;
+}
+
+.ai-message-content a {
+  @apply text-primary hover:text-primary/80 underline;
+}
+
+/* 特殊元素样式 */
+.ai-message-content .emoji {
+  @apply inline-block text-base;
+}
+
+/* 响应式调整 */
+@media (max-width: 640px) {
+  .ai-message-content {
+    @apply text-xs;
+  }
+  
+  .ai-message-content h1 {
+    @apply text-sm;
+  }
+  
+  .ai-message-content h2 {
+    @apply text-xs;
+  }
+}

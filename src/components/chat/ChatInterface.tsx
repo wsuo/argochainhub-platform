@@ -1,16 +1,21 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { Send, Sparkles, Bot, User, MinusCircle, ChevronDown, ChevronUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
+import { AISearchService, WorkflowStatus, DifyStreamEvent } from "@/services/aiSearchService";
+import { useTypewriterEffect, throttle } from "@/hooks/useTypewriterEffect";
+import { MessageContent } from "@/components/chat/MessageContent";
+import { WorkflowProgress } from "@/components/chat/WorkflowProgress";
 
 interface Message {
   id: string;
   content: string;
   sender: 'user' | 'ai';
   timestamp: Date;
+  isStreaming?: boolean;
 }
 
 interface ChatInterfaceProps {
@@ -24,35 +29,56 @@ export const ChatInterface = ({ onToggle }: ChatInterfaceProps) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isFocused, setIsFocused] = useState(false);
   const [showExamples, setShowExamples] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [workflowStatus, setWorkflowStatus] = useState<WorkflowStatus>({
+    isRunning: false,
+    completedNodes: []
+  });
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
+  const currentAssistantMessageRef = useRef<string>('');
+  const currentMessageIdRef = useRef<string>('');
+  const streamingContentRef = useRef<string>('');
+
+  // 节流更新消息内容
+  const throttledUpdateMessage = useCallback((messageId: string, content: string, isStreaming: boolean = false) => {
+    console.log('🔄 更新消息内容 - messageId:', messageId, 'content长度:', content.length + '字符', 'isStreaming:', isStreaming);
+    console.log('🔄 消息内容预览:', content.substring(0, 100) + (content.length > 100 ? '...' : ''));
+    setMessages(prev => {
+      const newMessages = prev.map(msg => 
+        msg.id === messageId 
+          ? { ...msg, content, isStreaming }
+          : msg
+      );
+      console.log('🔄 messages状态更新完成, 总消息数:', newMessages.length);
+      return newMessages;
+    });
+  }, []);
+
+  // 使用ref来实现节流 - 增加节流时间，减少打字机重启
+  const lastUpdateTime = useRef(0);
+  const throttledUpdate = useCallback((messageId: string, content: string, isStreaming: boolean = false) => {
+    const now = Date.now();
+    if (now - lastUpdateTime.current > 200) { // 改为200ms节流，减少更新频率
+      console.log('⚡ 节流更新通过 - 内容长度:', content.length, '距离上次更新:', now - lastUpdateTime.current, 'ms');
+      throttledUpdateMessage(messageId, content, isStreaming);
+      lastUpdateTime.current = now;
+    } else {
+      console.log('🚫 节流更新被阻止 - 距离上次更新:', now - lastUpdateTime.current, 'ms', '需要等待:', 200 - (now - lastUpdateTime.current), 'ms');
+    }
+  }, [throttledUpdateMessage]);
 
   // 示例查询
   const exampleQueries = [
     "推荐用于番茄晚疫病的杀菌剂",
     "查询草铵膦在欧盟的登记状况",
     "有什么有效成分可以防治玉米螟？",
-    "寻找环保型除草剂供应商"
+    "寻找环保型除草剂供应商",
+    "小麦锈病的防治方案有哪些？",
+    "吡虫啉的作用机理是什么？"
   ];
 
-  // 模拟AI响应
-  const simulateAIResponse = (userQuery: string): string => {
-    const responses = {
-      "番茄晚疫病": "针对番茄晚疫病，推荐使用以下杀菌剂：\n\n1. **丙森锌** - 广谱保护性杀菌剂\n2. **氟菌·霜霉威** - 内吸性治疗剂\n3. **烯酰吗啉** - 专用于疫病防治\n\n使用时建议轮换用药，避免抗性产生。",
-      "草铵膦": "草铵膦在欧盟的登记状况：\n\n✅ **已批准使用**\n📅 **有效期至2025年**\n⚠️ **限制条件**：仅限专业用户使用\n\n主要供应商包括拜耳、巴斯夫等国际厂商。",
-      "玉米螟": "防治玉米螟的有效成分推荐：\n\n🔸 **生物防治**：苏云金杆菌（Bt）\n🔸 **化学防治**：氯虫苯甲酰胺、茚虫威\n🔸 **物理防治**：性诱剂、杀虫灯\n\n建议采用综合防治策略，效果更佳。",
-      "环保型除草剂": "环保型除草剂供应商推荐：\n\n🌱 **科迪华农业科技** - 专注可持续农业\n🌱 **先正达集团** - 生物除草剂领导者\n🌱 **住友化学** - 低毒环保产品\n\n这些供应商都有完整的环保认证。"
-    };
 
-    // 简单的关键词匹配
-    for (const [keyword, response] of Object.entries(responses)) {
-      if (userQuery.includes(keyword)) {
-        return response;
-      }
-    }
-
-    return `感谢您的咨询："${userQuery}"\n\n我正在为您查询相关信息，这可能包括：\n• 产品技术参数\n• 供应商信息\n• 登记状况\n• 使用建议\n\n如需更详细信息，请提供更具体的要求。`;
-  };
 
   // 折叠聊天界面
   const handleCollapse = () => {
@@ -60,18 +86,21 @@ export const ChatInterface = ({ onToggle }: ChatInterfaceProps) => {
     onToggle?.(false);
     setMessages([]);
     setQuery("");
+    setError(null);
+    setWorkflowStatus({ isRunning: false, completedNodes: [] });
+    AISearchService.resetConversation();
   };
 
   // 发送消息
   const handleSubmit = async () => {
-    if (!query.trim()) return;
-    
+    if (!query.trim() || isLoading) return;
+
     // 首次发送消息时展开聊天界面
     if (!isExpanded) {
       setIsExpanded(true);
       onToggle?.(true);
     }
-    
+
     const userMessage: Message = {
       id: Date.now().toString(),
       content: query.trim(),
@@ -80,20 +109,122 @@ export const ChatInterface = ({ onToggle }: ChatInterfaceProps) => {
     };
 
     setMessages(prev => [...prev, userMessage]);
+    const currentQuery = query.trim();
     setQuery("");
     setIsLoading(true);
+    setError(null);
+    streamingContentRef.current = '';
+    
+    // 重置工作流状态
+    setWorkflowStatus({ isRunning: false, completedNodes: [] });
 
-    // 模拟AI响应延迟
-    setTimeout(() => {
-      const aiResponse: Message = {
-        id: (Date.now() + 1).toString(),
-        content: simulateAIResponse(userMessage.content),
-        sender: 'ai',
-        timestamp: new Date()
-      };
-      setMessages(prev => [...prev, aiResponse]);
+    // 创建助手消息占位符
+    const assistantMessageId = (Date.now() + 1).toString();
+    const assistantMessage: Message = {
+      id: assistantMessageId,
+      content: '',
+      sender: 'ai',
+      timestamp: new Date(),
+      isStreaming: true
+    };
+
+    setMessages(prev => [...prev, assistantMessage]);
+    currentMessageIdRef.current = assistantMessageId;
+
+    try {
+      await AISearchService.sendMessage(
+        currentQuery,
+        // onChunk - 处理流式响应
+        (chunk) => {
+          console.log('📦 收到chunk事件:', chunk.event, chunk.answer ? '有内容(' + chunk.answer.length + '字符)' : '无内容');
+          if (chunk.event === 'message' && chunk.answer) {
+            // 累积内容
+            const previousLength = streamingContentRef.current.length;
+            streamingContentRef.current += chunk.answer;
+            console.log('📦 内容累积 - 之前长度:', previousLength, '新增长度:', chunk.answer.length, '总长度:', streamingContentRef.current.length);
+            console.log('📦 新增内容:', '"' + chunk.answer + '"');
+            
+            // 使用节流更新UI
+            throttledUpdate(
+              currentMessageIdRef.current, 
+              streamingContentRef.current,
+              true
+            );
+          }
+        },
+        // onError - 处理错误
+        (error) => {
+          console.error('AI搜索流式传输错误:', error);
+          setError(error.message || '发送消息时出现错误');
+          setIsLoading(false);
+          setWorkflowStatus({ isRunning: false, completedNodes: [] });
+
+          // 更新助手消息为错误提示
+          setMessages(prev =>
+            prev.map(msg =>
+              msg.id === currentMessageIdRef.current
+                ? { ...msg, content: '抱歉，发生了错误，请稍后重试。', isStreaming: false }
+                : msg
+            )
+          );
+        },
+        // onComplete - 完成回调
+        () => {
+          console.log('流式传输完成');
+          setIsLoading(false);
+          // 标记流式传输完成
+          setMessages(prev =>
+            prev.map(msg =>
+              msg.id === currentMessageIdRef.current
+                ? { ...msg, isStreaming: false }
+                : msg
+            )
+          );
+          // 工作流执行完成
+          setWorkflowStatus(prev => ({ ...prev, isRunning: false }));
+        },
+        // onWorkflowEvent - 处理工作流事件
+        (event: DifyStreamEvent) => {
+          console.log('工作流事件:', event.event);
+          if (event.event === 'workflow_started') {
+            setWorkflowStatus(prev => ({
+              ...prev,
+              isRunning: true,
+              completedNodes: []
+            }));
+          } else if (event.event === 'node_started') {
+            const nodeData = event.data;
+            setWorkflowStatus(prev => ({
+              ...prev,
+              isRunning: true,
+              currentNode: {
+                title: nodeData.title,
+                nodeType: nodeData.node_type,
+                index: nodeData.index
+              },
+              // 将之前的当前节点添加到已完成列表
+              completedNodes: prev.currentNode 
+                ? [...prev.completedNodes, prev.currentNode]
+                : prev.completedNodes
+            }));
+          }
+        }
+      );
+    } catch (error) {
+      console.error('AI搜索错误:', error);
+      setError(error instanceof Error ? error.message : '发送消息时出现错误');
       setIsLoading(false);
-    }, 1500);
+      setWorkflowStatus({ isRunning: false, completedNodes: [] });
+
+      // 更新助手消息为错误提示
+      setMessages(prev =>
+        prev.map(msg =>
+          msg.id === currentMessageIdRef.current
+            ? { ...msg, content: '抱歉，发生了错误，请稍后重试。', isStreaming: false }
+            : msg
+        )
+      );
+    }
   };
 
   // 自动滚动到底部
@@ -162,6 +293,14 @@ export const ChatInterface = ({ onToggle }: ChatInterfaceProps) => {
               </div>
             )}
 
+            {/* 工作流进度显示 */}
+            {(workflowStatus.isRunning || workflowStatus.completedNodes.length > 0) && (
+              <WorkflowProgress 
+                status={workflowStatus} 
+                className="mb-4"
+              />
+            )}
+
             {messages.map((message) => (
               <div
                 key={message.id}
@@ -184,7 +323,11 @@ export const ChatInterface = ({ onToggle }: ChatInterfaceProps) => {
                       ? 'bg-primary text-primary-foreground'
                       : 'bg-muted'
                   }`}>
-                    <div className="text-sm whitespace-pre-wrap">{message.content}</div>
+                    <MessageContent 
+                      content={message.content}
+                      isStreaming={message.isStreaming}
+                      sender={message.sender}
+                    />
                     <div className={`text-xs mt-1 opacity-70`}>
                       {message.timestamp.toLocaleTimeString('zh-CN', { 
                         hour: '2-digit', 
@@ -196,17 +339,21 @@ export const ChatInterface = ({ onToggle }: ChatInterfaceProps) => {
               </div>
             ))}
 
-            {isLoading && (
+            {/* 加载状态时显示一个简单的思考提示 - 只在没有流式消息时显示 */}
+            {isLoading && !messages.some(m => m.isStreaming) && (
               <div className="flex justify-start">
                 <div className="flex items-start space-x-2">
                   <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
                     <Bot className="w-4 h-4" />
                   </div>
                   <div className="bg-muted rounded-lg p-3">
-                    <div className="flex space-x-1">
-                      <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce" />
-                      <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: '0.1s' }} />
-                      <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: '0.2s' }} />
+                    <div className="flex items-center space-x-2 text-sm text-muted-foreground">
+                      <span>AI正在思考</span>
+                      <div className="flex space-x-1">
+                        <div className="w-1 h-1 bg-muted-foreground rounded-full animate-bounce" />
+                        <div className="w-1 h-1 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: '0.1s' }} />
+                        <div className="w-1 h-1 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: '0.2s' }} />
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -214,6 +361,15 @@ export const ChatInterface = ({ onToggle }: ChatInterfaceProps) => {
             )}
           </div>
         </ScrollArea>
+
+        {/* Error Message */}
+        {error && (
+          <div className="px-4 py-2 bg-red-50 border-t border-red-200">
+            <div className="text-red-700 text-sm">
+              ❌ {error}
+            </div>
+          </div>
+        )}
 
         {/* Input */}
         <div className="p-4 border-t border-border">
