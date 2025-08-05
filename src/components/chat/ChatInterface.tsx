@@ -57,17 +57,54 @@ export const ChatInterface = ({ onToggle }: ChatInterfaceProps) => {
 
   // 使用ref来实现节流 - 优化节流时间，配合新的打字机效果
   const lastUpdateTime = useRef(0);
+  const lastContentLength = useRef(0);
+  const pendingUpdateRef = useRef<NodeJS.Timeout | null>(null);
+
   const throttledUpdate = useCallback((messageId: string, content: string, isStreaming: boolean = false) => {
     const now = Date.now();
-    // 根据内容长度动态调整节流时间
-    const throttleTime = content.length > 500 ? 300 : 150; // 长文本使用更长的节流时间
+    const contentLength = content.length;
+
+    // 动态调整节流时间
+    let throttleTime = 200; // 基础节流时间
+
+    // 如果内容长度大幅增加，使用更长的节流时间
+    if (contentLength > lastContentLength.current + 100) {
+      throttleTime = 400;
+    } else if (contentLength > 500) {
+      throttleTime = 300;
+    }
+
+    // 清除之前的延迟更新
+    if (pendingUpdateRef.current) {
+      clearTimeout(pendingUpdateRef.current);
+      pendingUpdateRef.current = null;
+    }
 
     if (now - lastUpdateTime.current > throttleTime) {
-      console.log('⚡ 节流更新通过 - 内容长度:', content.length, '距离上次更新:', now - lastUpdateTime.current, 'ms');
+      console.log('⚡ 节流更新通过 - 内容长度:', contentLength, '距离上次更新:', now - lastUpdateTime.current, 'ms');
       throttledUpdateMessage(messageId, content, isStreaming);
       lastUpdateTime.current = now;
+      lastContentLength.current = contentLength;
     } else {
       console.log('🚫 节流更新被阻止 - 距离上次更新:', now - lastUpdateTime.current, 'ms', '需要等待:', throttleTime - (now - lastUpdateTime.current), 'ms');
+
+      // 如果流式传输结束，确保最后的内容被更新
+      if (!isStreaming) {
+        console.log('📝 流式传输结束，立即更新最终内容');
+        throttledUpdateMessage(messageId, content, isStreaming);
+        lastUpdateTime.current = now;
+        lastContentLength.current = contentLength;
+      } else {
+        // 设置延迟更新，确保内容不会丢失
+        const remainingTime = throttleTime - (now - lastUpdateTime.current);
+        pendingUpdateRef.current = setTimeout(() => {
+          console.log('⏰ 延迟更新执行');
+          throttledUpdateMessage(messageId, content, isStreaming);
+          lastUpdateTime.current = Date.now();
+          lastContentLength.current = contentLength;
+          pendingUpdateRef.current = null;
+        }, remainingTime);
+      }
     }
   }, [throttledUpdateMessage]);
 

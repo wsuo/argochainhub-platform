@@ -75,13 +75,12 @@ export const useTypewriterEffect = (
   text: string,
   options: UseTypewriterEffectOptions = {}
 ) => {
-  const { speed = 8, onComplete, chunkSize = 5 } = options; // 大幅提升默认速度
+  const { speed = 8, onComplete, chunkSize = 5 } = options;
   const [displayedText, setDisplayedText] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const textRef = useRef('');
-  const chunksRef = useRef<string[]>([]);
-  const currentChunkIndexRef = useRef(0);
+  const displayedTextRef = useRef('');
 
   useEffect(() => {
     console.log('🔥 打字机useEffect触发 - 传入文本长度:', text.length, '显示文本长度:', displayedText.length, '正在打字:', isTyping);
@@ -92,8 +91,11 @@ export const useTypewriterEffect = (
       setDisplayedText('');
       setIsTyping(false);
       textRef.current = '';
-      chunksRef.current = [];
-      currentChunkIndexRef.current = 0;
+      displayedTextRef.current = '';
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
       return;
     }
 
@@ -106,57 +108,75 @@ export const useTypewriterEffect = (
     console.log('📝 打字机接收新文本:', text.substring(0, 50) + (text.length > 50 ? '...' : ''));
     console.log('📝 当前显示文本:', displayedText.substring(0, 50) + (displayedText.length > 50 ? '...' : ''));
 
-    // 如果新文本比已显示的短，直接设置
-    if (text.length < displayedText.length) {
-      console.log('📝 新文本更短，直接设置');
-      setDisplayedText(text);
-      setIsTyping(false);
-      textRef.current = text;
-      chunksRef.current = [];
-      currentChunkIndexRef.current = 0;
-      return;
-    }
-
     // 更新目标文本
     textRef.current = text;
 
-    // 判断是否需要启动或继续打字动画
-    const shouldStartTyping = (
-      displayedText.length === 0 || // 没有显示任何内容
-      !text.startsWith(displayedText) || // 新文本不是延续
-      (text.startsWith(displayedText) && text.length > displayedText.length) // 新文本是延续且更长
-    );
+    // 如果新文本比已显示的短，说明这是新消息的开始
+    if (text.length < displayedText.length) {
+      console.log('📝 新文本更短，这是新消息开始，重置状态');
+      setDisplayedText('');
+      displayedTextRef.current = '';
+      setIsTyping(text.length > 0);
 
-    if (shouldStartTyping) {
-      console.log('📝 开始新的打字动画，当前显示长度:', displayedText.length);
+      // 清除之前的定时器
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+
+      // 如果新文本为空，直接返回
+      if (text.length === 0) {
+        return;
+      }
+    }
+
+    // 如果新文本不是当前显示文本的延续，重新开始
+    if (displayedText.length > 0 && !text.startsWith(displayedText)) {
+      console.log('📝 新文本不是延续，重新开始');
+      setDisplayedText('');
+      displayedTextRef.current = '';
+      setIsTyping(true);
+
+      // 清除之前的定时器
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+    }
+
+    // 如果新文本是延续且更长，或者需要重新开始
+    if (text.length > displayedText.length) {
+      console.log('📝 开始/继续打字动画，当前显示长度:', displayedText.length, '目标长度:', text.length);
       setIsTyping(true);
 
       // 清除之前的定时器
       if (intervalRef.current) {
         console.log('📝 清除之前的定时器');
         clearInterval(intervalRef.current);
+        intervalRef.current = null;
       }
 
-      // 生成智能分块
-      chunksRef.current = getSmartChunks(text, chunkSize);
+      // 生成智能分块，但只生成从当前位置到结尾的部分
+      const remainingText = text.slice(displayedText.length);
+      const fullChunks = getSmartChunks(text, chunkSize);
 
-      // 找到当前应该从哪个分块开始
-      let startChunkIndex = 0;
-      if (displayedText.length > 0) {
-        startChunkIndex = chunksRef.current.findIndex(chunk => chunk.length > displayedText.length);
-        if (startChunkIndex === -1) {
-          startChunkIndex = chunksRef.current.length - 1;
+      // 找到当前显示位置对应的分块索引
+      let currentChunkIndex = 0;
+      for (let i = 0; i < fullChunks.length; i++) {
+        if (fullChunks[i].length > displayedText.length) {
+          currentChunkIndex = i;
+          break;
         }
       }
 
-      currentChunkIndexRef.current = startChunkIndex;
-      console.log('📝 智能分块生成完成，总块数:', chunksRef.current.length, '起始块索引:', startChunkIndex);
+      console.log('📝 智能分块生成完成，总块数:', fullChunks.length, '当前块索引:', currentChunkIndex);
 
+      let chunkIndex = currentChunkIndex;
       intervalRef.current = setInterval(() => {
-        const currentIndex = currentChunkIndexRef.current;
-        console.log('⏰ 定时器执行 - 当前块索引:', currentIndex, '总块数:', chunksRef.current.length);
+        console.log('⏰ 定时器执行 - 当前块索引:', chunkIndex, '总块数:', fullChunks.length);
 
-        if (currentIndex >= chunksRef.current.length) {
+        // 检查是否完成
+        if (chunkIndex >= fullChunks.length) {
           console.log('✅ 打字完成');
           setIsTyping(false);
           onComplete?.();
@@ -167,10 +187,17 @@ export const useTypewriterEffect = (
           return;
         }
 
-        const newDisplayText = chunksRef.current[currentIndex];
-        console.log('⏰ 更新显示文本 - 块索引:', currentIndex, '文本长度:', newDisplayText.length);
+        // 检查目标文本是否发生变化
+        if (textRef.current !== text) {
+          console.log('📝 目标文本已变化，停止当前动画');
+          return;
+        }
+
+        const newDisplayText = fullChunks[chunkIndex];
+        console.log('⏰ 更新显示文本 - 块索引:', chunkIndex, '文本长度:', newDisplayText.length);
         setDisplayedText(newDisplayText);
-        currentChunkIndexRef.current++;
+        displayedTextRef.current = newDisplayText;
+        chunkIndex++;
       }, speed);
     }
 
@@ -187,8 +214,7 @@ export const useTypewriterEffect = (
     setDisplayedText('');
     setIsTyping(false);
     textRef.current = '';
-    chunksRef.current = [];
-    currentChunkIndexRef.current = 0;
+    displayedTextRef.current = '';
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
       intervalRef.current = null;

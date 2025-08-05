@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI搜索服务测试</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .input-group {
+            margin-bottom: 20px;
+        }
+        input[type="text"] {
+            width: 70%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        button {
+            padding: 10px 20px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-left: 10px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        .messages {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            height: 400px;
+            overflow-y: auto;
+            padding: 10px;
+            background: #fafafa;
+        }
+        .message {
+            margin-bottom: 10px;
+            padding: 8px;
+            border-radius: 4px;
+        }
+        .user-message {
+            background: #007bff;
+            color: white;
+            text-align: right;
+        }
+        .assistant-message {
+            background: #e9ecef;
+            color: #333;
+        }
+        .error {
+            color: red;
+            margin-top: 10px;
+        }
+        .loading {
+            color: #666;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>AI农药智能查询服务测试</h1>
+        
+        <div class="input-group">
+            <input type="text" id="messageInput" placeholder="输入您的问题..." />
+            <button onclick="sendMessage()" id="sendBtn">发送</button>
+            <button onclick="clearMessages()" id="clearBtn">清空</button>
+        </div>
+        
+        <div class="messages" id="messages"></div>
+        
+        <div id="error" class="error"></div>
+    </div>
+
+    <script>
+        // 配置信息
+        const DIFY_API_BASE_URL = 'http://100.101.144.72/v1';
+        const DIFY_API_KEY = 'app-pHmzn3L1TMOrRWvoIa8mr6w0';
+        
+        let conversationId = null;
+        const userId = 'test-user-' + Math.random().toString(36).substr(2, 9);
+        let isLoading = false;
+
+        function addMessage(content, isUser = false) {
+            const messagesDiv = document.getElementById('messages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${isUser ? 'user-message' : 'assistant-message'}`;
+            messageDiv.textContent = content;
+            messagesDiv.appendChild(messageDiv);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+            return messageDiv;
+        }
+
+        function showError(message) {
+            document.getElementById('error').textContent = message;
+            setTimeout(() => {
+                document.getElementById('error').textContent = '';
+            }, 5000);
+        }
+
+        function setLoading(loading) {
+            isLoading = loading;
+            document.getElementById('sendBtn').disabled = loading;
+            document.getElementById('messageInput').disabled = loading;
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const message = input.value.trim();
+            
+            if (!message || isLoading) return;
+            
+            input.value = '';
+            addMessage(message, true);
+            setLoading(true);
+            
+            const assistantMessageDiv = addMessage('正在思考...', false);
+            let assistantContent = '';
+
+            try {
+                const requestBody = {
+                    inputs: {},
+                    query: message,
+                    response_mode: 'streaming',
+                    conversation_id: conversationId || undefined,
+                    user: userId,
+                };
+
+                const response = await fetch(`${DIFY_API_BASE_URL}/chat-messages`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${DIFY_API_KEY}`,
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(requestBody),
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
+                let buffer = '';
+
+                while (true) {
+                    const { done, value } = await reader.read();
+                    
+                    if (done) break;
+
+                    buffer += decoder.decode(value, { stream: true });
+                    const lines = buffer.split('\n');
+                    buffer = lines.pop() || '';
+
+                    for (const line of lines) {
+                        if (line.trim() === '') continue;
+                        
+                        if (line.startsWith('data: ')) {
+                            const data = line.slice(6);
+                            
+                            if (data === '[DONE]') {
+                                setLoading(false);
+                                return;
+                            }
+
+                            try {
+                                const chunk = JSON.parse(data);
+                                
+                                if (chunk.conversation_id && !conversationId) {
+                                    conversationId = chunk.conversation_id;
+                                }
+
+                                if (chunk.event === 'message' && chunk.answer) {
+                                    assistantContent += chunk.answer;
+                                    assistantMessageDiv.textContent = assistantContent;
+                                }
+                            } catch (parseError) {
+                                console.warn('解析流数据失败:', parseError);
+                            }
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('AI搜索请求失败:', error);
+                showError('发送消息失败: ' + error.message);
+                assistantMessageDiv.textContent = '抱歉，发生了错误，请稍后重试。';
+            } finally {
+                setLoading(false);
+            }
+        }
+
+        function clearMessages() {
+            document.getElementById('messages').innerHTML = '';
+            conversationId = null;
+        }
+
+        // 回车发送消息
+        document.getElementById('messageInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+    </script>
+</body>
+</html>
