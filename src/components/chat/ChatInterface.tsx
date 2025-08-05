@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import { Send, Sparkles, Bot, User, MinusCircle, ChevronDown, ChevronUp, MessageSquare } from "lucide-react";
+import { Send, Sparkles, Bot, User, MinusCircle, ChevronDown, ChevronUp, MessageSquare, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
@@ -9,6 +9,9 @@ import { AISearchService, WorkflowStatus, DifyStreamEvent } from "@/services/aiS
 import { useTypewriterEffect, throttle } from "@/hooks/useTypewriterEffect";
 import { MessageContent } from "@/components/chat/MessageContent";
 import { WorkflowProgress } from "@/components/chat/WorkflowProgress";
+import { conversationManager } from "@/managers/ConversationManager";
+import { ConversationService } from "@/services/conversationService";
+import { getOrCreateGuestId } from "@/utils/guestId";
 
 interface Message {
   id: string;
@@ -32,6 +35,8 @@ export const ChatInterface = ({ onToggle }: ChatInterfaceProps) => {
   const [showExamples, setShowExamples] = useState(false);
   const [hasConversationHistory, setHasConversationHistory] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isLoadingHistory, setIsLoadingHistory] = useState(false);
+  const [isNewConversation, setIsNewConversation] = useState(true); // 标记是否为新对话
   const [workflowStatus, setWorkflowStatus] = useState<WorkflowStatus>({
     isRunning: false,
     completedNodes: []
@@ -112,6 +117,66 @@ export const ChatInterface = ({ onToggle }: ChatInterfaceProps) => {
     "吡虫啉的作用机理是什么？"
   ];
 
+  // 加载最近的对话历史
+  const loadRecentConversation = useCallback(async () => {
+    try {
+      setIsLoadingHistory(true);
+      const guestId = getOrCreateGuestId();
+      const response = await ConversationService.getGuestConversations(guestId, {
+        page: 1,
+        limit: 1 // 只获取最近的一条对话
+      });
+
+      if (response.success && response.data.length > 0) {
+        const recentConversation = response.data[0];
+        
+        // 获取对话详情
+        const detailResponse = await ConversationService.getConversationDetail(
+          recentConversation.conversationId, 
+          guestId
+        );
+
+        if (detailResponse.success && detailResponse.data.messages.length > 0) {
+          // 转换消息格式
+          const historyMessages: Message[] = detailResponse.data.messages.map((msg, index) => ({
+            id: msg.id.toString(),
+            content: msg.content,
+            sender: msg.messageType === 'user_query' ? 'user' : 'ai',
+            timestamp: new Date(msg.createdAt),
+            isStreaming: false,
+            showBubble: true
+          }));
+
+          setMessages(historyMessages);
+          setHasConversationHistory(true);
+          setIsNewConversation(false); // 标记为从历史对话继续
+          console.log(`已加载最近对话: ${historyMessages.length} 条消息`);
+        }
+      }
+    } catch (error) {
+      console.error('加载最近对话失败:', error);
+      // 不显示错误，静默失败
+    } finally {
+      setIsLoadingHistory(false);
+    }
+  }, []);
+
+  // 组件挂载时加载最近对话
+  useEffect(() => {
+    loadRecentConversation();
+  }, [loadRecentConversation]);
+
+  // 开始新对话
+  const handleNewConversation = () => {
+    setMessages([]);
+    setQuery("");
+    setError(null);
+    setWorkflowStatus({ isRunning: false, completedNodes: [] });
+    setIsNewConversation(true); // 标记为新对话
+    // 重置AI服务对话状态
+    AISearchService.resetConversation();
+  };
+
 
 
   // 折叠聊天界面
@@ -145,7 +210,15 @@ export const ChatInterface = ({ onToggle }: ChatInterfaceProps) => {
       showBubble: true // 用户消息默认显示气泡
     };
 
-    setMessages(prev => [...prev, userMessage]);
+    // 如果之前有历史消息且用户开始新对话，清空历史消息
+    if (messages.length > 0 && !isLoading && !workflowStatus.isRunning && isNewConversation) {
+      // 开始新对话，清空之前的历史记录
+      setMessages([userMessage]);
+    } else {
+      // 继续当前对话
+      setMessages(prev => [...prev, userMessage]);
+    }
+    
     setHasConversationHistory(true); // 标记有对话历史
     const currentQuery = query.trim();
     setQuery("");
@@ -177,6 +250,23 @@ export const ChatInterface = ({ onToggle }: ChatInterfaceProps) => {
 
     setMessages(prev => [...prev, assistantMessage]);
     currentMessageIdRef.current = assistantMessageId;
+
+    // 标记不再是新对话（用户已经开始对话）
+    if (isNewConversation) {
+      setIsNewConversation(false);
+    }
+
+    // 使用一个临时ID来管理对话，但让Dify生成真正的conversationId
+    const tempConversationId = crypto.randomUUID();
+    console.log('开始对话，临时ID:', tempConversationId);
+
+    // 开始对话管理（使用临时ID）
+    conversationManager.startConversation({
+      conversation_id: tempConversationId,
+      query: currentQuery,
+      inputs: {},
+      user: AISearchService.getUserId()
+    });
 
     try {
       await AISearchService.sendMessage(
@@ -214,6 +304,9 @@ export const ChatInterface = ({ onToggle }: ChatInterfaceProps) => {
           setIsLoading(false);
           setWorkflowStatus({ isRunning: false, completedNodes: [] });
 
+          // 清理对话管理器中的对话
+          conversationManager.clearConversation(tempConversationId);
+
           // 更新助手消息为错误提示
           setMessages(prev =>
             prev.map(msg =>
@@ -224,7 +317,7 @@ export const ChatInterface = ({ onToggle }: ChatInterfaceProps) => {
           );
         },
         // onComplete - 完成回调
-        () => {
+        async () => {
           setIsLoading(false);
           
           // 清理工作流状态
@@ -234,7 +327,7 @@ export const ChatInterface = ({ onToggle }: ChatInterfaceProps) => {
           });
           
           // 标记流式传输完成 - 确保内容稳定后再停止流式状态
-          setTimeout(() => {
+          setTimeout(async () => {
             setMessages(prev =>
               prev.map(msg =>
                 msg.id === currentMessageIdRef.current
@@ -242,10 +335,25 @@ export const ChatInterface = ({ onToggle }: ChatInterfaceProps) => {
                   : msg
               )
             );
+            
+            // 完成对话并保存到后端
+            try {
+              const saved = await conversationManager.finishConversation(tempConversationId);
+              if (saved) {
+                console.log('对话记录已自动保存');
+              } else {
+                console.warn('对话记录保存失败');
+              }
+            } catch (error) {
+              console.error('保存对话记录时出错:', error);
+            }
           }, 100); // 短暂延迟，确保最后的内容更新完成
         },
         // onWorkflowEvent - 处理工作流事件
         (event: DifyStreamEvent) => {
+          // 记录所有事件到对话管理器
+          conversationManager.onStreamMessage(tempConversationId, event);
+          
           if (event.event === 'workflow_started') {
             setWorkflowStatus(prev => ({
               ...prev,
@@ -271,6 +379,24 @@ export const ChatInterface = ({ onToggle }: ChatInterfaceProps) => {
                 index: nodeData.index
               }
             }));
+          } else if (event.event === 'node_finished') {
+            // 处理节点完成事件，但不更新UI状态（因为可能会有下一个节点）
+            console.log('节点完成:', event);
+          } else if (event.event === 'workflow_finished') {
+            // 工作流完成，更新UI状态
+            console.log('工作流完成:', event);
+            setWorkflowStatus(prev => ({
+              ...prev,
+              isRunning: false,
+              // 将当前节点添加到已完成列表
+              completedNodes: prev.currentNode 
+                ? [...prev.completedNodes, prev.currentNode]
+                : prev.completedNodes,
+              currentNode: undefined
+            }));
+          } else if (event.event === 'message_end') {
+            // 消息结束事件，包含重要的usage统计信息
+            console.log('消息结束事件:', event);
           }
         }
       );
@@ -279,6 +405,9 @@ export const ChatInterface = ({ onToggle }: ChatInterfaceProps) => {
       setError(error instanceof Error ? error.message : '发送消息时出现错误');
       setIsLoading(false);
       setWorkflowStatus({ isRunning: false, completedNodes: [] });
+
+      // 清理对话管理器中的对话
+      conversationManager.clearConversation(tempConversationId);
 
       // 更新助手消息为错误提示
       setMessages(prev =>
@@ -350,14 +479,27 @@ export const ChatInterface = ({ onToggle }: ChatInterfaceProps) => {
               <p className="text-sm text-muted-foreground">基于专业农药知识库的智能问答</p>
             </div>
           </div>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleCollapse}
-            className="text-muted-foreground hover:text-foreground"
-          >
-            <MinusCircle className="w-4 h-4" />
-          </Button>
+          <div className="flex items-center space-x-2">
+            {messages.length > 0 && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleNewConversation}
+                className="text-muted-foreground hover:text-foreground"
+                title="开始新对话"
+              >
+                <RotateCcw className="w-4 h-4" />
+              </Button>
+            )}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleCollapse}
+              className="text-muted-foreground hover:text-foreground"
+            >
+              <MinusCircle className="w-4 h-4" />
+            </Button>
+          </div>
         </div>
 
         {/* Messages */}
@@ -367,7 +509,7 @@ export const ChatInterface = ({ onToggle }: ChatInterfaceProps) => {
           style={{ scrollBehavior: 'auto' }}
         >
           <div className="space-y-4">
-            {messages.length === 0 && (
+            {messages.length === 0 && !isLoadingHistory && (
               <div className="text-center py-8">
                 <div className="w-16 h-16 bg-gradient-to-br from-primary/20 to-agro-blue/20 rounded-full flex items-center justify-center mx-auto mb-4">
                   <Bot className="w-8 h-8 text-primary" />
@@ -392,6 +534,14 @@ export const ChatInterface = ({ onToggle }: ChatInterfaceProps) => {
                     ))}
                   </div>
                 </div>
+              </div>
+            )}
+
+            {/* 加载历史记录状态 */}
+            {isLoadingHistory && (
+              <div className="text-center py-8">
+                <div className="w-8 h-8 border-4 border-primary/30 border-t-primary rounded-full animate-spin mx-auto mb-2"></div>
+                <p className="text-muted-foreground">正在加载最近对话...</p>
               </div>
             )}
 

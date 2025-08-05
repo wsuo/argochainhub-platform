@@ -47,6 +47,85 @@ export interface NodeStartedEvent {
   };
 }
 
+export interface NodeFinishedEvent {
+  event: 'node_finished';
+  conversation_id: string;
+  message_id: string;
+  created_at: number;
+  task_id: string;
+  workflow_run_id: string;
+  data: {
+    id: string;
+    node_id: string;
+    node_type: string;
+    title: string;
+    index: number;
+    predecessor_node_id?: string;
+    inputs?: unknown;
+    outputs?: unknown;
+    status: string;
+    error?: string;
+    elapsed_time?: number;
+    execution_metadata?: Record<string, unknown>;
+    created_at: number;
+    finished_at?: number;
+  };
+}
+
+export interface WorkflowFinishedEvent {
+  event: 'workflow_finished';
+  conversation_id: string;
+  message_id: string;
+  created_at: number;
+  task_id: string;
+  workflow_run_id: string;
+  data: {
+    id: string;
+    workflow_id: string;
+    status: string;
+    outputs?: Record<string, unknown>;
+    error?: string;
+    elapsed_time?: number;
+    total_tokens?: number;
+    total_steps?: number;
+    exceptions_count?: number;
+    created_by?: {
+      id: string;
+      user: string;
+    };
+    created_at: number;
+    finished_at?: number;
+  };
+}
+
+export interface MessageEndEvent {
+  event: 'message_end';
+  conversation_id: string;
+  message_id: string;
+  created_at: number;
+  task_id: string;
+  id: string;
+  metadata?: {
+    annotation_reply?: unknown;
+    retriever_resources?: Array<unknown>;
+    usage?: {
+      prompt_tokens: number;
+      prompt_unit_price: string;
+      prompt_price_unit: string;
+      prompt_price: string;
+      completion_tokens: number;
+      completion_unit_price: string;
+      completion_price_unit: string;
+      completion_price: string;
+      total_tokens: number;
+      total_price: string;
+      currency: string;
+      latency: number;
+    };
+  };
+  files?: Array<unknown>;
+}
+
 export interface MessageEvent {
   event: 'message';
   task_id: string;
@@ -79,7 +158,7 @@ export interface MessageEvent {
 }
 
 // 联合类型，包含所有可能的事件
-export type DifyStreamEvent = WorkflowStartedEvent | NodeStartedEvent | MessageEvent;
+export type DifyStreamEvent = WorkflowStartedEvent | NodeStartedEvent | NodeFinishedEvent | WorkflowFinishedEvent | MessageEvent | MessageEndEvent;
 
 // 工作流状态信息
 export interface WorkflowStatus {
@@ -235,10 +314,16 @@ export class AISearchService {
                   onWorkflowEvent?.(event as WorkflowStartedEvent);
                 } else if (event.event === 'node_started') {
                   onWorkflowEvent?.(event as NodeStartedEvent);
+                } else if (event.event === 'node_finished') {
+                  onWorkflowEvent?.(event as NodeFinishedEvent);
+                } else if (event.event === 'workflow_finished') {
+                  onWorkflowEvent?.(event as WorkflowFinishedEvent);
                 } else if (event.event === 'message') {
                   // 兼容旧版本的回调
                   onChunk?.(event as any);
                   onWorkflowEvent?.(event as MessageEvent);
+                } else if (event.event === 'message_end') {
+                  onWorkflowEvent?.(event as MessageEndEvent);
                 }
               } catch (parseError) {
                 console.warn('解析流数据失败:', parseError, 'Data:', data);

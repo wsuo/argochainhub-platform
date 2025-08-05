@@ -7,7 +7,8 @@ import {
   ClipboardList,
   Building2,
   Users,
-  Star
+  Star,
+  History
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -27,6 +28,12 @@ export const Sidebar = ({ userType, activeItem, onItemClick }: SidebarProps) => 
       label: "AI农药查询",
       icon: MessageSquare,
       description: "智能问答服务"
+    },
+    {
+      id: "conversation-history",
+      label: "对话历史",
+      icon: History,
+      description: "查看AI对话记录"
     },
     {
       id: "products",
@@ -78,6 +85,12 @@ export const Sidebar = ({ userType, activeItem, onItemClick }: SidebarProps) => 
       label: "AI农药查询",
       icon: MessageSquare,
       description: "智能问答服务"
+    },
+    {
+      id: "conversation-history",
+      label: "对话历史",
+      icon: History,
+      description: "查看AI对话记录"
     },
     {
       id: "my-products",
