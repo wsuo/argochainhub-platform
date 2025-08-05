@@ -134,8 +134,8 @@ export const FeatureCards = ({ userType }: FeatureCardsProps) => {
                 {feature.description}
               </CardDescription>
               
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 className="w-full group-hover:bg-primary group-hover:text-primary-foreground group-hover:border-primary transition-all"
               >
                 {feature.buttonText}

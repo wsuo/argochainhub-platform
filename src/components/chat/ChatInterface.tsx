@@ -55,16 +55,19 @@ export const ChatInterface = ({ onToggle }: ChatInterfaceProps) => {
     });
   }, []);
 
-  // 使用ref来实现节流 - 增加节流时间，减少打字机重启
+  // 使用ref来实现节流 - 优化节流时间，配合新的打字机效果
   const lastUpdateTime = useRef(0);
   const throttledUpdate = useCallback((messageId: string, content: string, isStreaming: boolean = false) => {
     const now = Date.now();
-    if (now - lastUpdateTime.current > 200) { // 改为200ms节流，减少更新频率
+    // 根据内容长度动态调整节流时间
+    const throttleTime = content.length > 500 ? 300 : 150; // 长文本使用更长的节流时间
+
+    if (now - lastUpdateTime.current > throttleTime) {
       console.log('⚡ 节流更新通过 - 内容长度:', content.length, '距离上次更新:', now - lastUpdateTime.current, 'ms');
       throttledUpdateMessage(messageId, content, isStreaming);
       lastUpdateTime.current = now;
     } else {
-      console.log('🚫 节流更新被阻止 - 距离上次更新:', now - lastUpdateTime.current, 'ms', '需要等待:', 200 - (now - lastUpdateTime.current), 'ms');
+      console.log('🚫 节流更新被阻止 - 距离上次更新:', now - lastUpdateTime.current, 'ms', '需要等待:', throttleTime - (now - lastUpdateTime.current), 'ms');
     }
   }, [throttledUpdateMessage]);
 

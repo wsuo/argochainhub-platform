@@ -15,9 +15,10 @@ export const MessageContent = ({ content, isStreaming, sender }: MessageContentP
   console.log('📋 MessageContent 渲染 - sender:', sender, 'content长度:', content.length, 'isStreaming:', isStreaming, 'shouldUseTypewriter:', shouldUseTypewriter);
   
   const { displayedText, isTyping } = useTypewriterEffect(
-    shouldUseTypewriter ? content : '', 
+    shouldUseTypewriter ? content : '',
     {
-      speed: 25, // 打字速度，越小越快
+      speed: 15, // 打字速度，越小越快 - 优化后的速度
+      chunkSize: content.length > 500 ? 8 : 3, // 长文本使用更大的分块
     }
   );
 
