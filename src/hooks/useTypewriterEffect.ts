@@ -83,11 +83,8 @@ export const useTypewriterEffect = (
   const displayedTextRef = useRef('');
 
   useEffect(() => {
-    console.log('🔥 打字机useEffect触发 - 传入文本长度:', text.length, '显示文本长度:', displayedText.length, '正在打字:', isTyping);
-
     // 如果文本为空，重置
     if (!text) {
-      console.log('📝 文本为空，重置状态');
       setDisplayedText('');
       setIsTyping(false);
       textRef.current = '';
@@ -101,19 +98,14 @@ export const useTypewriterEffect = (
 
     // 如果文本没有变化，不处理
     if (text === textRef.current) {
-      console.log('📝 文本未变化，跳过处理');
       return;
     }
-
-    console.log('📝 打字机接收新文本:', text.substring(0, 50) + (text.length > 50 ? '...' : ''));
-    console.log('📝 当前显示文本:', displayedText.substring(0, 50) + (displayedText.length > 50 ? '...' : ''));
 
     // 更新目标文本
     textRef.current = text;
 
     // 如果新文本比已显示的短，说明这是新消息的开始
     if (text.length < displayedText.length) {
-      console.log('📝 新文本更短，这是新消息开始，重置状态');
       setDisplayedText('');
       displayedTextRef.current = '';
       setIsTyping(text.length > 0);
@@ -132,7 +124,6 @@ export const useTypewriterEffect = (
 
     // 如果新文本不是当前显示文本的延续，重新开始
     if (displayedText.length > 0 && !text.startsWith(displayedText)) {
-      console.log('📝 新文本不是延续，重新开始');
       setDisplayedText('');
       displayedTextRef.current = '';
       setIsTyping(true);
@@ -146,12 +137,10 @@ export const useTypewriterEffect = (
 
     // 如果新文本是延续且更长，或者需要重新开始
     if (text.length > displayedText.length) {
-      console.log('📝 开始/继续打字动画，当前显示长度:', displayedText.length, '目标长度:', text.length);
       setIsTyping(true);
 
       // 清除之前的定时器
       if (intervalRef.current) {
-        console.log('📝 清除之前的定时器');
         clearInterval(intervalRef.current);
         intervalRef.current = null;
       }
@@ -169,15 +158,10 @@ export const useTypewriterEffect = (
         }
       }
 
-      console.log('📝 智能分块生成完成，总块数:', fullChunks.length, '当前块索引:', currentChunkIndex);
-
       let chunkIndex = currentChunkIndex;
       intervalRef.current = setInterval(() => {
-        console.log('⏰ 定时器执行 - 当前块索引:', chunkIndex, '总块数:', fullChunks.length);
-
         // 检查是否完成
         if (chunkIndex >= fullChunks.length) {
-          console.log('✅ 打字完成');
           setIsTyping(false);
           onComplete?.();
           if (intervalRef.current) {
@@ -189,12 +173,10 @@ export const useTypewriterEffect = (
 
         // 检查目标文本是否发生变化
         if (textRef.current !== text) {
-          console.log('📝 目标文本已变化，停止当前动画');
           return;
         }
 
         const newDisplayText = fullChunks[chunkIndex];
-        console.log('⏰ 更新显示文本 - 块索引:', chunkIndex, '文本长度:', newDisplayText.length);
         setDisplayedText(newDisplayText);
         displayedTextRef.current = newDisplayText;
         chunkIndex++;
@@ -203,7 +185,6 @@ export const useTypewriterEffect = (
 
     return () => {
       if (intervalRef.current) {
-        console.log('🧹 清理定时器');
         clearInterval(intervalRef.current);
         intervalRef.current = null;
       }

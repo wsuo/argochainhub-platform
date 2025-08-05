@@ -46,11 +46,11 @@ const Index = () => {
           </div>
         )}
 
-        {/* Feature Cards - 核心采购功能，限制宽度为70% */}
+        {/* Feature Cards - 核心采购功能，压缩高度并限制宽度为70% */}
         {!isChatMode && (
-          <div className="mb-6 flex-shrink-0">
+          <div className="mb-4 flex-shrink-0">
             <div className="w-[70%] mx-auto">
-              <h3 className="text-xl font-semibold text-foreground mb-6">
+              <h3 className="text-lg font-semibold text-foreground mb-4">
                 {t('features.coreBuyerFeatures')}
               </h3>
               <FeatureCards userType={currentUserType} />

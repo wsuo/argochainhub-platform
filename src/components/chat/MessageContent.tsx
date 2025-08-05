@@ -6,13 +6,12 @@ interface MessageContentProps {
   content: string;
   isStreaming?: boolean;
   sender: 'user' | 'ai';
+  useTypewriter?: boolean; // 新增参数控制是否使用打字机效果
 }
 
-export const MessageContent = ({ content, isStreaming, sender }: MessageContentProps) => {
-  // 只有AI消息且有内容时使用打字机效果
-  const shouldUseTypewriter = sender === 'ai' && content.length > 0;
-  
-  console.log('📋 MessageContent 渲染 - sender:', sender, 'content长度:', content.length, 'isStreaming:', isStreaming, 'shouldUseTypewriter:', shouldUseTypewriter);
+export const MessageContent = ({ content, isStreaming, sender, useTypewriter = false }: MessageContentProps) => {
+  // 只有明确指定使用打字机效果且正在流式传输时才使用
+  const shouldUseTypewriter = useTypewriter && sender === 'ai' && isStreaming && content.length > 0;
   
   const { displayedText, isTyping } = useTypewriterEffect(
     shouldUseTypewriter ? content : '',
@@ -21,12 +20,9 @@ export const MessageContent = ({ content, isStreaming, sender }: MessageContentP
       chunkSize: content.length > 500 ? 8 : 3, // 长文本使用更大的分块
     }
   );
-
-  console.log('📋 打字机状态 - displayedText长度:', displayedText.length, 'isTyping:', isTyping);
   
   // 当不使用打字机效果时显示原文，使用打字机效果时显示逐步显示的文本
   const textToShow = shouldUseTypewriter ? displayedText : content;
-  console.log('📋 最终显示文本长度:', textToShow.length);
 
   // 用户消息使用普通文本，AI消息使用Markdown渲染
   if (sender === 'user') {

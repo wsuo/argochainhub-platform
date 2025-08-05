@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import { Send, Sparkles, Bot, User, MinusCircle, ChevronDown, ChevronUp } from "lucide-react";
+import { Send, Sparkles, Bot, User, MinusCircle, ChevronDown, ChevronUp, MessageSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
@@ -16,6 +16,7 @@ interface Message {
   sender: 'user' | 'ai';
   timestamp: Date;
   isStreaming?: boolean;
+  showBubble?: boolean; // 控制是否显示气泡内容
 }
 
 interface ChatInterfaceProps {
@@ -29,6 +30,7 @@ export const ChatInterface = ({ onToggle }: ChatInterfaceProps) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isFocused, setIsFocused] = useState(false);
   const [showExamples, setShowExamples] = useState(false);
+  const [hasConversationHistory, setHasConversationHistory] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [workflowStatus, setWorkflowStatus] = useState<WorkflowStatus>({
     isRunning: false,
@@ -42,15 +44,12 @@ export const ChatInterface = ({ onToggle }: ChatInterfaceProps) => {
 
   // 节流更新消息内容
   const throttledUpdateMessage = useCallback((messageId: string, content: string, isStreaming: boolean = false) => {
-    console.log('🔄 更新消息内容 - messageId:', messageId, 'content长度:', content.length + '字符', 'isStreaming:', isStreaming);
-    console.log('🔄 消息内容预览:', content.substring(0, 100) + (content.length > 100 ? '...' : ''));
     setMessages(prev => {
       const newMessages = prev.map(msg => 
         msg.id === messageId 
           ? { ...msg, content, isStreaming }
           : msg
       );
-      console.log('🔄 messages状态更新完成, 总消息数:', newMessages.length);
       return newMessages;
     });
   }, []);
@@ -81,16 +80,12 @@ export const ChatInterface = ({ onToggle }: ChatInterfaceProps) => {
     }
 
     if (now - lastUpdateTime.current > throttleTime) {
-      console.log('⚡ 节流更新通过 - 内容长度:', contentLength, '距离上次更新:', now - lastUpdateTime.current, 'ms');
       throttledUpdateMessage(messageId, content, isStreaming);
       lastUpdateTime.current = now;
       lastContentLength.current = contentLength;
     } else {
-      console.log('🚫 节流更新被阻止 - 距离上次更新:', now - lastUpdateTime.current, 'ms', '需要等待:', throttleTime - (now - lastUpdateTime.current), 'ms');
-
       // 如果流式传输结束，确保最后的内容被更新
       if (!isStreaming) {
-        console.log('📝 流式传输结束，立即更新最终内容');
         throttledUpdateMessage(messageId, content, isStreaming);
         lastUpdateTime.current = now;
         lastContentLength.current = contentLength;
@@ -98,7 +93,6 @@ export const ChatInterface = ({ onToggle }: ChatInterfaceProps) => {
         // 设置延迟更新，确保内容不会丢失
         const remainingTime = throttleTime - (now - lastUpdateTime.current);
         pendingUpdateRef.current = setTimeout(() => {
-          console.log('⏰ 延迟更新执行');
           throttledUpdateMessage(messageId, content, isStreaming);
           lastUpdateTime.current = Date.now();
           lastContentLength.current = contentLength;
@@ -124,11 +118,13 @@ export const ChatInterface = ({ onToggle }: ChatInterfaceProps) => {
   const handleCollapse = () => {
     setIsExpanded(false);
     onToggle?.(false);
-    setMessages([]);
+    // 不清空messages，保持对话历史用于显示"查看对话"按钮
+    // setMessages([]);
     setQuery("");
     setError(null);
-    setWorkflowStatus({ isRunning: false, completedNodes: [] });
-    AISearchService.resetConversation();
+    // 保持工作流状态，以便在重新展开时显示
+    // setWorkflowStatus({ isRunning: false, completedNodes: [] });
+    // AISearchService.resetConversation();
   };
 
   // 发送消息
@@ -145,27 +141,38 @@ export const ChatInterface = ({ onToggle }: ChatInterfaceProps) => {
       id: Date.now().toString(),
       content: query.trim(),
       sender: 'user',
-      timestamp: new Date()
+      timestamp: new Date(),
+      showBubble: true // 用户消息默认显示气泡
     };
 
     setMessages(prev => [...prev, userMessage]);
+    setHasConversationHistory(true); // 标记有对话历史
     const currentQuery = query.trim();
     setQuery("");
     setIsLoading(true);
     setError(null);
-    streamingContentRef.current = '';
+    streamingContentRef.current = ''; // 重置流式内容
     
-    // 重置工作流状态
-    setWorkflowStatus({ isRunning: false, completedNodes: [] });
+    // 立即显示工作流状态 - 用户提问后立即展示
+    setWorkflowStatus({ 
+      isRunning: true, 
+      completedNodes: [],
+      currentNode: {
+        title: "准备处理查询...",
+        nodeType: "start",
+        index: 0
+      }
+    });
 
-    // 创建助手消息占位符
+    // 立即创建助手消息占位符 - 先不显示气泡，只显示工作流
     const assistantMessageId = (Date.now() + 1).toString();
     const assistantMessage: Message = {
       id: assistantMessageId,
       content: '',
       sender: 'ai',
       timestamp: new Date(),
-      isStreaming: true
+      isStreaming: true,
+      showBubble: false // 先不显示气泡
     };
 
     setMessages(prev => [...prev, assistantMessage]);
@@ -176,13 +183,21 @@ export const ChatInterface = ({ onToggle }: ChatInterfaceProps) => {
         currentQuery,
         // onChunk - 处理流式响应
         (chunk) => {
-          console.log('📦 收到chunk事件:', chunk.event, chunk.answer ? '有内容(' + chunk.answer.length + '字符)' : '无内容');
           if (chunk.event === 'message' && chunk.answer) {
+            // 如果是首次收到内容，启用气泡显示
+            if (streamingContentRef.current === '') {
+              setMessages(prev =>
+                prev.map(msg =>
+                  msg.id === currentMessageIdRef.current
+                    ? { ...msg, showBubble: true }
+                    : msg
+                )
+              );
+            }
+            
             // 累积内容
             const previousLength = streamingContentRef.current.length;
             streamingContentRef.current += chunk.answer;
-            console.log('📦 内容累积 - 之前长度:', previousLength, '新增长度:', chunk.answer.length, '总长度:', streamingContentRef.current.length);
-            console.log('📦 新增内容:', '"' + chunk.answer + '"');
             
             // 使用节流更新UI
             throttledUpdate(
@@ -203,49 +218,58 @@ export const ChatInterface = ({ onToggle }: ChatInterfaceProps) => {
           setMessages(prev =>
             prev.map(msg =>
               msg.id === currentMessageIdRef.current
-                ? { ...msg, content: '抱歉，发生了错误，请稍后重试。', isStreaming: false }
+                ? { ...msg, content: '抱歉，发生了错误，请稍后重试。', isStreaming: false, showBubble: true }
                 : msg
             )
           );
         },
         // onComplete - 完成回调
         () => {
-          console.log('流式传输完成');
           setIsLoading(false);
-          // 标记流式传输完成
-          setMessages(prev =>
-            prev.map(msg =>
-              msg.id === currentMessageIdRef.current
-                ? { ...msg, isStreaming: false }
-                : msg
-            )
-          );
-          // 工作流执行完成
-          setWorkflowStatus(prev => ({ ...prev, isRunning: false }));
+          
+          // 清理工作流状态
+          setWorkflowStatus({
+            isRunning: false, 
+            completedNodes: []
+          });
+          
+          // 标记流式传输完成 - 确保内容稳定后再停止流式状态
+          setTimeout(() => {
+            setMessages(prev =>
+              prev.map(msg =>
+                msg.id === currentMessageIdRef.current
+                  ? { ...msg, isStreaming: false, showBubble: true }
+                  : msg
+              )
+            );
+          }, 100); // 短暂延迟，确保最后的内容更新完成
         },
         // onWorkflowEvent - 处理工作流事件
         (event: DifyStreamEvent) => {
-          console.log('工作流事件:', event.event);
           if (event.event === 'workflow_started') {
             setWorkflowStatus(prev => ({
               ...prev,
               isRunning: true,
-              completedNodes: []
+              currentNode: {
+                title: "工作流已启动",
+                nodeType: "workflow",
+                index: 0
+              }
             }));
           } else if (event.event === 'node_started') {
             const nodeData = event.data;
             setWorkflowStatus(prev => ({
               ...prev,
               isRunning: true,
+              // 将之前的当前节点添加到已完成列表（如果存在且不是初始节点）
+              completedNodes: prev.currentNode && prev.currentNode.title !== "准备处理查询..." && prev.currentNode.title !== "工作流已启动"
+                ? [...prev.completedNodes, prev.currentNode]
+                : prev.completedNodes,
               currentNode: {
                 title: nodeData.title,
                 nodeType: nodeData.node_type,
                 index: nodeData.index
-              },
-              // 将之前的当前节点添加到已完成列表
-              completedNodes: prev.currentNode 
-                ? [...prev.completedNodes, prev.currentNode]
-                : prev.completedNodes
+              }
             }));
           }
         }
@@ -260,22 +284,56 @@ export const ChatInterface = ({ onToggle }: ChatInterfaceProps) => {
       setMessages(prev =>
         prev.map(msg =>
           msg.id === currentMessageIdRef.current
-            ? { ...msg, content: '抱歉，发生了错误，请稍后重试。', isStreaming: false }
+            ? { ...msg, content: '抱歉，发生了错误，请稍后重试。', isStreaming: false, showBubble: true }
             : msg
         )
       );
     }
   };
 
-  // 自动滚动到底部
-  useEffect(() => {
+  // 自动滚动到底部的函数
+  const scrollToBottom = useCallback(() => {
     if (scrollAreaRef.current) {
       const scrollContainer = scrollAreaRef.current.querySelector('[data-radix-scroll-area-viewport]');
       if (scrollContainer) {
         scrollContainer.scrollTop = scrollContainer.scrollHeight;
       }
     }
-  }, [messages]);
+  }, []);
+
+  // 立即定位到底部的函数（无动画）
+  const scrollToBottomInstantly = useCallback(() => {
+    if (scrollAreaRef.current) {
+      const scrollContainer = scrollAreaRef.current.querySelector('[data-radix-scroll-area-viewport]');
+      if (scrollContainer) {
+        // 临时禁用滚动动画
+        const originalScrollBehavior = scrollContainer.style.scrollBehavior;
+        scrollContainer.style.scrollBehavior = 'auto';
+        scrollContainer.scrollTop = scrollContainer.scrollHeight;
+        // 恢复原来的滚动行为
+        setTimeout(() => {
+          scrollContainer.style.scrollBehavior = originalScrollBehavior;
+        }, 0);
+      }
+    }
+  }, []);
+
+  // 自动滚动到底部
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages, scrollToBottom]);
+
+  // 当展开聊天时立即定位到底部（无滚动动画）
+  useEffect(() => {
+    if (isExpanded) {
+      // 使用 requestAnimationFrame 确保DOM完全渲染后再定位
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          scrollToBottomInstantly();
+        });
+      });
+    }
+  }, [isExpanded, scrollToBottomInstantly]);
 
   if (isExpanded) {
     // 展开的聊天界面
@@ -303,7 +361,11 @@ export const ChatInterface = ({ onToggle }: ChatInterfaceProps) => {
         </div>
 
         {/* Messages */}
-        <ScrollArea ref={scrollAreaRef} className="flex-1 p-4">
+        <ScrollArea 
+          ref={scrollAreaRef} 
+          className="flex-1 p-4"
+          style={{ scrollBehavior: 'auto' }}
+        >
           <div className="space-y-4">
             {messages.length === 0 && (
               <div className="text-center py-8">
@@ -333,13 +395,6 @@ export const ChatInterface = ({ onToggle }: ChatInterfaceProps) => {
               </div>
             )}
 
-            {/* 工作流进度显示 */}
-            {(workflowStatus.isRunning || workflowStatus.completedNodes.length > 0) && (
-              <WorkflowProgress 
-                status={workflowStatus} 
-                className="mb-4"
-              />
-            )}
 
             {messages.map((message) => (
               <div
@@ -358,47 +413,57 @@ export const ChatInterface = ({ onToggle }: ChatInterfaceProps) => {
                       <Bot className="w-4 h-4" />
                     )}
                   </div>
-                  <div className={`rounded-lg p-3 ${
-                    message.sender === 'user'
-                      ? 'bg-primary text-primary-foreground'
-                      : 'bg-muted'
-                  }`}>
-                    <MessageContent 
-                      content={message.content}
-                      isStreaming={message.isStreaming}
-                      sender={message.sender}
-                    />
-                    <div className={`text-xs mt-1 opacity-70`}>
-                      {message.timestamp.toLocaleTimeString('zh-CN', { 
-                        hour: '2-digit', 
-                        minute: '2-digit' 
-                      })}
-                    </div>
+                  <div className="flex flex-col space-y-2">
+                    {/* 如果是AI消息，只在执行过程中显示工作流 */}
+                    {message.sender === 'ai' && message.isStreaming && message.id === currentMessageIdRef.current && workflowStatus.isRunning && (
+                      <WorkflowProgress 
+                        status={workflowStatus} 
+                        className="max-w-full"
+                      />
+                    )}
+                    {/* 只有当showBubble为true时才显示气泡内容 */}
+                    {(message.sender === 'user' || message.showBubble !== false) && (
+                      <div className={`rounded-lg p-3 ${
+                        message.sender === 'user'
+                          ? 'bg-primary text-primary-foreground'
+                          : 'bg-muted'
+                      }`}>
+                        <MessageContent 
+                          content={message.content}
+                          isStreaming={message.isStreaming}
+                          sender={message.sender}
+                          useTypewriter={message.isStreaming && message.sender === 'ai'}
+                        />
+                        <div className={`text-xs mt-1 opacity-70`}>
+                          {message.timestamp.toLocaleTimeString('zh-CN', { 
+                            hour: '2-digit', 
+                            minute: '2-digit' 
+                          })}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
             ))}
 
-            {/* 加载状态时显示一个简单的思考提示 - 只在没有流式消息时显示 */}
-            {isLoading && !messages.some(m => m.isStreaming) && (
+            {/* 仅在没有消息或消息为空时显示当前工作流 */}
+            {workflowStatus.isRunning && messages.length === 0 && (
               <div className="flex justify-start">
-                <div className="flex items-start space-x-2">
+                <div className="flex items-start space-x-2 max-w-[80%]">
                   <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
                     <Bot className="w-4 h-4" />
                   </div>
-                  <div className="bg-muted rounded-lg p-3">
-                    <div className="flex items-center space-x-2 text-sm text-muted-foreground">
-                      <span>AI正在思考</span>
-                      <div className="flex space-x-1">
-                        <div className="w-1 h-1 bg-muted-foreground rounded-full animate-bounce" />
-                        <div className="w-1 h-1 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: '0.1s' }} />
-                        <div className="w-1 h-1 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: '0.2s' }} />
-                      </div>
-                    </div>
+                  <div className="flex flex-col space-y-2">
+                    <WorkflowProgress 
+                      status={workflowStatus} 
+                      className="max-w-full"
+                    />
                   </div>
                 </div>
               </div>
             )}
+
           </div>
         </ScrollArea>
 
@@ -447,16 +512,34 @@ export const ChatInterface = ({ onToggle }: ChatInterfaceProps) => {
   return (
     <Card className="p-6 bg-background border border-border shadow-sm rounded-xl">
       {/* 头部区域 */}
-      <div className="flex items-center space-x-3 mb-4">
-        <div className="relative w-10 h-10 bg-gradient-to-br from-primary to-agro-blue rounded-lg flex items-center justify-center">
-          <Sparkles className="w-5 h-5 text-white" />
-          {/* 简化的闪亮效果 */}
-          <div className="absolute -top-1 -right-1 w-2 h-2 bg-yellow-400 rounded-full animate-pulse"></div>
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center space-x-3">
+          <div className="relative w-10 h-10 bg-gradient-to-br from-primary to-agro-blue rounded-lg flex items-center justify-center">
+            <Sparkles className="w-5 h-5 text-white" />
+            {/* 简化的闪亮效果 */}
+            <div className="absolute -top-1 -right-1 w-2 h-2 bg-yellow-400 rounded-full animate-pulse"></div>
+          </div>
+          <div>
+            <h3 className="text-lg font-semibold text-foreground">AI农药智能查询</h3>
+            <p className="text-sm text-muted-foreground">专业问答</p>
+          </div>
         </div>
-        <div>
-          <h3 className="text-lg font-semibold text-foreground">AI农药智能查询</h3>
-          <p className="text-sm text-muted-foreground">专业问答</p>
-        </div>
+        
+        {/* 展开聊天按钮 */}
+        {hasConversationHistory && (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              setIsExpanded(true);
+              onToggle?.(true);
+            }}
+            className="text-primary hover:bg-primary/10 border-primary/30"
+          >
+            <MessageSquare className="w-4 h-4 mr-2" />
+            查看对话
+          </Button>
+        )}
       </div>
       
       <div className="space-y-4">
@@ -484,14 +567,14 @@ export const ChatInterface = ({ onToggle }: ChatInterfaceProps) => {
           </div>
           
           {/* 提示文字和发送按钮在同一行 */}
-          <div className="flex items-center justify-between mt-2">
+          <div className="flex items-end justify-between mt-2">
             <div className="text-xs text-muted-foreground">
               按Enter发送，Shift+Enter换行
             </div>
             <Button 
               onClick={handleSubmit}
               disabled={!query.trim() || isLoading}
-              className="bg-gradient-to-r from-primary to-agro-blue hover:from-primary/90 hover:to-agro-blue/90 h-10 px-4 rounded-xl"
+              className="bg-gradient-to-r from-primary to-agro-blue hover:from-primary/90 hover:to-agro-blue/90 h-10 px-4 rounded-xl self-end"
             >
               {isLoading ? (
                 <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -522,13 +605,13 @@ export const ChatInterface = ({ onToggle }: ChatInterfaceProps) => {
           </Button>
           
           {showExamples && (
-            <div className="grid grid-cols-2 gap-3 mt-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-3 max-h-32 overflow-y-auto">
               {exampleQueries.map((example, index) => (
                 <Button
                   key={index}
                   variant="outline"
                   size="sm"
-                  className="justify-start h-auto p-3 text-left border-border hover:bg-muted/50 hover:border-primary/50"
+                  className="justify-start h-auto p-2 text-left border-border hover:bg-muted/50 hover:border-primary/50 text-xs"
                   onClick={() => {
                     setQuery(example);
                     setShowExamples(false); // 选择后自动收起
@@ -538,7 +621,7 @@ export const ChatInterface = ({ onToggle }: ChatInterfaceProps) => {
                     }, 100);
                   }}
                 >
-                  <div className="text-sm text-foreground">{example}</div>
+                  <div className="text-xs text-foreground leading-tight">{example}</div>
                 </Button>
               ))}
             </div>

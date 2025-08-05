@@ -103,24 +103,24 @@ export const FeatureCards = ({ userType }: FeatureCardsProps) => {
   const features = userType === "buyer" ? buyerFeatures : supplierFeatures;
 
   return (
-    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
       {features.map((feature) => {
         const Icon = feature.icon;
         
         return (
           <Card key={feature.id} className="group hover:shadow-lg transition-all duration-300 border-border/50 hover:border-primary/30">
-            <CardHeader className="pb-3">
+            <CardHeader className="pb-2">
               <div className="flex items-start justify-between">
                 <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 bg-gradient-to-br from-primary/20 to-agro-blue/20 rounded-lg flex items-center justify-center group-hover:from-primary/30 group-hover:to-agro-blue/30 transition-colors">
-                    <Icon className="w-5 h-5 text-primary" />
+                  <div className="w-8 h-8 bg-gradient-to-br from-primary/20 to-agro-blue/20 rounded-lg flex items-center justify-center group-hover:from-primary/30 group-hover:to-agro-blue/30 transition-colors">
+                    <Icon className="w-4 h-4 text-primary" />
                   </div>
                   <div>
-                    <CardTitle className="text-lg group-hover:text-primary transition-colors">
+                    <CardTitle className="text-base group-hover:text-primary transition-colors">
                       {feature.title}
                     </CardTitle>
                     {feature.stats && (
-                      <div className="text-xs text-agro-blue font-medium mt-1">
+                      <div className="text-xs text-agro-blue font-medium mt-0.5">
                         {feature.stats}
                       </div>
                     )}
@@ -129,17 +129,18 @@ export const FeatureCards = ({ userType }: FeatureCardsProps) => {
               </div>
             </CardHeader>
             
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-3 pt-0">
               <CardDescription className="text-sm leading-relaxed">
                 {feature.description}
               </CardDescription>
               
               <Button
                 variant="outline"
+                size="sm"
                 className="w-full group-hover:bg-primary group-hover:text-primary-foreground group-hover:border-primary transition-all"
               >
                 {feature.buttonText}
-                <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+                <ArrowRight className="w-3 h-3 ml-2 group-hover:translate-x-1 transition-transform" />
               </Button>
             </CardContent>
           </Card>
