@@ -93,6 +93,13 @@ class DictionaryService {
   }
 
   /**
+   * 获取询价状态字典
+   */
+  async getInquiryStatuses(): Promise<DictionaryItem[]> {
+    return this.getDictionary('inquiry_status');
+  }
+
+  /**
    * 根据key获取字典项的显示标签
    */
   getDictionaryLabel(items: DictionaryItem[], key: string): string {
