@@ -33,11 +33,10 @@ export const useErrorHandler = (options: UseErrorHandlerOptions = {}) => {
     const parsed = parseError(error);
     setParsedError(parsed);
 
-    // 自动处理认证错误
+    // 自动处理认证错误 - 不再强制跳转，让组件处理显示
     if (ErrorParser.isAuthError(parsed.type)) {
-      if (options.autoRedirect !== false) {
-        navigate('/login');
-      }
+      // 认证错误让ErrorBoundary组件友好显示，不再强制跳转
+      console.log('认证错误检测到，将通过错误组件显示友好提示');
       return;
     }
 

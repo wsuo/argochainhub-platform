@@ -19,6 +19,22 @@
     "nextPage": "Next",
     "pageInfo": "Page {{current}} of {{total}}"
   },
+  "auth": {
+    "loginToContinue": "Login to continue",
+    "loginRequired": "Please login first",
+    "loginNow": "Login now",
+    "orBrowseProducts": "or",
+    "browseProductsFirst": "browse products first",
+    "loginToInquire": "Login to make inquiry",
+    "inquireLoginDesc": "Please log in to your account to make product inquiries to suppliers",
+    "loginToAddCart": "Login to add to cart",
+    "cartLoginDesc": "Please log in to your account to add products to cart",
+    "loginToRequestSample": "Login to request sample",
+    "sampleLoginDesc": "Please log in to your account to request product samples from suppliers",
+    "loginToAccessInquiries": "Login to access inquiry management",
+    "inquiryAccessDesc": "Please log in to your account to view and manage your inquiry records",
+    "inquiryLoginMessage": "Inquiry management features require login. Please log in to your account to view and manage your inquiry records."
+  },
   "userType": {
     "buyer": "Buyer",
     "supplier": "Supplier",
@@ -258,6 +274,14 @@
       }
     },
     "inquiry": {
+      "AUTH_UNAUTHORIZED": {
+        "title": "Login Required",
+        "message": "You need to log in to access inquiry management features."
+      },
+      "AUTH_TOKEN_EXPIRED": {
+        "title": "Login Expired", 
+        "message": "Your login session has expired, please log in again to continue using inquiry features."
+      },
       "PERMISSION_COMPANY_NOT_ASSOCIATED": {
         "title": "Inquiry feature requires company authentication",
         "message": "Accessing inquiry management features requires completing company authentication first. Please go to company settings to complete the authentication process."
@@ -310,6 +334,18 @@
     "UNKNOWN_ERROR": {
       "title": "Unknown error",
       "message": "An unknown error occurred, please try again later."
+    },
+    "AUTH_UNAUTHORIZED": {
+      "title": "Login Required",
+      "message": "You need to log in to access this feature."
+    },
+    "AUTH_TOKEN_EXPIRED": {
+      "title": "Login Expired",
+      "message": "Your login session has expired, please log in again."
+    },
+    "AUTH_INVALID_CREDENTIALS": {
+      "title": "Login Failed",
+      "message": "Username or password is incorrect, please try again."
     }
   }
 }

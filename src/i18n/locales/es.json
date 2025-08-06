@@ -19,6 +19,22 @@
     "nextPage": "Siguiente",
     "pageInfo": "Página {{current}} de {{total}}"
   },
+  "auth": {
+    "loginToContinue": "Inicia sesión para continuar",
+    "loginRequired": "Por favor inicia sesión primero",
+    "loginNow": "Iniciar sesión ahora",
+    "orBrowseProducts": "o",
+    "browseProductsFirst": "navegar productos primero",
+    "loginToInquire": "Iniciar sesión para consultar",
+    "inquireLoginDesc": "Por favor inicia sesión en tu cuenta para hacer consultas de productos a proveedores",
+    "loginToAddCart": "Iniciar sesión para agregar al carrito",
+    "cartLoginDesc": "Por favor inicia sesión en tu cuenta para agregar productos al carrito",
+    "loginToRequestSample": "Iniciar sesión para solicitar muestra",
+    "sampleLoginDesc": "Por favor inicia sesión en tu cuenta para solicitar muestras de productos a proveedores",
+    "loginToAccessInquiries": "Iniciar sesión para acceder a gestión de consultas",
+    "inquiryAccessDesc": "Por favor inicia sesión en tu cuenta para ver y gestionar tus registros de consulta",
+    "inquiryLoginMessage": "Las funciones de gestión de consultas requieren iniciar sesión. Por favor inicia sesión en tu cuenta para ver y gestionar tus registros de consulta."
+  },
   "userType": {
     "buyer": "Comprador",
     "supplier": "Proveedor",
@@ -235,6 +251,16 @@
         "description": "Temporalmente no puede acceder a esta función, verifique la configuración de permisos de su cuenta."
       }
     },
+    "inquiry": {
+      "AUTH_UNAUTHORIZED": {
+        "title": "Inicio de sesión requerido",
+        "message": "Necesita iniciar sesión para acceder a las funciones de gestión de consultas."
+      },
+      "AUTH_TOKEN_EXPIRED": {
+        "title": "Sesión expirada", 
+        "message": "Su sesión ha expirado, por favor inicie sesión nuevamente para continuar usando las funciones de consulta."
+      }
+    },
     "company": {
       "PERMISSION_COMPANY_NOT_ASSOCIATED": {
         "title": "La función de autenticación de empresa requiere autenticación de empresa",
@@ -288,6 +314,18 @@
     "UNKNOWN_ERROR": {
       "title": "Error desconocido",
       "message": "Ocurrió un error desconocido, inténtelo de nuevo más tarde."
+    },
+    "AUTH_UNAUTHORIZED": {
+      "title": "Inicio de sesión requerido",
+      "message": "Necesita iniciar sesión para acceder a esta función."
+    },
+    "AUTH_TOKEN_EXPIRED": {
+      "title": "Sesión expirada",
+      "message": "Su sesión ha expirado, por favor inicie sesión nuevamente."
+    },
+    "AUTH_INVALID_CREDENTIALS": {
+      "title": "Error de inicio de sesión",
+      "message": "Usuario o contraseña incorrectos, por favor inténtelo de nuevo."
     }
   }
 }

@@ -42,7 +42,21 @@
     "privacyPolicy": "隐私政策",
     "agreementText": "继续使用即表示您同意我们的",
     "and": "和",
-    "backToHome": "← 返回主页"
+    "backToHome": "← 返回主页",
+    "loginToContinue": "登录以继续",
+    "loginRequired": "请先登录",
+    "loginNow": "立即登录",
+    "orBrowseProducts": "或者",
+    "browseProductsFirst": "先浏览产品",
+    "loginToInquire": "登录以发起询价",
+    "inquireLoginDesc": "请登录您的账户以向供应商发起产品询价",
+    "loginToAddCart": "登录以添加到购物车",
+    "cartLoginDesc": "请登录您的账户以添加产品到购物车",
+    "loginToRequestSample": "登录以申请样品",
+    "sampleLoginDesc": "请登录您的账户以向供应商申请产品样品",
+    "loginToAccessInquiries": "登录以访问询价管理",
+    "inquiryAccessDesc": "请登录您的账户以查看和管理您的询价记录",
+    "inquiryLoginMessage": "询价管理功能需要登录后才能使用。请登录您的账户以查看和管理您的询价记录。"
   },
   "userType": {
     "buyer": "采购商",
@@ -301,6 +315,14 @@
       }
     },
     "inquiry": {
+      "AUTH_UNAUTHORIZED": {
+        "title": "需要登录",
+        "message": "您需要登录后才能访问询价管理功能。"
+      },
+      "AUTH_TOKEN_EXPIRED": {
+        "title": "登录已过期", 
+        "message": "您的登录状态已过期，请重新登录以继续使用询价功能。"
+      },
       "PERMISSION_COMPANY_NOT_ASSOCIATED": {
         "title": "询价功能需要公司认证",
         "message": "访问询价管理功能需要先完成公司认证。请前往公司设置完成认证流程。"
@@ -353,6 +375,18 @@
     "UNKNOWN_ERROR": {
       "title": "未知错误",
       "message": "发生了未知错误，请稍后重试。"
+    },
+    "AUTH_UNAUTHORIZED": {
+      "title": "需要登录",
+      "message": "您需要登录后才能访问此功能。"
+    },
+    "AUTH_TOKEN_EXPIRED": {
+      "title": "登录已过期",
+      "message": "您的登录状态已过期，请重新登录。"
+    },
+    "AUTH_INVALID_CREDENTIALS": {
+      "title": "登录失败",
+      "message": "用户名或密码错误，请重新输入。"
     }
   }
 }

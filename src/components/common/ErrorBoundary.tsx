@@ -1,5 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -46,6 +47,7 @@ export const ErrorBoundary: React.FC<ErrorBoundaryProps> = ({
   children
 }) => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
 
   // 如果没有错误，渲染子组件
   if (!error) {
@@ -81,6 +83,16 @@ export const ErrorBoundary: React.FC<ErrorBoundaryProps> = ({
   // 构建默认操作按钮
   const buildDefaultActions = (): ErrorActionConfig[] => {
     const actions: ErrorActionConfig[] = [];
+
+    // 认证错误：提供登录按钮
+    if (ErrorParser.isAuthError(error.type)) {
+      actions.push({
+        type: 'button',
+        label: '去登录',
+        variant: 'default',
+        action: () => navigate('/auth')
+      });
+    }
 
     // 重试按钮
     if (ErrorParser.isRetryable(error.type) && onRetry) {
@@ -123,6 +135,10 @@ export const ErrorBoundary: React.FC<ErrorBoundaryProps> = ({
   const actions = config?.actions || buildDefaultActions();
   const showDetails = config?.showDetails ?? error.severity !== ErrorSeverity.LOW;
 
+  // 分离返回按钮和其他操作
+  const backAction = actions.find(action => action.label === t('common.goBack'));
+  const otherActions = actions.filter(action => action.label !== t('common.goBack'));
+
   // 获取翻译文本
   const errorTitle = title || t(error.title, { defaultValue: 'An error occurred' });
   const errorMessage = description || t(error.message, { 
@@ -131,6 +147,22 @@ export const ErrorBoundary: React.FC<ErrorBoundaryProps> = ({
 
   return (
     <div className={`w-full ${className}`}>
+      {/* 返回按钮 - 左上角 */}
+      {backAction && (
+        <div className="mb-4">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={backAction.action}
+            disabled={loading}
+            className="p-2 h-auto"
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            {backAction.label}
+          </Button>
+        </div>
+      )}
+      
       <Card className="border-border/50">
         <CardContent className="p-6">
           <Alert variant={variant as any}>
@@ -155,9 +187,9 @@ export const ErrorBoundary: React.FC<ErrorBoundaryProps> = ({
                   </details>
                 )}
 
-                {actions.length > 0 && (
+                {otherActions.length > 0 && (
                   <div className="flex flex-wrap gap-2 pt-2">
-                    {actions.map((action, index) => (
+                    {otherActions.map((action, index) => (
                       <Button
                         key={index}
                         variant={action.variant || 'outline'}
@@ -168,9 +200,6 @@ export const ErrorBoundary: React.FC<ErrorBoundaryProps> = ({
                       >
                         {action.type === 'button' && action.label === t('common.retry') && loading && (
                           <RefreshCw className="h-3 w-3 mr-1 animate-spin" />
-                        )}
-                        {action.type === 'button' && action.label === t('common.goBack') && (
-                          <ArrowLeft className="h-3 w-3 mr-1" />
                         )}
                         {action.type === 'button' && action.label === t('common.getHelp') && (
                           <HelpCircle className="h-3 w-3 mr-1" />
