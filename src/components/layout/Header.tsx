@@ -11,8 +11,10 @@ import { Badge } from "@/components/ui/badge";
 import { useTranslation } from "react-i18next";
 import { useLanguage } from "@/hooks/useLanguage";
 import { useAuth } from "@/contexts/MockAuthContext";
+import { useNotifications } from "@/contexts/NotificationContext";
 import { useNavigate } from "react-router-dom";
 import { SUPPORTED_LANGUAGES } from "@/i18n/config";
+import { NotificationBell } from "@/components/notifications/NotificationBell";
 
 interface HeaderProps {
   userType: "buyer" | "supplier";
@@ -22,6 +24,7 @@ export const Header = ({ userType }: HeaderProps) => {
   const { t } = useTranslation();
   const { currentLanguage, changeLanguage } = useLanguage();
   const { user, isLoggedIn, logout, canSwitchToSupplier } = useAuth();
+  const { unreadCount, wsStatus } = useNotifications();
   const navigate = useNavigate();
   
   const currentLangData = SUPPORTED_LANGUAGES.find(lang => lang.code === currentLanguage) || SUPPORTED_LANGUAGES[0];
@@ -74,10 +77,13 @@ export const Header = ({ userType }: HeaderProps) => {
         {isLoggedIn ? (
           <>
             {/* Notifications */}
-            <Button variant="ghost" size="sm" className="relative">
-              <Bell className="w-4 h-4" />
-              <span className="absolute -top-1 -right-1 w-2 h-2 bg-destructive rounded-full"></span>
-            </Button>
+            <NotificationBell 
+              unreadCount={unreadCount}
+              wsStatus={wsStatus}
+              size="md"
+              showConnectionStatus={true}
+              animate={true}
+            />
 
             {/* User Menu */}
             <DropdownMenu>
