@@ -31,6 +31,7 @@ interface AuthContextType {
   canSwitchToSupplier: boolean;
   clearError: () => void;
   retryLastOperation: () => Promise<void>;
+  refreshUser: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -164,20 +165,41 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     };
 
-    // 监听unauthorized事件，自动登出
+    // 监听unauthorized事件，设置错误信息但不自动登出
     const handleUnauthorized = () => {
-      console.log('Unauthorized detected, logging out...');
-      logout();
-      setError('登录已过期，请重新登录');
+      console.log('Unauthorized detected, setting auth error message...');
+      // 不立即登出，让ErrorBoundary来处理友好显示
+      setError('需要登录才能访问此功能');
+      // 不调用 logout() 避免页面闪烁
+    };
+
+    // 监听token刷新事件，更新用户信息
+    const handleTokenRefresh = (event: CustomEvent) => {
+      console.log('Token refresh detected, updating user info...');
+      
+      const { user: newUserInfo, reason } = event.detail;
+      
+      if (newUserInfo) {
+        setUser(newUserInfo);
+        console.log('User info updated after token refresh:', reason);
+        
+        // 如果是企业认证通过，显示成功消息
+        if (reason === 'company_approved') {
+          setError(null); // 清除任何现有错误
+          // 可以在这里添加成功提示，但避免覆盖NotificationContext的处理
+        }
+      }
     };
 
     window.addEventListener('auth:unauthorized', handleUnauthorized);
+    window.addEventListener('auth:token-refreshed', handleTokenRefresh as EventListener);
     
     initializeAuth();
 
     // 清理事件监听器
     return () => {
       window.removeEventListener('auth:unauthorized', handleUnauthorized);
+      window.removeEventListener('auth:token-refreshed', handleTokenRefresh as EventListener);
     };
   }, []);
 
@@ -295,6 +317,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setError(null);
   };
 
+  // 刷新用户信息
+  const refreshUser = async () => {
+    if (!AuthService.hasValidToken()) {
+      console.log('No valid token, cannot refresh user');
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      const userInfo = await AuthService.getCurrentUser();
+      setUser(userInfo);
+      console.log('User info refreshed successfully');
+    } catch (error) {
+      console.error('Failed to refresh user info:', error);
+      handleError(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   // 判断是否可以切换到供应商模式
   // 规则：供应商注册的用户可以体验采购商模式，但采购商注册的用户不能切换到供应商
   const canSwitchToSupplier = user ? 
@@ -315,6 +357,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     canSwitchToSupplier,
     clearError,
     retryLastOperation,
+    refreshUser,
   };
 
   return (

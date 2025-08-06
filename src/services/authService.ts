@@ -302,6 +302,23 @@ export class AuthService {
   }
 
   /**
+   * 刷新Token
+   */
+  static async refreshToken(): Promise<LoginResponseData> {
+    const response = await httpClient.post<ApiResponse<LoginResponseData>>(
+      `${API_PREFIX}/refresh-token`
+    );
+    
+    // 保存新token到localStorage
+    if (response.data?.accessToken) {
+      localStorage.setItem('agro_access_token', response.data.accessToken);
+      console.log('Token刷新成功');
+    }
+    
+    return response.data!;
+  }
+
+  /**
    * 登出
    */
   static logout(): void {
