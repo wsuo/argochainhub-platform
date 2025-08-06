@@ -24,9 +24,10 @@ export const ProductCard = ({
   const { currentLanguage } = useLanguage();
 
   // 获取多语言文本的辅助函数
-  const getLocalizedText = (text: MultiLanguageText): string => {
+  const getLocalizedText = (text: MultiLanguageText | null): string => {
+    if (!text) return '';
     const langKey = currentLanguage as keyof MultiLanguageText;
-    return text[langKey] || text['zh-CN'];
+    return text[langKey] || text['zh-CN'] || '';
   };
 
   // 获取评级星级

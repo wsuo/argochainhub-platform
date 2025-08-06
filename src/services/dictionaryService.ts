@@ -1,11 +1,19 @@
 // 字典服务
 export interface DictionaryItem {
+  id: string;
+  code: string;
+  name: {
+    'zh-CN': string;
+    en: string;
+    es: string;
+  };
+  description?: string;
+  sortOrder: number;
+  isActive: boolean;
+  // 为了兼容现有代码，添加计算属性
   key: string;
-  value: string;
   label: string;
-  sort_order?: number;
-  parent_key?: string;
-  is_active?: boolean;
+  value: string;
 }
 
 export interface DictionaryResponse {
@@ -54,12 +62,20 @@ class DictionaryService {
       const url = `${API_BASE_URL}/dictionaries/${dictType}`;
       const response = await this.makeRequest<DictionaryResponse>(url);
       
-      // 按排序字段排序，如果没有则按key排序
-      return response.data.sort((a, b) => {
-        if (a.sort_order !== undefined && b.sort_order !== undefined) {
-          return a.sort_order - b.sort_order;
+      // 转换后端数据格式为前端需要的格式
+      const transformedData = response.data.map(item => ({
+        ...item,
+        key: item.code,
+        value: item.code,
+        label: item.name['zh-CN'] || item.name.en || item.code
+      }));
+      
+      // 按排序字段排序，如果没有则按code排序
+      return transformedData.sort((a, b) => {
+        if (a.sortOrder !== undefined && b.sortOrder !== undefined) {
+          return a.sortOrder - b.sortOrder;
         }
-        return a.key.localeCompare(b.key);
+        return a.code.localeCompare(b.code);
       });
     } catch (error) {
       console.warn(`Failed to fetch dictionary ${dictType}:`, error);

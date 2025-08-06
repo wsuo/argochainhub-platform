@@ -32,7 +32,8 @@ export const mockProducts: Product[] = [
       id: "1",
       name: {
         'zh-CN': "绿源农化科技有限公司",
-        en: "GreenSource Agrochem Co., Ltd."
+        en: "GreenSource Agrochem Co., Ltd.",
+        es: "GreenSource Agrochem Co., Ltd."
       },
       profile: {
         phone: "021-12345678",

@@ -35,7 +35,33 @@ const ProductsPage = () => {
   });
   const [currentPage, setCurrentPage] = useState(1);
   const [sortBy, setSortBy] = useState('relevance');
+  const [hasToken, setHasToken] = useState(!!localStorage.getItem('agro_access_token'));
   const itemsPerPage = 12;
+
+  // 监听token变化
+  useEffect(() => {
+    const checkToken = () => {
+      const token = !!localStorage.getItem('agro_access_token');
+      if (token !== hasToken) {
+        console.log('Token status changed:', token);
+        setHasToken(token);
+      }
+    };
+
+    // 立即检查一次
+    checkToken();
+
+    // 监听storage变化
+    window.addEventListener('storage', checkToken);
+    
+    // 定期检查（防止同页面内的token变化）
+    const interval = setInterval(checkToken, 1000);
+
+    return () => {
+      window.removeEventListener('storage', checkToken);
+      clearInterval(interval);
+    };
+  }, [hasToken]);
 
   // 构建多语言产品计数文本
   const getProductCountText = (count: number) => {
@@ -51,10 +77,14 @@ const ProductsPage = () => {
   };
 
   // 获取产品分类字典
-  const { data: categoryDict = [] } = useQuery({
+  const { data: categoryDict = [], isLoading: isCategoryLoading } = useQuery({
     queryKey: ['product-categories-dict'],
-    queryFn: () => dictionaryService.getProductCategories(),
+    queryFn: () => {
+      console.log('Fetching product categories...');
+      return dictionaryService.getProductCategories();
+    },
     staleTime: 10 * 60 * 1000, // 10分钟缓存，字典数据变化较少
+    enabled: hasToken, // 使用状态变量而不是直接检查localStorage
   });
 
   // 提取分类标签用于显示
@@ -90,8 +120,12 @@ const ProductsPage = () => {
     refetch
   } = useQuery({
     queryKey: ['products', queryParams],
-    queryFn: () => productService.getProducts(queryParams),
+    queryFn: () => {
+      console.log('Fetching products with params:', queryParams);
+      return productService.getProducts(queryParams);
+    },
     staleTime: 2 * 60 * 1000, // 2分钟缓存
+    enabled: hasToken, // 使用状态变量而不是直接检查localStorage
   });
 
   // 过滤和排序产品
@@ -153,26 +187,26 @@ const ProductsPage = () => {
 
   return (
     <Layout userType={currentUserType}>
-      <main className="flex-1 p-6 bg-gradient-to-br from-slate-50 via-agro-green-light/30 to-agro-blue-light/40 relative overflow-hidden">
+      <main className="flex-1 p-6 bg-gradient-to-br from-slate-50 via-agro-green-light/30 to-agro-blue-light/40 relative overflow-auto min-h-full">
         {/* 装饰性渐变叠层 */}
         <div className="absolute inset-0 bg-gradient-to-tr from-primary/5 via-transparent to-agro-blue/8 pointer-events-none" />
         <div className="absolute top-0 right-0 w-1/3 h-1/3 bg-gradient-radial from-primary/10 via-primary/5 to-transparent rounded-full blur-3xl pointer-events-none" />
         <div className="absolute bottom-0 left-0 w-1/2 h-1/2 bg-gradient-radial from-agro-blue/8 via-agro-blue/4 to-transparent rounded-full blur-3xl pointer-events-none" />
         
         {/* 内容区域 */}
-        <div className="relative z-10 max-w-7xl mx-auto">
+        <div className="relative z-10 max-w-7xl mx-auto space-y-8 pb-16">
           {/* 页面标题 */}
-          <div className="mb-6">
-            <h1 className="text-3xl font-bold text-foreground mb-2">
+          <div className="mb-8">
+            <h1 className="text-4xl font-bold text-foreground mb-3">
               {t('products.title')}
             </h1>
-            <p className="text-muted-foreground">
+            <p className="text-lg text-muted-foreground">
               {t('products.subtitle')}
             </p>
           </div>
           
           {/* 搜索栏 */}
-          <div className="mb-6">
+          <div className="mb-8">
             <ProductSearchBar
               searchQuery={searchQuery}
               onSearchChange={setSearchQuery}
@@ -184,19 +218,19 @@ const ProductsPage = () => {
           </div>
 
           {/* 结果信息和排序 */}
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
             <div className="flex items-center space-x-4">
               {productsResponse && (
-                <span className="text-sm text-muted-foreground">
+                <span className="text-base font-medium text-foreground">
                   {getProductCountText(productsResponse.meta.totalItems)}
                 </span>
               )}
             </div>
             
-            <div className="flex items-center space-x-2">
-              <span className="text-sm text-muted-foreground">{t('products.sortBy')}:</span>
+            <div className="flex items-center space-x-3">
+              <span className="text-sm font-medium text-muted-foreground">{t('products.sortBy')}:</span>
               <Select value={sortBy} onValueChange={setSortBy}>
-                <SelectTrigger className="w-40">
+                <SelectTrigger className="w-44 h-10">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -210,7 +244,7 @@ const ProductsPage = () => {
 
           {/* 内容区域 */}
           {error ? (
-            <Alert variant="destructive">
+            <Alert variant="destructive" className="max-w-2xl mx-auto">
               <AlertCircle className="h-4 w-4" />
               <AlertDescription className="flex items-center justify-between">
                 <span>{t('products.errorLoadingDesc')}</span>
@@ -229,13 +263,16 @@ const ProductsPage = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {[...Array(itemsPerPage)].map((_, index) => (
                 <div key={index} className="space-y-4">
-                  <Skeleton className="h-64 w-full" />
+                  <Skeleton className="h-72 w-full rounded-xl" />
                 </div>
               ))}
             </div>
           ) : filteredAndSortedProducts.length === 0 ? (
-            <div className="text-center py-12">
-              <h3 className="text-lg font-medium text-muted-foreground mb-2">
+            <div className="text-center py-16 max-w-md mx-auto">
+              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-muted/30 flex items-center justify-center">
+                <AlertCircle className="h-8 w-8 text-muted-foreground" />
+              </div>
+              <h3 className="text-xl font-semibold text-muted-foreground mb-2">
                 {t('products.noResults')}
               </h3>
               <p className="text-muted-foreground">
@@ -245,7 +282,7 @@ const ProductsPage = () => {
           ) : (
             <>
               {/* 产品网格 */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-12">
                 {filteredAndSortedProducts.map((product) => (
                   <ProductCard
                     key={product.id}
@@ -259,7 +296,7 @@ const ProductsPage = () => {
 
               {/* 分页 */}
               {totalPages > 1 && (
-                <div className="flex justify-center">
+                <div className="flex justify-center pt-8">
                   <Pagination>
                     <PaginationContent>
                       <PaginationItem>
