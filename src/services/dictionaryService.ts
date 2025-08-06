@@ -25,25 +25,33 @@ export interface DictionaryResponse {
 const API_BASE_URL = 'http://localhost:3050/api/v1';
 
 class DictionaryService {
-  private getAuthToken(): string {
+  private getAuthToken(): string | null {
     // 使用与AuthService一致的token存储键
     const token = localStorage.getItem('agro_access_token');
-    if (!token) {
-      throw new Error('未找到认证token，请先登录');
-    }
     return token;
   }
 
-  private async makeRequest<T>(url: string, options: RequestInit = {}): Promise<T> {
+  private async makeRequest<T>(url: string, options: RequestInit = {}, requireAuth: boolean = true): Promise<T> {
     const token = this.getAuthToken();
+    
+    // 如果需要认证但没有token，抛出错误
+    if (requireAuth && !token) {
+      throw new Error('未找到认证token，请先登录');
+    }
+    
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+      ...options.headers as Record<string, string>
+    };
+
+    // 只在有token时才添加Authorization header
+    if (token) {
+      headers.Authorization = `Bearer ${token}`;
+    }
     
     const response = await fetch(url, {
       ...options,
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
-        ...options.headers,
-      },
+      headers
     });
 
     if (!response.ok) {
@@ -60,7 +68,7 @@ class DictionaryService {
   async getDictionary(dictType: string): Promise<DictionaryItem[]> {
     try {
       const url = `${API_BASE_URL}/dictionaries/${dictType}`;
-      const response = await this.makeRequest<DictionaryResponse>(url);
+      const response = await this.makeRequest<DictionaryResponse>(url, {}, false); // 字典数据不需要认证
       
       // 转换后端数据格式为前端需要的格式
       const transformedData = response.data.map(item => ({

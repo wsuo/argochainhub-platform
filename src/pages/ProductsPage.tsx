@@ -23,6 +23,8 @@ import { productService } from "@/services/productService";
 import { dictionaryService } from "@/services/dictionaryService";
 import { Product, ProductFilters } from "@/types/product";
 import { useQuery } from "@tanstack/react-query";
+import { AuthDialog } from "@/components/auth/AuthDialog";
+import { useAuthGuard } from "@/hooks/useAuthGuard";
 
 const ProductsPage = () => {
   const { t } = useTranslation();
@@ -37,33 +39,11 @@ const ProductsPage = () => {
   });
   const [currentPage, setCurrentPage] = useState(1);
   const [sortBy, setSortBy] = useState('relevance');
-  const [hasToken, setHasToken] = useState(!!localStorage.getItem('agro_access_token'));
   const itemsPerPage = 12;
 
-  // 监听token变化
-  useEffect(() => {
-    const checkToken = () => {
-      const token = !!localStorage.getItem('agro_access_token');
-      if (token !== hasToken) {
-        console.log('Token status changed:', token);
-        setHasToken(token);
-      }
-    };
-
-    // 立即检查一次
-    checkToken();
-
-    // 监听storage变化
-    window.addEventListener('storage', checkToken);
-    
-    // 定期检查（防止同页面内的token变化）
-    const interval = setInterval(checkToken, 1000);
-
-    return () => {
-      window.removeEventListener('storage', checkToken);
-      clearInterval(interval);
-    };
-  }, [hasToken]);
+  // 使用认证守卫，但不需要在页面级别显示弹窗
+  // 因为弹窗会在ProductCard组件中处理
+  const {} = useAuthGuard();
 
   // 构建多语言产品计数文本
   const getProductCountText = (count: number) => {
@@ -86,7 +66,7 @@ const ProductsPage = () => {
       return dictionaryService.getProductCategories();
     },
     staleTime: 10 * 60 * 1000, // 10分钟缓存，字典数据变化较少
-    enabled: hasToken, // 使用状态变量而不是直接检查localStorage
+    // 移除enabled条件，让游客也能获取产品分类
   });
 
   // 提取分类标签用于显示
@@ -127,7 +107,7 @@ const ProductsPage = () => {
       return productService.getProducts(queryParams);
     },
     staleTime: 2 * 60 * 1000, // 2分钟缓存
-    enabled: hasToken, // 使用状态变量而不是直接检查localStorage
+    // 移除enabled条件，让游客也能获取产品列表
   });
 
   // 过滤和排序产品
@@ -171,10 +151,11 @@ const ProductsPage = () => {
   // 处理分页
   const totalPages = productsResponse?.meta.totalPages || 1;
 
-  // 处理操作
+  // 处理操作 - 现在这些操作由ProductCard内部的认证守卫处理
   const handleAddToCart = (product: Product) => {
     console.log('Add to cart:', product);
     // TODO: 实现添加到购物车逻辑
+    // 实际的购物车操作将在这里实现
   };
 
   const handleInquire = (product: Product) => {
@@ -185,6 +166,7 @@ const ProductsPage = () => {
   const handleRequestSample = (product: Product) => {
     console.log('Request sample for product:', product);
     // TODO: 实现申请样品逻辑
+    // 实际的样品申请操作将在这里实现
   };
 
   return (

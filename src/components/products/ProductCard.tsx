@@ -7,6 +7,8 @@ import { useLanguage } from "@/hooks/useLanguage";
 import { Product, MultiLanguageText } from "@/types/product";
 import { Link } from "react-router-dom";
 import { CreateInquiryDialog } from "@/components/inquiries/CreateInquiryDialog";
+import { AuthDialog } from "@/components/auth/AuthDialog";
+import { useAuthGuard } from "@/hooks/useAuthGuard";
 import { useState } from "react";
 
 interface ProductCardProps {
@@ -25,6 +27,15 @@ export const ProductCard = ({
   const { t } = useTranslation();
   const { currentLanguage } = useLanguage();
   const [showInquiryDialog, setShowInquiryDialog] = useState(false);
+  
+  // 使用认证守卫
+  const {
+    showAuthDialog,
+    authConfig,
+    executeWithAuth,
+    handleAuthSuccess,
+    closeAuthDialog
+  } = useAuthGuard();
 
   // 获取多语言文本的辅助函数
   const getLocalizedText = (text: MultiLanguageText | null): string => {
@@ -35,8 +46,42 @@ export const ProductCard = ({
 
   // 处理询价
   const handleInquire = () => {
-    setShowInquiryDialog(true);
-    onInquire?.(); // 保持原有回调
+    executeWithAuth(() => {
+      setShowInquiryDialog(true);
+      onInquire?.();
+    }, {
+      title: t('auth.loginToInquire', { defaultValue: '登录以发起询价' }),
+      description: t('auth.inquireLoginDesc', { 
+        defaultValue: '请登录您的账户以向供应商发起产品询价' 
+      }),
+      requiredUserType: 'buyer'
+    });
+  };
+
+  // 处理添加到购物车
+  const handleAddToCart = () => {
+    executeWithAuth(() => {
+      onAddToCart?.();
+    }, {
+      title: t('auth.loginToAddCart', { defaultValue: '登录以添加到购物车' }),
+      description: t('auth.cartLoginDesc', { 
+        defaultValue: '请登录您的账户以添加产品到购物车' 
+      }),
+      requiredUserType: 'buyer'
+    });
+  };
+
+  // 处理申请样品
+  const handleRequestSample = () => {
+    executeWithAuth(() => {
+      onRequestSample?.();
+    }, {
+      title: t('auth.loginToRequestSample', { defaultValue: '登录以申请样品' }),
+      description: t('auth.sampleLoginDesc', { 
+        defaultValue: '请登录您的账户以向供应商申请产品样品' 
+      }),
+      requiredUserType: 'buyer'
+    });
   };
 
   // 获取评级星级
@@ -159,7 +204,7 @@ export const ProductCard = ({
             <Button
               variant="outline"
               size="sm"
-              onClick={onAddToCart}
+              onClick={handleAddToCart}
               className="hover:bg-green-500 hover:text-white hover:border-green-500 transition-colors"
               title={t('products.addToCart')}
             >
@@ -177,7 +222,7 @@ export const ProductCard = ({
             <Button
               variant="outline"
               size="sm"
-              onClick={onRequestSample}
+              onClick={handleRequestSample}
               className="hover:bg-blue-500 hover:text-white hover:border-blue-500 transition-colors"
               title={t('products.requestSample')}
             >
@@ -192,6 +237,15 @@ export const ProductCard = ({
         open={showInquiryDialog}
         onOpenChange={setShowInquiryDialog}
         product={product}
+      />
+
+      {/* 认证弹窗 */}
+      <AuthDialog
+        open={showAuthDialog}
+        onOpenChange={closeAuthDialog}
+        onSuccess={handleAuthSuccess}
+        title={authConfig.title}
+        description={authConfig.description}
       />
     </Card>
   );
