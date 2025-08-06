@@ -10,7 +10,14 @@
     "companyInfo": "Company Info",
     "membership": "Membership",
     "upgradeMembership": "Upgrade Now",
-    "getMorePrivileges": "Upgrade for more privileges"
+    "getMorePrivileges": "Upgrade for more privileges",
+    "retry": "Retry",
+    "goBack": "Go back",
+    "getHelp": "Get help",
+    "contactSupport": "Contact support",
+    "previousPage": "Previous",
+    "nextPage": "Next",
+    "pageInfo": "Page {{current}} of {{total}}"
   },
   "userType": {
     "buyer": "Buyer",
@@ -123,5 +130,186 @@
     "clearHistory": "Clear History",
     "hotSearches": "Hot Searches",
     "suggestions": "Suggestions"
+  },
+  "inquiry": {
+    "inquiryNo": "Inquiry No.",
+    "status": {
+      "pendingQuote": "Pending Quote",
+      "quoted": "Quoted",
+      "confirmed": "Confirmed",
+      "declined": "Declined",
+      "expired": "Expired",
+      "cancelled": "Cancelled"
+    },
+    "supplier": "Supplier",
+    "buyer": "Buyer",
+    "products": "Product List",
+    "deadline": "Deadline",
+    "deliveryLocation": "Delivery Location",
+    "tradeTerms": "Trade Terms",
+    "paymentMethod": "Payment Method",
+    "quantity": "Quantity",
+    "packagingReq": "Packaging Requirements",
+    "buyerRemarks": "Buyer Remarks",
+    "supplierRemarks": "Supplier Remarks",
+    "totalPrice": "Total Price",
+    "validUntil": "Valid Until",
+    "basicInfo": "Basic Information",
+    "productDetails": "Product Details",
+    "quoteDetails": "Quote Details",
+    "communicationHistory": "Communication History",
+    "recentMessage": "Recent Message",
+    "viewDetails": "View Details",
+    "respondNow": "Respond Now",
+    "backToList": "Back to List",
+    "filterAndSearch": "Filter & Search",
+    "searchInquiry": "Search Inquiry",
+    "searchPlaceholder": "Search inquiry no., supplier or product...",
+    "searchSupplierPlaceholder": "Search inquiry no., buyer or product...",
+    "filterByStatus": "Filter by Status",
+    "allStatus": "All Status",
+    "noInquiries": "No Inquiries",
+    "noInquiriesDesc": "You haven't made any inquiries yet, browse products first",
+    "noInquiryResponses": "No Inquiry Requests",
+    "noInquiryResponsesDesc": "No inquiry requests received yet",
+    "browseProducts": "Browse Products",
+    "errorLoading": "Failed to load inquiries",
+    "errorLoadingDetail": "Failed to load inquiry details",
+    "notFound": "Inquiry Not Found",
+    "notFoundDesc": "The inquiry you're looking for may have been deleted or doesn't exist",
+    "typeMessage": "Type message...",
+    "send": "Send",
+    "messageHint": "Press Enter to send, Shift+Enter for new line",
+    "messageSuccess": "Message Sent",
+    "messageSuccessDesc": "Your message has been sent to the recipient",
+    "messageFailed": "Message Failed",
+    "messageFailedDesc": "Please check your network connection and try again",
+    "messageTooLong": "Message Too Long",
+    "messageTooLongDesc": "Message length cannot exceed 1000 characters",
+    "noMessages": "No Messages",
+    "noMessagesDesc": "Send the first message to start communication",
+    "andMoreItems": "and {{count}} more items",
+    "showMoreItems": "Show {{count}} more items",
+    "showLess": "Show Less",
+    "urgent": "Urgent",
+    "awaitingResponse": "Awaiting Response",
+    "needQuote": "Need Quote",
+    "hasQuoted": "Quoted",
+    "totalInquiries": "Total Inquiries",
+    "pendingQuotes": "Pending Quotes",
+    "quoted": "Quoted",
+    "confirmed": "Confirmed"
+  },
+  "errors": {
+    "technicalDetails": "Technical Details",
+    "suggestedActions": "Suggested Actions",
+    "needHelp": "Need help?",
+    "viewDocumentation": "View help documentation",
+    "permission": {
+      "companyNotAssociated": {
+        "title": "Company authentication required",
+        "description": "Your account is not associated with a company and cannot access this feature. Please complete the company authentication process first.",
+        "gotoAuth": "Go to company authentication"
+      },
+      "invalidCompanyType": {
+        "title": "Company type mismatch",
+        "description": "Your company type cannot access this feature. This feature is only available to specific types of companies.",
+        "checkProfile": "View company profile"
+      },
+      "accessDenied": {
+        "title": "Insufficient access permissions",
+        "description": "You do not have permission to access this resource. This may be because you are not a relevant business participant."
+      },
+      "onlyBuyer": {
+        "title": "Buyers only",
+        "description": "This feature is only available to buyers. If you are a supplier, please use the appropriate supplier functions.",
+        "switchToSupplier": "Go to supplier functions"
+      },
+      "onlySupplier": {
+        "title": "Suppliers only",
+        "description": "This feature is only available to suppliers. If you are a buyer, please use the appropriate buyer functions.",
+        "switchToBuyer": "Go to buyer functions"
+      },
+      "generic": {
+        "title": "Insufficient permissions",
+        "description": "You temporarily cannot access this feature, please check your account permission settings."
+      }
+    },
+    "company": {
+      "PERMISSION_COMPANY_NOT_ASSOCIATED": {
+        "title": "Company authentication feature requires company authentication",
+        "message": "Accessing company authentication features requires completing company authentication first. Please fill in company information to complete the authentication process."
+      },
+      "DATA_NOT_FOUND": {
+        "title": "Data not found",
+        "message": "The related data information was not found. Please check the request parameters or try again."
+      },
+      "API_ENDPOINT_NOT_FOUND": {
+        "title": "API endpoint not found",
+        "message": "The requested API endpoint does not exist. The server may not have implemented this functionality yet. Please contact technical support."
+      },
+      "NETWORK_CONNECTION_ERROR": {
+        "title": "Network connection failed",
+        "message": "Unable to connect to company authentication service. Please check your network connection and try again."
+      },
+      "PERMISSION_ACCESS_DENIED": {
+        "title": "Access to company authentication denied",
+        "message": "You do not have permission to access this company authentication feature. Please contact the administrator."
+      }
+    },
+    "inquiry": {
+      "PERMISSION_COMPANY_NOT_ASSOCIATED": {
+        "title": "Inquiry feature requires company authentication",
+        "message": "Accessing inquiry management features requires completing company authentication first. Please go to company settings to complete the authentication process."
+      },
+      "PERMISSION_INVALID_COMPANY_TYPE": {
+        "title": "Company type does not meet requirements",
+        "message": "Your company type cannot access inquiry features. Please contact customer service for detailed requirements."
+      },
+      "PERMISSION_ACCESS_DENIED": {
+        "title": "No access to this inquiry",
+        "message": "You do not have permission to view this inquiry information. Only related buyers or suppliers can access it."
+      },
+      "DATA_NOT_FOUND": {
+        "title": "Inquiry does not exist",
+        "message": "The inquiry you are looking for may have been deleted or does not exist, please check if the inquiry number is correct."
+      },
+      "NETWORK_CONNECTION_ERROR": {
+        "title": "Network connection failed",
+        "message": "Unable to connect to the server, please check your network connection and try again."
+      }
+    },
+    "PERMISSION_COMPANY_NOT_ASSOCIATED": {
+      "title": "Company association required",
+      "message": "Your account is not associated with a company and cannot use this feature."
+    },
+    "PERMISSION_INVALID_COMPANY_TYPE": {
+      "title": "Company type mismatch",
+      "message": "Your company type cannot access this feature."
+    },
+    "PERMISSION_ACCESS_DENIED": {
+      "title": "Access denied",
+      "message": "You do not have permission to access this resource."
+    },
+    "AUTH_UNAUTHORIZED": {
+      "title": "Authentication failed",
+      "message": "Your login status has expired, please log in again."
+    },
+    "DATA_NOT_FOUND": {
+      "title": "Data does not exist",
+      "message": "The content you are looking for does not exist or has been deleted."
+    },
+    "API_ENDPOINT_NOT_FOUND": {
+      "title": "API endpoint not found",
+      "message": "The requested functionality is not yet available. Please contact technical support or try again later."
+    },
+    "NETWORK_CONNECTION_ERROR": {
+      "title": "Network connection failed",
+      "message": "Unable to connect to the server, please check your network connection."
+    },
+    "UNKNOWN_ERROR": {
+      "title": "Unknown error",
+      "message": "An unknown error occurred, please try again later."
+    }
   }
 }

@@ -10,7 +10,14 @@
     "companyInfo": "Información de la empresa",
     "membership": "Membresía",
     "upgradeMembership": "Actualizar ahora",
-    "getMorePrivileges": "Actualice para obtener más privilegios"
+    "getMorePrivileges": "Actualice para obtener más privilegios",
+    "retry": "Reintentar",
+    "goBack": "Volver",
+    "getHelp": "Obtener ayuda",
+    "contactSupport": "Contactar soporte",
+    "previousPage": "Anterior",
+    "nextPage": "Siguiente",
+    "pageInfo": "Página {{current}} de {{total}}"
   },
   "userType": {
     "buyer": "Comprador",
@@ -123,5 +130,164 @@
     "clearHistory": "Limpiar historial",
     "hotSearches": "Búsquedas populares",
     "suggestions": "Sugerencias"
+  },
+  "inquiry": {
+    "inquiryNo": "No. de consulta",
+    "status": {
+      "pendingQuote": "Cotización pendiente",
+      "quoted": "Cotizado",
+      "confirmed": "Confirmado",
+      "declined": "Rechazado",
+      "expired": "Vencido",
+      "cancelled": "Cancelado"
+    },
+    "supplier": "Proveedor",
+    "buyer": "Comprador",
+    "products": "Lista de productos",
+    "deadline": "Fecha límite",
+    "deliveryLocation": "Lugar de entrega",
+    "tradeTerms": "Términos comerciales",
+    "paymentMethod": "Método de pago",
+    "quantity": "Cantidad",
+    "packagingReq": "Requisitos de embalaje",
+    "buyerRemarks": "Comentarios del comprador",
+    "supplierRemarks": "Comentarios del proveedor",
+    "totalPrice": "Precio total",
+    "validUntil": "Válido hasta",
+    "basicInfo": "Información básica",
+    "productDetails": "Detalles del producto",
+    "quoteDetails": "Detalles de cotización",
+    "communicationHistory": "Historial de comunicación",
+    "recentMessage": "Mensaje reciente",
+    "viewDetails": "Ver detalles",
+    "respondNow": "Responder ahora",
+    "backToList": "Volver a la lista",
+    "filterAndSearch": "Filtrar y buscar",
+    "searchInquiry": "Buscar consulta",
+    "searchPlaceholder": "Buscar no. consulta, proveedor o producto...",
+    "searchSupplierPlaceholder": "Buscar no. consulta, comprador o producto...",
+    "filterByStatus": "Filtrar por estado",
+    "allStatus": "Todos los estados",
+    "noInquiries": "Sin consultas",
+    "noInquiriesDesc": "Aún no has hecho consultas, navega productos primero",
+    "noInquiryResponses": "Sin solicitudes de consulta",
+    "noInquiryResponsesDesc": "Aún no se han recibido solicitudes de consulta",
+    "browseProducts": "Explorar productos",
+    "errorLoading": "Error al cargar consultas",
+    "errorLoadingDetail": "Error al cargar detalles de consulta",
+    "notFound": "Consulta no encontrada",
+    "notFoundDesc": "La consulta que buscas puede haber sido eliminada o no existe",
+    "typeMessage": "Escribir mensaje...",
+    "send": "Enviar",
+    "messageHint": "Presiona Enter para enviar, Shift+Enter para nueva línea",
+    "messageSuccess": "Mensaje enviado",
+    "messageSuccessDesc": "Tu mensaje ha sido enviado al destinatario",
+    "messageFailed": "Error al enviar mensaje",
+    "messageFailedDesc": "Verifica tu conexión a internet y vuelve a intentar",
+    "messageTooLong": "Mensaje muy largo",
+    "messageTooLongDesc": "El mensaje no puede exceder 1000 caracteres",
+    "noMessages": "Sin mensajes",
+    "noMessagesDesc": "Envía el primer mensaje para iniciar comunicación",
+    "andMoreItems": "y {{count}} artículos más",
+    "showMoreItems": "Mostrar {{count}} artículos más",
+    "showLess": "Mostrar menos",
+    "urgent": "Urgente",
+    "awaitingResponse": "Esperando respuesta",
+    "needQuote": "Necesita cotización",
+    "hasQuoted": "Cotizado",
+    "totalInquiries": "Total consultas",
+    "pendingQuotes": "Cotizaciones pendientes",
+    "quoted": "Cotizado",
+    "confirmed": "Confirmado"
+  },
+  "errors": {
+    "technicalDetails": "Detalles técnicos",
+    "suggestedActions": "Acciones sugeridas",
+    "needHelp": "¿Necesita ayuda?",
+    "viewDocumentation": "Ver documentación de ayuda",
+    "permission": {
+      "companyNotAssociated": {
+        "title": "Se requiere autenticación de empresa",
+        "description": "Su cuenta no está asociada con una empresa y no puede acceder a esta función. Complete el proceso de autenticación de la empresa primero.",
+        "gotoAuth": "Ir a autenticación de empresa"
+      },
+      "invalidCompanyType": {
+        "title": "Tipo de empresa no coincide",
+        "description": "Su tipo de empresa no puede acceder a esta función. Esta función solo está disponible para tipos específicos de empresas.",
+        "checkProfile": "Ver perfil de empresa"
+      },
+      "accessDenied": {
+        "title": "Permisos de acceso insuficientes",
+        "description": "No tiene permiso para acceder a este recurso. Esto puede ser porque no es un participante comercial relevante."
+      },
+      "onlyBuyer": {
+        "title": "Solo compradores",
+        "description": "Esta función solo está disponible para compradores. Si es un proveedor, utilice las funciones de proveedor apropiadas.",
+        "switchToSupplier": "Ir a funciones de proveedor"
+      },
+      "onlySupplier": {
+        "title": "Solo proveedores",
+        "description": "Esta función solo está disponible para proveedores. Si es un comprador, utilice las funciones de comprador apropiadas.",
+        "switchToBuyer": "Ir a funciones de comprador"
+      },
+      "generic": {
+        "title": "Permisos insuficientes",
+        "description": "Temporalmente no puede acceder a esta función, verifique la configuración de permisos de su cuenta."
+      }
+    },
+    "company": {
+      "PERMISSION_COMPANY_NOT_ASSOCIATED": {
+        "title": "La función de autenticación de empresa requiere autenticación de empresa",
+        "message": "El acceso a las funciones de autenticación de empresa requiere completar la autenticación de empresa primero. Complete la información de la empresa para completar el proceso de autenticación."
+      },
+      "DATA_NOT_FOUND": {
+        "title": "Datos no encontrados",
+        "message": "No se encontró la información de datos relacionada. Verifique los parámetros de la solicitud o inténtelo de nuevo."
+      },
+      "API_ENDPOINT_NOT_FOUND": {
+        "title": "Endpoint de API no encontrado",
+        "message": "El endpoint de API solicitado no existe. El servidor puede no haber implementado esta funcionalidad aún. Contacte al soporte técnico."
+      },
+      "NETWORK_CONNECTION_ERROR": {
+        "title": "Error de conexión de red",
+        "message": "No se puede conectar al servicio de autenticación de empresa. Verifique su conexión de red e inténtelo de nuevo."
+      },
+      "PERMISSION_ACCESS_DENIED": {
+        "title": "Acceso a autenticación de empresa denegado",
+        "message": "No tiene permiso para acceder a esta función de autenticación de empresa. Contacte al administrador."
+      }
+    },
+    "PERMISSION_COMPANY_NOT_ASSOCIATED": {
+      "title": "Se requiere asociación de empresa",
+      "message": "Su cuenta no está asociada con una empresa y no puede usar esta función."
+    },
+    "PERMISSION_INVALID_COMPANY_TYPE": {
+      "title": "Tipo de empresa no coincide",
+      "message": "Su tipo de empresa no puede acceder a esta función."
+    },
+    "PERMISSION_ACCESS_DENIED": {
+      "title": "Acceso denegado",
+      "message": "No tiene permiso para acceder a este recurso."
+    },
+    "AUTH_UNAUTHORIZED": {
+      "title": "Error de autenticación",
+      "message": "Su estado de inicio de sesión ha expirado, inicie sesión de nuevo."
+    },
+    "DATA_NOT_FOUND": {
+      "title": "Los datos no existen",
+      "message": "El contenido que busca no existe o ha sido eliminado."
+    },
+    "API_ENDPOINT_NOT_FOUND": {
+      "title": "Endpoint de API no encontrado",
+      "message": "La funcionalidad solicitada aún no está disponible. Contacte al soporte técnico o inténtelo más tarde."
+    },
+    "NETWORK_CONNECTION_ERROR": {
+      "title": "Error de conexión de red",
+      "message": "No se puede conectar al servidor, verifique la conexión de red."
+    },
+    "UNKNOWN_ERROR": {
+      "title": "Error desconocido",
+      "message": "Ocurrió un error desconocido, inténtelo de nuevo más tarde."
+    }
   }
 }

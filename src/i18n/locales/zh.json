@@ -13,7 +13,14 @@
     "getMorePrivileges": "升级获得更多权限",
     "login": "登录",
     "register": "注册",
-    "loginRegister": "登录/注册"
+    "loginRegister": "登录/注册",
+    "retry": "重试",
+    "goBack": "返回",
+    "getHelp": "获取帮助",
+    "contactSupport": "联系客服",
+    "previousPage": "上一页",
+    "nextPage": "下一页",
+    "pageInfo": "第 {{current}} 页，共 {{total}} 页"
   },
   "auth": {
     "welcomeTitle": "欢迎来到AgroChainHub",
@@ -166,5 +173,186 @@
     "clearHistory": "清除历史",
     "hotSearches": "热门搜索",
     "suggestions": "搜索建议"
+  },
+  "inquiry": {
+    "inquiryNo": "询价单号",
+    "status": {
+      "pendingQuote": "等待报价",
+      "quoted": "已报价",
+      "confirmed": "已确认",
+      "declined": "已拒绝",
+      "expired": "已过期",
+      "cancelled": "已取消"
+    },
+    "supplier": "供应商",
+    "buyer": "采购商",
+    "products": "产品清单",
+    "deadline": "截止日期",
+    "deliveryLocation": "交货地点",
+    "tradeTerms": "贸易条件",
+    "paymentMethod": "付款方式",
+    "quantity": "数量",
+    "packagingReq": "包装要求",
+    "buyerRemarks": "采购商备注",
+    "supplierRemarks": "供应商备注",
+    "totalPrice": "总报价",
+    "validUntil": "报价有效期",
+    "basicInfo": "基本信息",
+    "productDetails": "产品明细",
+    "quoteDetails": "报价详情",
+    "communicationHistory": "沟通记录",
+    "recentMessage": "最新消息",
+    "viewDetails": "查看详情",
+    "respondNow": "立即回应",
+    "backToList": "返回列表",
+    "filterAndSearch": "筛选和搜索",
+    "searchInquiry": "搜索询价",
+    "searchPlaceholder": "搜索询价单号、供应商或产品...",
+    "searchSupplierPlaceholder": "搜索询价单号、采购商或产品...",
+    "filterByStatus": "按状态筛选",
+    "allStatus": "全部状态",
+    "noInquiries": "暂无询价记录",
+    "noInquiriesDesc": "您还没有发起过询价，去产品库看看吧",
+    "noInquiryResponses": "暂无询价请求",
+    "noInquiryResponsesDesc": "目前还没有收到询价请求",
+    "browseProducts": "浏览产品",
+    "errorLoading": "加载询价列表失败",
+    "errorLoadingDetail": "加载询价详情失败",
+    "notFound": "询价不存在",
+    "notFoundDesc": "您要查看的询价可能已被删除或不存在",
+    "typeMessage": "输入消息...",
+    "send": "发送",
+    "messageHint": "按Enter发送，Shift+Enter换行",
+    "messageSuccess": "消息发送成功",
+    "messageSuccessDesc": "您的消息已发送给对方",
+    "messageFailed": "消息发送失败",
+    "messageFailedDesc": "请检查网络连接后重试",
+    "messageTooLong": "消息太长",
+    "messageTooLongDesc": "消息长度不能超过1000字符",
+    "noMessages": "暂无消息",
+    "noMessagesDesc": "发送第一条消息开始沟通吧",
+    "andMoreItems": "还有 {{count}} 个产品",
+    "showMoreItems": "显示更多 {{count}} 个产品",
+    "showLess": "收起",
+    "urgent": "紧急",
+    "awaitingResponse": "待回应",
+    "needQuote": "需要报价",
+    "hasQuoted": "已报价",
+    "totalInquiries": "总询价",
+    "pendingQuotes": "待报价",
+    "quoted": "已报价",
+    "confirmed": "已确认"
+  },
+  "errors": {
+    "technicalDetails": "技术详情",
+    "suggestedActions": "建议操作",
+    "needHelp": "需要帮助？",
+    "viewDocumentation": "查看帮助文档",
+    "permission": {
+      "companyNotAssociated": {
+        "title": "需要公司认证",
+        "description": "您的账户尚未关联公司，无法访问此功能。请先完成公司认证流程。",
+        "gotoAuth": "前往公司认证"
+      },
+      "invalidCompanyType": {
+        "title": "公司类型不匹配",
+        "description": "您的公司类型无法访问此功能。此功能仅限特定类型的公司使用。",
+        "checkProfile": "查看公司资料"
+      },
+      "accessDenied": {
+        "title": "访问权限不足",
+        "description": "您没有权限访问此资源。可能是因为您不是相关的业务参与方。"
+      },
+      "onlyBuyer": {
+        "title": "仅限采购商",
+        "description": "此功能仅限采购商使用。如果您是供应商，请使用相应的供应商功能。",
+        "switchToSupplier": "前往供应商功能"
+      },
+      "onlySupplier": {
+        "title": "仅限供应商",
+        "description": "此功能仅限供应商使用。如果您是采购商，请使用相应的采购商功能。",
+        "switchToBuyer": "前往采购商功能"
+      },
+      "generic": {
+        "title": "权限不足",
+        "description": "您暂时无法访问此功能，请检查您的账户权限设置。"
+      }
+    },
+    "company": {
+      "PERMISSION_COMPANY_NOT_ASSOCIATED": {
+        "title": "企业认证功能需要公司认证",
+        "message": "访问企业认证功能需要先完成公司认证。请填写企业信息完成认证流程。"
+      },
+      "DATA_NOT_FOUND": {
+        "title": "数据不存在", 
+        "message": "未找到相关数据信息，请检查请求参数或重新尝试。"
+      },
+      "API_ENDPOINT_NOT_FOUND": {
+        "title": "API接口不存在",
+        "message": "请求的API接口不存在，可能服务器端尚未实现该功能。请联系技术支持。"
+      },
+      "NETWORK_CONNECTION_ERROR": {
+        "title": "网络连接失败",
+        "message": "无法连接到企业认证服务，请检查网络连接后重试。"
+      },
+      "PERMISSION_ACCESS_DENIED": {
+        "title": "无权访问企业认证",
+        "message": "您没有权限访问此企业认证功能，请联系管理员。"
+      }
+    },
+    "inquiry": {
+      "PERMISSION_COMPANY_NOT_ASSOCIATED": {
+        "title": "询价功能需要公司认证",
+        "message": "访问询价管理功能需要先完成公司认证。请前往公司设置完成认证流程。"
+      },
+      "PERMISSION_INVALID_COMPANY_TYPE": {
+        "title": "公司类型不符合要求",
+        "message": "您的公司类型无法访问询价功能。请联系客服了解详细要求。"
+      },
+      "PERMISSION_ACCESS_DENIED": {
+        "title": "无权访问此询价",
+        "message": "您没有权限查看此询价信息。只有相关的采购商或供应商可以访问。"
+      },
+      "DATA_NOT_FOUND": {
+        "title": "询价不存在",
+        "message": "您查找的询价可能已被删除或不存在，请检查询价编号是否正确。"
+      },
+      "NETWORK_CONNECTION_ERROR": {
+        "title": "网络连接失败",
+        "message": "无法连接到服务器，请检查您的网络连接后重试。"
+      }
+    },
+    "PERMISSION_COMPANY_NOT_ASSOCIATED": {
+      "title": "需要关联公司",
+      "message": "您的账户尚未关联公司，无法使用此功能。"
+    },
+    "PERMISSION_INVALID_COMPANY_TYPE": {
+      "title": "公司类型不匹配",
+      "message": "您的公司类型无法访问此功能。"
+    },
+    "PERMISSION_ACCESS_DENIED": {
+      "title": "访问被拒绝",
+      "message": "您没有权限访问此资源。"
+    },
+    "AUTH_UNAUTHORIZED": {
+      "title": "身份验证失败",
+      "message": "您的登录状态已过期，请重新登录。"
+    },
+    "DATA_NOT_FOUND": {
+      "title": "数据不存在",
+      "message": "您查找的内容不存在或已被删除。"
+    },
+    "API_ENDPOINT_NOT_FOUND": {
+      "title": "API接口不存在", 
+      "message": "请求的功能暂未开放，请联系技术支持或稍后再试。"
+    },
+    "NETWORK_CONNECTION_ERROR": {
+      "title": "网络连接失败",
+      "message": "无法连接到服务器，请检查网络连接。"
+    },
+    "UNKNOWN_ERROR": {
+      "title": "未知错误",
+      "message": "发生了未知错误，请稍后重试。"
+    }
   }
 }
