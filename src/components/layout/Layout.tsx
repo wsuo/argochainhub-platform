@@ -18,6 +18,8 @@ export const Layout = ({ children, userType = "buyer" }: LayoutProps) => {
   const getActiveItemFromPath = (pathname: string) => {
     if (pathname.startsWith('/products')) return 'products';
     if (pathname === '/conversation-history') return 'conversation-history';
+    if (pathname.startsWith('/inquiries')) return 'inquiries';
+    if (pathname.startsWith('/inquiry-responses')) return 'inquiry-responses';
     return 'ai-query';
   };
 
@@ -32,6 +34,12 @@ export const Layout = ({ children, userType = "buyer" }: LayoutProps) => {
       case 'conversation-history':
         navigate('/conversation-history');
         break;
+      case 'inquiries':
+        navigate('/inquiries');
+        break;
+      case 'inquiry-responses':
+        navigate('/inquiry-responses');
+        break;
       case 'ai-query':
         navigate('/');
         break;
@@ -43,7 +51,12 @@ export const Layout = ({ children, userType = "buyer" }: LayoutProps) => {
   };
 
   // 如果是特定路由，直接渲染children，不使用Layout的内部路由逻辑
-  const isExternalRoute = location.pathname.startsWith('/products') || location.pathname === '/auth' || location.pathname === '/supplier' || location.pathname === '/conversation-history';
+  const isExternalRoute = location.pathname.startsWith('/products') || 
+                         location.pathname === '/auth' || 
+                         location.pathname === '/supplier' || 
+                         location.pathname === '/conversation-history' ||
+                         location.pathname.startsWith('/inquiries') ||
+                         location.pathname.startsWith('/inquiry-responses');
   const currentActiveItem = getActiveItemFromPath(location.pathname);
 
   const renderContent = () => {

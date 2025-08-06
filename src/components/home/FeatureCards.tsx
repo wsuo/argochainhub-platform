@@ -29,7 +29,8 @@ export const FeatureCards = ({ userType }: FeatureCardsProps) => {
       icon: FileText,
       image: inquiryIcon,
       stats: "平均24h响应",
-      buttonText: "发起询价"
+      buttonText: "发起询价",
+      link: "/inquiries"
     },
     {
       id: "samples",
@@ -82,7 +83,8 @@ export const FeatureCards = ({ userType }: FeatureCardsProps) => {
       icon: FileText,
       image: inquiryIcon,
       stats: "实时通知",
-      buttonText: "查看询价"
+      buttonText: "查看询价",
+      link: "/inquiry-responses"
     },
     {
       id: "sample-responses",

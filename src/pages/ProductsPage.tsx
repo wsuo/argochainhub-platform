@@ -18,6 +18,7 @@ import { useTranslation } from "react-i18next";
 import { useLanguage } from "@/hooks/useLanguage";
 import { useState, useEffect, useMemo } from "react";
 import { useAuth } from "@/contexts/MockAuthContext";
+import { useNavigate } from "react-router-dom";
 import { productService } from "@/services/productService";
 import { dictionaryService } from "@/services/dictionaryService";
 import { Product, ProductFilters } from "@/types/product";
@@ -27,6 +28,7 @@ const ProductsPage = () => {
   const { t } = useTranslation();
   const { currentLanguage } = useLanguage();
   const { currentUserType } = useAuth();
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const [filters, setFilters] = useState<ProductFilters>({
     category: 'all',
@@ -176,8 +178,8 @@ const ProductsPage = () => {
   };
 
   const handleInquire = (product: Product) => {
-    console.log('Inquire about product:', product);
-    // TODO: 实现询价逻辑
+    console.log('Opening inquiry dialog for product:', product);
+    // 询价弹窗已经在 ProductCard 组件中处理，这里不需要额外操作
   };
 
   const handleRequestSample = (product: Product) => {

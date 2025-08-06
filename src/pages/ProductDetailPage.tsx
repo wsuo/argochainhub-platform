@@ -71,8 +71,9 @@ const ProductDetailPage = () => {
   };
 
   const handleInquire = () => {
-    console.log('Inquire about product:', product);
-    // TODO: 实现询价逻辑
+    // TODO: 实现创建询价对话框
+    // 暂时跳转到询价管理页面
+    navigate('/inquiries');
   };
 
   const handleRequestSample = () => {

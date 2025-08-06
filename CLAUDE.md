@@ -138,58 +138,58 @@ Ensure `bg-gradient-radial` is available in your CSS:
 
 ## Internationalization (i18n) Guidelines
 
+### Overview
+项目使用 i18next + react-i18next 实现完整的国际化支持，应用启动时通过 Suspense 确保翻译资源完全加载。
+
 ### Supported Languages
 - **Chinese (zh)**: Default language
-- **English (en)**: Primary international language
+- **English (en)**: Primary international language  
 - **Spanish (es)**: Secondary international language
 
-### Development Guidelines
+### Core Files
+- **Config**: `@/i18n/config.ts` - i18next 配置和语言检测
+- **Hook**: `@/hooks/useLanguage.tsx` - 语言切换逻辑
+- **Translations**: `@/i18n/locales/{lang}.json` - 分语言翻译文件
 
-1. **Always use translation keys** - Never hardcode text in components
-   ```typescript
-   // ❌ Bad
-   <h1>欢迎来到AgroChainHub</h1>
-   
-   // ✅ Good
-   <h1>{t('common.welcome')}</h1>
-   ```
+### Usage Examples
 
-2. **Import and use translations**
-   ```typescript
-   import { useTranslation } from 'react-i18next';
-   
-   const Component = () => {
-     const { t } = useTranslation();
-     return <div>{t('key.path')}</div>;
-   };
-   ```
+```typescript
+// 1. 基本使用
+import { useTranslation } from 'react-i18next';
 
-3. **Translation file structure** - Organize keys by feature/context
-   ```json
-   {
-     "common": { /* Shared translations */ },
-     "navigation": { /* Menu and nav items */ },
-     "features": { /* Feature-specific */ },
-     "userType": { /* User type related */ }
-   }
-   ```
+const Component = () => {
+  const { t } = useTranslation();
+  return <h1>{t('common.welcome')}</h1>;
+};
 
-4. **Language switching** - Use the custom hook
-   ```typescript
-   import { useLanguage } from '@/hooks/useLanguage';
-   
-   const { currentLanguage, changeLanguage } = useLanguage();
-   ```
+// 2. 语言切换
+import { useLanguage } from '@/hooks/useLanguage';
 
-5. **Adding new translations**
-   - Add keys to all three language files (zh.json, en.json, es.json)
-   - Keep the same structure across all files
-   - Use descriptive, hierarchical key names
+const { currentLanguage, changeLanguage } = useLanguage();
+// changeLanguage('en') 切换到英语
 
-6. **Key naming conventions**
-   - Use dot notation: `section.subsection.item`
-   - Be descriptive: `navigation.aiQuery` not `nav.ai`
-   - Group related translations together
+// 3. 多语言文本对象处理
+const getLocalizedText = (text: MultiLanguageText): string => {
+  const langKey = currentLanguage as keyof MultiLanguageText;
+  return text[langKey] || text['zh-CN'];
+};
+```
+
+### Translation Structure
+```json
+{
+  "common": { /* 公共翻译 */ },
+  "navigation": { /* 导航菜单 */ },
+  "errors": { /* 错误处理 */ },
+  "features": { /* 功能模块 */ }
+}
+```
+
+### Best Practices
+- 永远使用翻译键，禁止硬编码文本
+- 所有新功能必须同时添加三种语言的翻译
+- 使用层级结构组织翻译键 (`module.section.item`)
+- 通过 App.tsx 中的 Suspense 确保翻译资源加载完成
 
 ## Dictionary Service (字典服务)
 
@@ -221,3 +221,71 @@ const { data: categoryDict = [] } = useQuery({
 - **Usage**: Use `key` for API queries, `label` for display text
 
 See implementation in `ProductsPage.tsx` for complete usage example.
+
+## Error Handling System (错误处理系统)
+
+### Overview
+项目实现了统一的错误处理架构，包含智能错误解析、用户友好提示和多语言支持。
+
+### Core Components
+- **ErrorBoundary** (`@/components/common/ErrorBoundary.tsx`): 通用错误显示容器
+- **PermissionError** (`@/components/common/PermissionError.tsx`): 权限错误专用组件  
+- **ErrorParser** (`@/utils/errorParser.ts`): 错误解析和分类工具
+- **useErrorHandler** (`@/hooks/useErrorHandler.ts`): 统一错误处理Hook
+
+### Usage Examples
+
+```typescript
+// 1. React Query错误处理
+const errorHandler = useQueryErrorHandler({
+  module: 'inquiry',
+  action: 'read', 
+  resourceType: 'list'
+});
+
+const { data, error } = useQuery({
+  queryKey: ['inquiries'],
+  queryFn: () => InquiryService.getInquiries(),
+  retry: false // 建议禁用重试避免重复请求
+});
+
+// 手动处理错误
+useEffect(() => {
+  if (error && !errorHandler.hasError) {
+    errorHandler.handleError(error);
+  }
+}, [error, errorHandler]);
+
+// 2. 条件渲染错误组件
+if (errorHandler.isPermissionError) {
+  return (
+    <PermissionError
+      error={errorHandler.parsedError}
+      businessContext="inquiry"
+      onRetry={() => errorHandler.retry(refetch)}
+      onNavigateBack={() => errorHandler.navigateBack('/')}
+    />
+  );
+}
+
+if (errorHandler.hasError) {
+  return (
+    <ErrorBoundary
+      error={errorHandler.parsedError}
+      loading={isLoading}
+      onRetry={() => errorHandler.retry(refetch)}
+      onNavigateBack={() => errorHandler.navigateBack('/')}
+    />
+  );
+}
+```
+
+### Error Types
+- **Permission**: 权限相关错误 (403)
+- **Auth**: 认证相关错误 (401) 
+- **Network**: 网络连接错误
+- **Data**: 数据不存在错误 (404)
+- **Business**: 业务逻辑错误 (400)
+
+### Translation Keys
+错误信息支持多语言，相关翻译键位于 `errors.*` 命名空间下。详见翻译文件结构。

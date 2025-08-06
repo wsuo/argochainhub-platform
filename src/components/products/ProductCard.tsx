@@ -6,6 +6,8 @@ import { useTranslation } from "react-i18next";
 import { useLanguage } from "@/hooks/useLanguage";
 import { Product, MultiLanguageText } from "@/types/product";
 import { Link } from "react-router-dom";
+import { CreateInquiryDialog } from "@/components/inquiries/CreateInquiryDialog";
+import { useState } from "react";
 
 interface ProductCardProps {
   product: Product;
@@ -22,6 +24,7 @@ export const ProductCard = ({
 }: ProductCardProps) => {
   const { t } = useTranslation();
   const { currentLanguage } = useLanguage();
+  const [showInquiryDialog, setShowInquiryDialog] = useState(false);
 
   // 获取多语言文本的辅助函数
   const getLocalizedText = (text: MultiLanguageText | null): string => {
@@ -30,17 +33,23 @@ export const ProductCard = ({
     return text[langKey] || text['zh-CN'] || '';
   };
 
+  // 处理询价
+  const handleInquire = () => {
+    setShowInquiryDialog(true);
+    onInquire?.(); // 保持原有回调
+  };
+
   // 获取评级星级
   const rating = parseFloat(product.supplier.rating);
   const fullStars = Math.floor(rating);
   const hasHalfStar = rating % 1 >= 0.5;
 
   return (
-    <Card className="group hover:shadow-lg transition-all duration-300 border-border/50 hover:border-primary/30 h-full flex flex-col">
+    <Card className="hover:shadow-lg transition-all duration-300 border-border/50 hover:border-primary/30 h-full flex flex-col">
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between mb-2">
           <div className="flex-1 min-w-0">
-            <CardTitle className="text-lg line-clamp-2 group-hover:text-primary transition-colors">
+            <CardTitle className="text-lg line-clamp-2 hover:text-primary transition-colors">
               {getLocalizedText(product.name)}
             </CardTitle>
             <CardDescription className="text-sm text-muted-foreground mt-1">
@@ -140,7 +149,7 @@ export const ProductCard = ({
         {/* 操作按钮 */}
         <div className="space-y-2 mt-auto">
           <Link to={`/products/${product.id}`}>
-            <Button variant="outline" className="w-full group-hover:bg-primary group-hover:text-primary-foreground transition-all">
+            <Button variant="outline" className="w-full hover:bg-primary hover:text-primary-foreground transition-all">
               <Eye className="h-4 w-4 mr-2" />
               {t('products.viewDetails')}
             </Button>
@@ -151,15 +160,17 @@ export const ProductCard = ({
               variant="outline"
               size="sm"
               onClick={onAddToCart}
-              className="hover:bg-agro-green hover:text-white transition-colors"
+              className="hover:bg-green-500 hover:text-white hover:border-green-500 transition-colors"
+              title={t('products.addToCart')}
             >
               <ShoppingCart className="h-3 w-3" />
             </Button>
             <Button
               variant="outline"
               size="sm"
-              onClick={onInquire}
-              className="hover:bg-primary hover:text-primary-foreground transition-colors"
+              onClick={handleInquire}
+              className="hover:bg-primary hover:text-primary-foreground hover:border-primary transition-colors"
+              title={t('products.inquireNow')}
             >
               <MessageSquare className="h-3 w-3" />
             </Button>
@@ -167,13 +178,21 @@ export const ProductCard = ({
               variant="outline"
               size="sm"
               onClick={onRequestSample}
-              className="hover:bg-agro-blue hover:text-white transition-colors"
+              className="hover:bg-blue-500 hover:text-white hover:border-blue-500 transition-colors"
+              title={t('products.requestSample')}
             >
               <TestTube className="h-3 w-3" />
             </Button>
           </div>
         </div>
       </CardContent>
+
+      {/* 询价弹窗 */}
+      <CreateInquiryDialog
+        open={showInquiryDialog}
+        onOpenChange={setShowInquiryDialog}
+        product={product}
+      />
     </Card>
   );
 };
