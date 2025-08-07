@@ -259,6 +259,38 @@
       "AUTH_TOKEN_EXPIRED": {
         "title": "Sesión expirada", 
         "message": "Su sesión ha expirado, por favor inicie sesión nuevamente para continuar usando las funciones de consulta."
+      },
+      "PERMISSION_COMPANY_NOT_ASSOCIATED": {
+        "title": "La función de consulta requiere autenticación de empresa",
+        "message": "El acceso a las funciones de gestión de consultas requiere completar la autenticación de empresa primero. Vaya a la configuración de la empresa para completar el proceso de autenticación."
+      },
+      "PERMISSION_INVALID_COMPANY_TYPE": {
+        "title": "Tipo de empresa no cumple con los requisitos",
+        "message": "Su tipo de empresa no puede acceder a las funciones de consulta. Póngase en contacto con atención al cliente para conocer los requisitos detallados."
+      },
+      "PERMISSION_ACCESS_DENIED": {
+        "title": "Sin acceso a esta consulta",
+        "message": "No tiene permisos para ver esta información de consulta. Solo los compradores o proveedores relacionados pueden acceder a ella."
+      },
+      "SUBSCRIPTION_NOT_FOUND": {
+        "title": "Servicio de Consulta No Activado",
+        "message": "Su cuenta no ha activado el servicio de consulta. Póngase en contacto con atención al cliente para activar esta función."
+      },
+      "SUBSCRIPTION_EXPIRED": {
+        "title": "Servicio de Consulta Expirado",
+        "message": "Su servicio de consulta ha expirado. Por favor renueve para continuar usando esta función."
+      },
+      "SUBSCRIPTION_REQUIRED": {
+        "title": "Activación de Servicio de Consulta Requerida",
+        "message": "El uso de las funciones de consulta requiere activación de servicio. Póngase en contacto con atención al cliente para más detalles."
+      },
+      "BUSINESS_VALIDATION_ERROR": {
+        "title": "Error de Validación de Datos",
+        "message": "Los datos enviados no cumplen con los requisitos. Por favor verifique su entrada e inténtelo de nuevo."
+      },
+      "DATA_NOT_FOUND": {
+        "title": "La consulta no existe",
+        "message": "La consulta que busca puede haber sido eliminada o no existir, por favor verifique si el número de consulta es correcto."
       }
     },
     "company": {
@@ -315,6 +347,28 @@
       "title": "Error desconocido",
       "message": "Ocurrió un error desconocido, inténtelo de nuevo más tarde."
     },
+    "SUBSCRIPTION_NOT_FOUND": {
+      "title": "Servicio No Activado",
+      "message": "Su cuenta no ha activado este servicio. Póngase en contacto con atención al cliente para activarlo."
+    },
+    "SUBSCRIPTION_EXPIRED": {
+      "title": "Servicio Expirado",
+      "message": "Su servicio ha expirado. Por favor renueve para continuar usándolo."
+    },
+    "SUBSCRIPTION_REQUIRED": {
+      "title": "Activación de Servicio Requerida",
+      "message": "Esta función requiere activación de servicio."
+    },
+    "BUSINESS_VALIDATION_ERROR": {
+      "title": "Error de Validación de Datos",
+      "message": "Los datos enviados no cumplen con los requisitos. Por favor verifique e inténtelo de nuevo."
+    },
+    "BUSINESS_OPERATION_NOT_ALLOWED": {
+      "title": "Operación No Permitida",
+      "message": "Esta operación no se puede realizar en el estado actual."
+    },
+    "validationErrors": "Detalles del Error de Validación:",
+    "technicalDetails": "Detalles Técnicos",
     "AUTH_UNAUTHORIZED": {
       "title": "Inicio de sesión requerido",
       "message": "Necesita iniciar sesión para acceder a esta función."
