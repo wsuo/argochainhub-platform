@@ -115,12 +115,11 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
     }
   };
 
-  // 组件挂载时加载通知
+  // 组件挂载时加载通知 - 只在首次挂载时执行
   useEffect(() => {
-    if (notifications.length === 0 && !loading) {
-      fetchNotifications();
-    }
-  }, [notifications.length, loading, fetchNotifications]);
+    fetchNotifications();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // 空依赖数组，只在组件挂载时执行一次
 
   return (
     <div className={cn(
@@ -204,10 +203,18 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
       <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as 'all' | 'unread')}>
         <div className="px-4 pt-3">
           <TabsList className="grid w-full grid-cols-2 h-8">
-            <TabsTrigger value="all" className="text-xs">
+            <TabsTrigger 
+              value="all" 
+              className="text-xs h-full flex items-center justify-center py-0 px-2 data-[state=active]:bg-background data-[state=active]:text-foreground"
+              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+            >
               全部 ({notifications.length})
             </TabsTrigger>
-            <TabsTrigger value="unread" className="text-xs">
+            <TabsTrigger 
+              value="unread" 
+              className="text-xs h-full flex items-center justify-center py-0 px-2 data-[state=active]:bg-background data-[state=active]:text-foreground"
+              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+            >
               未读 ({unreadCount})
             </TabsTrigger>
           </TabsList>
