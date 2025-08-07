@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLanguage } from '@/hooks/useLanguage';
 import { useMutation } from '@tanstack/react-query';
@@ -62,6 +62,7 @@ export const CreateInquiryDialog: React.FC<CreateInquiryDialogProps> = ({
   const { currentLanguage } = useLanguage();
   const { user } = useAuth();
   const [step, setStep] = useState<'form' | 'success'>('form');
+  const quantityInputRef = useRef<HTMLInputElement>(null);
 
   const errorHandler = useErrorHandler({
     businessContext: { module: 'inquiry', action: 'create', resourceType: 'inquiry' }
@@ -121,6 +122,33 @@ export const CreateInquiryDialog: React.FC<CreateInquiryDialogProps> = ({
   const handleSubmit = (data: FormData) => {
     submitMutation.mutate(data);
   };
+
+  // 对话框打开时聚焦到数量输入框
+  useEffect(() => {
+    if (open && step === 'form') {
+      // 使用多个定时器确保聚焦生效，覆盖其他可能的聚焦逻辑
+      const timer1 = setTimeout(() => {
+        quantityInputRef.current?.focus();
+        quantityInputRef.current?.select();
+      }, 50);
+      
+      const timer2 = setTimeout(() => {
+        quantityInputRef.current?.focus();
+        quantityInputRef.current?.select();
+      }, 200);
+      
+      const timer3 = setTimeout(() => {
+        quantityInputRef.current?.focus();
+        quantityInputRef.current?.select();
+      }, 500);
+      
+      return () => {
+        clearTimeout(timer1);
+        clearTimeout(timer2);
+        clearTimeout(timer3);
+      };
+    }
+  }, [open, step]);
 
   const handleClose = () => {
     if (step === 'success') {
@@ -246,6 +274,8 @@ export const CreateInquiryDialog: React.FC<CreateInquiryDialogProps> = ({
                 placeholder="请输入产品名称"
                 readOnly={!!product}
                 className={product ? 'bg-muted cursor-not-allowed' : ''}
+                autoFocus={false}
+                tabIndex={product ? -1 : 1}
               />
               {form.formState.errors.productName && (
                 <p className="text-sm text-red-600 mt-1">
@@ -259,9 +289,12 @@ export const CreateInquiryDialog: React.FC<CreateInquiryDialogProps> = ({
                 <Label htmlFor="quantity">需求数量 *</Label>
                 <Input
                   id="quantity"
+                  ref={quantityInputRef}
                   type="number"
                   {...form.register('quantity', { valueAsNumber: true })}
                   placeholder="1000"
+                  autoFocus={true}
+                  tabIndex={0}
                 />
                 {form.formState.errors.quantity && (
                   <p className="text-sm text-red-600 mt-1">
