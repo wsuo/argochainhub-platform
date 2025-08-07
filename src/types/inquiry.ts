@@ -155,19 +155,28 @@ export interface MessageQueryParams {
   desc?: boolean;
 }
 
-// 创建询价请求
-export interface CreateInquiryRequest {
-  productName: string;
-  productId?: string;
-  supplierId?: string;
+// 创建询价商品项（根据API文档调整）
+export interface CreateInquiryItemRequest {
+  productId: number;        // 改为number类型
   quantity: number;
-  quantityUnit: string;
-  deliveryLocation: string;
-  deadline: string;
+  unit: string;             // 字段名从quantityUnit改为unit
+  packagingReq?: string;    // 字段名从packagingRequirements改为packagingReq
+}
+
+// 创建询价详情（根据API文档调整）
+export interface CreateInquiryDetailsRequest {
+  deliveryLocation?: string;  // 改为可选
   tradeTerms?: string;
   paymentMethod?: string;
-  packagingRequirements?: string;
-  remarks?: string;
+  buyerRemarks?: string;      // 字段名从remarks改为buyerRemarks
+}
+
+// 创建询价请求（根据API文档调整）
+export interface CreateInquiryRequest {
+  supplierId: number;        // 移到顶层，改为number类型
+  deadline: string;          // 移到顶层
+  items: CreateInquiryItemRequest[];
+  details: CreateInquiryDetailsRequest;
 }
 
 // 询价状态本地化映射
