@@ -1,4 +1,4 @@
-import { Bell, Globe, User, ChevronDown, LogIn } from "lucide-react";
+import { Bell, Globe, User, ChevronDown, LogIn, ShoppingCart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -12,6 +12,7 @@ import { useTranslation } from "react-i18next";
 import { useLanguage } from "@/hooks/useLanguage";
 import { useAuth } from "@/contexts/MockAuthContext";
 import { useNotifications } from "@/contexts/NotificationContext";
+import { useCart } from "@/contexts/CartContext";
 import { useNavigate } from "react-router-dom";
 import { SUPPORTED_LANGUAGES } from "@/i18n/config";
 import { NotificationBell } from "@/components/notifications/NotificationBell";
@@ -25,9 +26,11 @@ export const Header = ({ userType }: HeaderProps) => {
   const { currentLanguage, changeLanguage } = useLanguage();
   const { user, isLoggedIn, logout, canSwitchToSupplier } = useAuth();
   const { unreadCount, wsStatus } = useNotifications();
+  const { getCartCount } = useCart();
   const navigate = useNavigate();
   
   const currentLangData = SUPPORTED_LANGUAGES.find(lang => lang.code === currentLanguage) || SUPPORTED_LANGUAGES[0];
+  const cartCount = getCartCount();
 
   const handleLogin = () => {
     navigate('/auth');
@@ -36,6 +39,10 @@ export const Header = ({ userType }: HeaderProps) => {
   const handleLogout = () => {
     logout();
     navigate('/');
+  };
+
+  const handleCartClick = () => {
+    navigate('/cart');
   };
 
   return (
@@ -76,6 +83,26 @@ export const Header = ({ userType }: HeaderProps) => {
         {/* Conditional rendering based on login status */}
         {isLoggedIn ? (
           <>
+            {/* Shopping Cart - Only for buyer users */}
+            {userType === 'buyer' && (
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={handleCartClick}
+                className="relative hover:bg-accent"
+              >
+                <ShoppingCart className="w-5 h-5" />
+                {cartCount > 0 && (
+                  <Badge 
+                    variant="destructive" 
+                    className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs"
+                  >
+                    {cartCount > 99 ? '99+' : cartCount}
+                  </Badge>
+                )}
+              </Button>
+            )}
+
             {/* Notifications */}
             <NotificationBell 
               unreadCount={unreadCount}

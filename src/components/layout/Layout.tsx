@@ -20,6 +20,7 @@ export const Layout = ({ children, userType = "buyer" }: LayoutProps) => {
     if (pathname === '/conversation-history') return 'conversation-history';
     if (pathname.startsWith('/inquiries')) return 'inquiries';
     if (pathname.startsWith('/inquiry-responses')) return 'inquiry-responses';
+    if (pathname === '/cart') return 'cart';
     return 'ai-query';
   };
 
@@ -30,6 +31,9 @@ export const Layout = ({ children, userType = "buyer" }: LayoutProps) => {
     switch (itemId) {
       case 'products':
         navigate('/products');
+        break;
+      case 'cart':
+        navigate('/cart');
         break;
       case 'conversation-history':
         navigate('/conversation-history');
@@ -56,7 +60,8 @@ export const Layout = ({ children, userType = "buyer" }: LayoutProps) => {
                          location.pathname === '/supplier' || 
                          location.pathname === '/conversation-history' ||
                          location.pathname.startsWith('/inquiries') ||
-                         location.pathname.startsWith('/inquiry-responses');
+                         location.pathname.startsWith('/inquiry-responses') ||
+                         location.pathname === '/cart';
   const currentActiveItem = getActiveItemFromPath(location.pathname);
 
   const renderContent = () => {
