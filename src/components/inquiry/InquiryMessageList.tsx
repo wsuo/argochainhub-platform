@@ -4,7 +4,7 @@ import { useLanguage } from "@/hooks/useLanguage";
 import { useAuth } from "@/contexts/MockAuthContext";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
-import { User, MessageSquare } from "lucide-react";
+import { MessageSquare } from "lucide-react";
 import { InquiryMessage, MultiLanguageText } from "@/types/inquiry";
 import { InquiryService } from "@/services/inquiryService";
 
@@ -40,41 +40,34 @@ export const InquiryMessageList = ({ messages, isLoading, className }: InquiryMe
                     (new Date(messages[index + 1]?.createdAt).getTime() - new Date(message.createdAt).getTime()) > 5 * 60 * 1000; // 5分钟间隔
 
     return (
-      <div key={message.id} className={`flex ${isCurrentUser ? 'justify-end' : 'justify-start'} mb-4`}>
-        <div className={`max-w-[70%] ${isCurrentUser ? 'order-2' : 'order-1'}`}>
+      <div key={message.id} className={`flex ${isCurrentUser ? 'justify-end' : 'justify-start'} mb-3`}>
+        <div className={`max-w-[75%] ${isCurrentUser ? 'order-2' : 'order-1'}`}>
           {/* 发送者信息 */}
           {showSender && (
-            <div className={`flex items-center gap-2 mb-2 ${isCurrentUser ? 'justify-end' : 'justify-start'}`}>
-              <div className={`flex items-center gap-2 text-xs text-muted-foreground ${isCurrentUser ? 'flex-row-reverse' : 'flex-row'}`}>
-                <div className={`w-6 h-6 rounded-full bg-gradient-to-br from-primary/20 to-agro-blue/20 flex items-center justify-center`}>
-                  <User className="h-3 w-3" />
-                </div>
-                <div className={`${isCurrentUser ? 'text-right' : 'text-left'}`}>
-                  <div className="font-medium">{message.sender.name}</div>
-                  <div className="text-xs opacity-75">
-                    {getLocalizedText(message.sender.company.name)}
-                  </div>
-                </div>
-              </div>
+            <div className={`mb-1 text-xs text-muted-foreground ${isCurrentUser ? 'text-right' : 'text-left'}`}>
+              <span className="font-medium">{message.sender.name}</span>
+              <span className="opacity-75 ml-1">
+                ({getLocalizedText(message.sender.company.name)})
+              </span>
             </div>
           )}
           
           {/* 消息内容 */}
           <div
-            className={`rounded-lg px-4 py-3 shadow-sm ${
+            className={`rounded-lg px-3 py-2 shadow-sm text-sm leading-relaxed ${
               isCurrentUser
-                ? 'bg-primary text-primary-foreground ml-4'
-                : 'bg-muted mr-4'
+                ? 'bg-green-600 text-white ml-2'
+                : 'bg-gray-100 text-gray-800 mr-2'
             }`}
           >
-            <p className="text-sm leading-relaxed whitespace-pre-wrap break-words">
+            <p className="whitespace-pre-wrap break-words">
               {message.message}
             </p>
           </div>
           
           {/* 时间戳 */}
           {showTime && (
-            <div className={`text-xs text-muted-foreground mt-1 ${isCurrentUser ? 'text-right mr-4' : 'text-left ml-4'}`}>
+            <div className={`text-xs text-muted-foreground mt-1 ${isCurrentUser ? 'text-right mr-2' : 'text-left ml-2'}`}>
               {InquiryService.formatDateTime(message.createdAt)}
             </div>
           )}

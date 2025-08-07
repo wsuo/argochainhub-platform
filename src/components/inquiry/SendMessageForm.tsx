@@ -66,13 +66,13 @@ export const SendMessageForm = ({ inquiryId, onMessageSent }: SendMessageFormPro
   };
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-3 p-4">
       <Textarea
         placeholder={t('inquiry.typeMessage')}
         value={message}
         onChange={(e) => setMessage(e.target.value)}
         onKeyDown={handleKeyDown}
-        className="min-h-[60px] resize-none"
+        className="min-h-[60px] resize-none border-gray-200 focus:border-green-500 focus:ring-green-500"
         disabled={sendMessageMutation.isPending}
         maxLength={1000}
       />
@@ -86,6 +86,7 @@ export const SendMessageForm = ({ inquiryId, onMessageSent }: SendMessageFormPro
           onClick={handleSendMessage}
           disabled={!message.trim() || sendMessageMutation.isPending}
           size="sm"
+          className="bg-green-600 hover:bg-green-700 text-white"
         >
           {sendMessageMutation.isPending ? (
             <Loader2 className="h-4 w-4 animate-spin mr-2" />
