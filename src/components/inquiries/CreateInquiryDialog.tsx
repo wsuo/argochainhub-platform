@@ -7,7 +7,7 @@ import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Product, MultiLanguageText } from '@/types/product';
-import { CreateInquiryRequest } from '@/types/inquiry';
+import { CreateInquiryRequest, CreateInquiryItemRequest, CreateInquiryDetailsRequest } from '@/types/inquiry';
 import { InquiryService } from '@/services/inquiryService';
 import { useErrorHandler } from '@/hooks/useErrorHandler';
 
@@ -92,19 +92,28 @@ export const CreateInquiryDialog: React.FC<CreateInquiryDialogProps> = ({
 
   const submitMutation = useMutation({
     mutationFn: async (data: FormData) => {
-      // 转换表单数据为API请求格式
+      // 根据API文档转换表单数据为正确的请求格式
+      if (!product?.id || !product?.supplier.id) {
+        throw new Error('产品信息缺失，无法创建询价');
+      }
+
       const inquiryRequest: CreateInquiryRequest = {
-        productName: data.productName,
-        productId: product?.id,
-        supplierId: product?.supplier.id,
-        quantity: data.quantity,
-        quantityUnit: data.quantityUnit,
-        deliveryLocation: data.deliveryLocation,
-        deadline: data.deadline,
-        tradeTerms: data.tradeTerms,
-        paymentMethod: data.paymentMethod,
-        packagingRequirements: data.packagingRequirements,
-        remarks: data.remarks,
+        supplierId: parseInt(product.supplier.id), // 移到顶层，确保是number类型
+        deadline: data.deadline,                   // 移到顶层
+        items: [
+          {
+            productId: parseInt(product.id),       // 改为number类型
+            quantity: data.quantity,
+            unit: data.quantityUnit,               // 字段名改为unit
+            packagingReq: data.packagingRequirements, // 字段名改为packagingReq
+          }
+        ],
+        details: {
+          deliveryLocation: data.deliveryLocation,
+          tradeTerms: data.tradeTerms,
+          paymentMethod: data.paymentMethod,
+          buyerRemarks: data.remarks,              // 字段名改为buyerRemarks
+        }
       };
 
       return InquiryService.createInquiry(inquiryRequest);
