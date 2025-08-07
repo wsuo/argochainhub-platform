@@ -294,6 +294,22 @@
         "title": "No access to this inquiry",
         "message": "You do not have permission to view this inquiry information. Only related buyers or suppliers can access it."
       },
+      "SUBSCRIPTION_NOT_FOUND": {
+        "title": "Inquiry Service Not Activated",
+        "message": "Your account has not activated the inquiry service. Please contact customer service to activate this feature."
+      },
+      "SUBSCRIPTION_EXPIRED": {
+        "title": "Inquiry Service Expired",
+        "message": "Your inquiry service has expired. Please renew to continue using this feature."
+      },
+      "SUBSCRIPTION_REQUIRED": {
+        "title": "Inquiry Service Activation Required",
+        "message": "Using inquiry features requires service activation. Please contact customer service for details."
+      },
+      "BUSINESS_VALIDATION_ERROR": {
+        "title": "Data Validation Failed",
+        "message": "The submitted data does not meet requirements. Please check your input and try again."
+      },
       "DATA_NOT_FOUND": {
         "title": "Inquiry does not exist",
         "message": "The inquiry you are looking for may have been deleted or does not exist, please check if the inquiry number is correct."
@@ -335,6 +351,28 @@
       "title": "Unknown error",
       "message": "An unknown error occurred, please try again later."
     },
+    "SUBSCRIPTION_NOT_FOUND": {
+      "title": "Service Not Activated",
+      "message": "Your account has not activated this service. Please contact customer service to activate it."
+    },
+    "SUBSCRIPTION_EXPIRED": {
+      "title": "Service Expired",
+      "message": "Your service has expired. Please renew to continue using it."
+    },
+    "SUBSCRIPTION_REQUIRED": {
+      "title": "Service Activation Required",
+      "message": "This feature requires service activation."
+    },
+    "BUSINESS_VALIDATION_ERROR": {
+      "title": "Data Validation Failed",
+      "message": "The submitted data does not meet requirements. Please check and try again."
+    },
+    "BUSINESS_OPERATION_NOT_ALLOWED": {
+      "title": "Operation Not Allowed",
+      "message": "This operation cannot be performed in the current state."
+    },
+    "validationErrors": "Validation Error Details:",
+    "technicalDetails": "Technical Details",
     "AUTH_UNAUTHORIZED": {
       "title": "Login Required",
       "message": "You need to log in to access this feature."
