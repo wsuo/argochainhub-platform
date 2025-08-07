@@ -54,7 +54,8 @@ export const FeatureCards = ({ userType }: FeatureCardsProps) => {
       description: "收集心仪产品，批量发起询价、样品和登记申请",
       icon: ShoppingCart,
       stats: "批量操作",
-      buttonText: "查看购物车"
+      buttonText: "查看购物车",
+      link: "/cart"
     },
     {
       id: "suppliers",

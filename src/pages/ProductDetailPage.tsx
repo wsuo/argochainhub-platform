@@ -17,7 +17,8 @@ import {
   MessageSquare, 
   TestTube,
   AlertCircle,
-  RefreshCw
+  RefreshCw,
+  Check
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useLanguage } from "@/hooks/useLanguage";
@@ -27,6 +28,11 @@ import { useQuery } from "@tanstack/react-query";
 import { productService } from "@/services/productService";
 import { Product, MultiLanguageText } from "@/types/product";
 import { ProductCard } from "@/components/products/ProductCard";
+import { useCart } from "@/contexts/CartContext";
+import { CreateInquiryDialog } from "@/components/inquiries/CreateInquiryDialog";
+import { AuthDialog } from "@/components/auth/AuthDialog";
+import { useAuthGuard } from "@/hooks/useAuthGuard";
+import { useState } from "react";
 
 const ProductDetailPage = () => {
   const { t } = useTranslation();
@@ -34,6 +40,17 @@ const ProductDetailPage = () => {
   const { currentUserType } = useAuth();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { addToCart, isInCart } = useCart();
+  const [showInquiryDialog, setShowInquiryDialog] = useState(false);
+
+  // 使用认证守卫
+  const {
+    showAuthDialog,
+    authConfig,
+    executeWithAuth,
+    handleAuthSuccess,
+    closeAuthDialog
+  } = useAuthGuard();
 
   // 获取多语言文本的辅助函数
   const getLocalizedText = (text: MultiLanguageText): string => {
@@ -64,21 +81,56 @@ const ProductDetailPage = () => {
 
   const product = productResponse?.data;
 
+  // Check if product is already in cart
+  const isProductInCart = product ? isInCart(product.id) : false;
+
   // 处理操作
   const handleAddToCart = () => {
-    console.log('Add to cart:', product);
-    // TODO: 实现添加到购物车逻辑
+    if (!product) return;
+    
+    if (isProductInCart) {
+      // If already in cart, do nothing or show a message
+      return;
+    }
+
+    executeWithAuth(async () => {
+      await addToCart(product, 1, 'kg');
+    }, {
+      title: t('auth.loginToAddCart', { defaultValue: '登录以添加到购物车' }),
+      description: t('auth.cartLoginDesc', { 
+        defaultValue: '请登录您的账户以添加产品到购物车' 
+      }),
+      requiredUserType: 'buyer'
+    });
   };
 
   const handleInquire = () => {
-    // TODO: 实现创建询价对话框
-    // 暂时跳转到询价管理页面
-    navigate('/inquiries');
+    if (!product) return;
+
+    executeWithAuth(() => {
+      setShowInquiryDialog(true);
+    }, {
+      title: t('auth.loginToInquire', { defaultValue: '登录以发起询价' }),
+      description: t('auth.inquireLoginDesc', { 
+        defaultValue: '请登录您的账户以向供应商发起产品询价' 
+      }),
+      requiredUserType: 'buyer'
+    });
   };
 
   const handleRequestSample = () => {
-    console.log('Request sample for product:', product);
-    // TODO: 实现申请样品逻辑
+    if (!product) return;
+
+    executeWithAuth(() => {
+      console.log('Request sample for product:', product);
+      // TODO: 实现申请样品逻辑
+    }, {
+      title: t('auth.loginToRequestSample', { defaultValue: '登录以申请样品' }),
+      description: t('auth.sampleLoginDesc', { 
+        defaultValue: '请登录您的账户以向供应商申请产品样品' 
+      }),
+      requiredUserType: 'buyer'
+    });
   };
 
   if (error) {
@@ -187,9 +239,17 @@ const ProductDetailPage = () => {
                 
                 {/* 操作按钮 */}
                 <div className="flex flex-col sm:flex-row gap-3">
-                  <Button onClick={handleAddToCart} variant="outline">
-                    <ShoppingCart className="h-4 w-4 mr-2" />
-                    {t('products.addToCart')}
+                  <Button 
+                    onClick={handleAddToCart} 
+                    variant="outline"
+                    disabled={isProductInCart}
+                    className={isProductInCart 
+                      ? "bg-green-500 text-white border-green-500 hover:bg-green-600" 
+                      : "hover:bg-green-500 hover:text-white hover:border-green-500 transition-colors"
+                    }
+                  >
+                    {isProductInCart ? <Check className="h-4 w-4 mr-2" /> : <ShoppingCart className="h-4 w-4 mr-2" />}
+                    {isProductInCart ? t('products.alreadyInCart') : t('products.addToCart')}
                   </Button>
                   <Button onClick={handleInquire}>
                     <MessageSquare className="h-4 w-4 mr-2" />
@@ -402,9 +462,9 @@ const ProductDetailPage = () => {
                     <ProductCard
                       key={relatedProduct.id}
                       product={relatedProduct}
-                      onAddToCart={() => handleAddToCart()}
-                      onInquire={() => handleInquire()}
-                      onRequestSample={() => handleRequestSample()}
+                      onAddToCart={() => console.log('Add related product to cart')}
+                      onInquire={() => console.log('Inquire related product')}
+                      onRequestSample={() => console.log('Request sample for related product')}
                     />
                   ))}
                 </div>
@@ -413,6 +473,24 @@ const ProductDetailPage = () => {
           )}
         </div>
       </main>
+
+      {/* 询价弹窗 */}
+      {product && (
+        <CreateInquiryDialog
+          open={showInquiryDialog}
+          onOpenChange={setShowInquiryDialog}
+          product={product}
+        />
+      )}
+
+      {/* 认证弹窗 */}
+      <AuthDialog
+        open={showAuthDialog}
+        onOpenChange={closeAuthDialog}
+        onSuccess={handleAuthSuccess}
+        title={authConfig.title}
+        description={authConfig.description}
+      />
     </Layout>
   );
 };
