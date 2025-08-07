@@ -37,12 +37,19 @@ export class ErrorParser {
       severity = ErrorSeverity.HIGH;
     }
 
+    // 处理详细的验证错误信息
+    let processedDetails = details;
+    if (statusCode === 400 && Array.isArray(message)) {
+      // 400错误且消息是数组时，将验证错误信息整合到details中
+      processedDetails = message.join('\n');
+    }
+
     return {
       type: errorType,
       severity,
       title: this.getErrorTitle(errorType, businessContext),
       message: this.getErrorMessage(errorType, message, businessContext),
-      details,
+      details: processedDetails,
       statusCode,
       originalError: error,
       timestamp: new Date(),
@@ -53,9 +60,12 @@ export class ErrorParser {
   /**
    * 匹配错误消息模式
    */
-  private static matchErrorPattern(message: string) {
+  private static matchErrorPattern(message: string | string[]) {
+    // 如果是数组，转换为字符串进行匹配
+    const messageStr = Array.isArray(message) ? message.join(' ') : message;
+    
     for (const pattern of ALL_ERROR_PATTERNS) {
-      if (pattern.pattern.test(message)) {
+      if (pattern.pattern.test(messageStr)) {
         return pattern;
       }
     }

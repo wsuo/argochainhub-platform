@@ -145,6 +145,26 @@ export const ErrorBoundary: React.FC<ErrorBoundaryProps> = ({
     defaultValue: 'Please try again or contact support if the problem persists'
   });
 
+  // 处理验证错误的详细信息展示
+  const getValidationErrorDisplay = () => {
+    if (error.statusCode === 400 && error.details) {
+      const details = typeof error.details === 'string' ? error.details.split('\n') : [];
+      if (details.length > 0) {
+        return (
+          <div className="mt-2 space-y-1">
+            <p className="text-sm font-medium">{t('errors.validationErrors', { defaultValue: '验证错误详情：' })}</p>
+            <ul className="text-sm text-muted-foreground space-y-1 pl-4">
+              {details.map((detail, index) => (
+                <li key={index} className="list-disc">{detail}</li>
+              ))}
+            </ul>
+          </div>
+        );
+      }
+    }
+    return null;
+  };
+
   return (
     <div className={`w-full ${className}`}>
       {/* 返回按钮 - 左上角 */}
@@ -175,6 +195,9 @@ export const ErrorBoundary: React.FC<ErrorBoundaryProps> = ({
                 <p className="text-sm leading-relaxed">
                   {errorMessage}
                 </p>
+                
+                {/* 验证错误详情展示 */}
+                {getValidationErrorDisplay()}
                 
                 {showDetails && error.details && (
                   <details className="text-xs text-muted-foreground">

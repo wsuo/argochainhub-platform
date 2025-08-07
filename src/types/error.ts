@@ -34,6 +34,11 @@ export enum ErrorType {
   BUSINESS_DEADLINE_PASSED = 'BUSINESS_DEADLINE_PASSED',
   BUSINESS_STATUS_INVALID = 'BUSINESS_STATUS_INVALID',
   
+  // 订阅相关错误
+  SUBSCRIPTION_NOT_FOUND = 'SUBSCRIPTION_NOT_FOUND',
+  SUBSCRIPTION_EXPIRED = 'SUBSCRIPTION_EXPIRED',
+  SUBSCRIPTION_REQUIRED = 'SUBSCRIPTION_REQUIRED',
+  
   // 通用错误
   UNKNOWN_ERROR = 'UNKNOWN_ERROR',
   SYSTEM_MAINTENANCE = 'SYSTEM_MAINTENANCE'
@@ -134,6 +139,25 @@ export const PERMISSION_ERROR_PATTERNS: ErrorPattern[] = [
   }
 ];
 
+// 订阅错误消息模式
+export const SUBSCRIPTION_ERROR_PATTERNS: ErrorPattern[] = [
+  {
+    pattern: /No active subscription found/i,
+    errorType: ErrorType.SUBSCRIPTION_NOT_FOUND,
+    severity: ErrorSeverity.HIGH
+  },
+  {
+    pattern: /subscription.*expired/i,
+    errorType: ErrorType.SUBSCRIPTION_EXPIRED,
+    severity: ErrorSeverity.HIGH
+  },
+  {
+    pattern: /subscription.*required/i,
+    errorType: ErrorType.SUBSCRIPTION_REQUIRED,
+    severity: ErrorSeverity.HIGH
+  }
+];
+
 // 业务逻辑错误模式
 export const BUSINESS_ERROR_PATTERNS: ErrorPattern[] = [
   {
@@ -165,6 +189,7 @@ export const API_ERROR_PATTERNS: ErrorPattern[] = [
 // 所有错误模式
 export const ALL_ERROR_PATTERNS: ErrorPattern[] = [
   ...PERMISSION_ERROR_PATTERNS,
+  ...SUBSCRIPTION_ERROR_PATTERNS,
   ...BUSINESS_ERROR_PATTERNS,
   ...API_ERROR_PATTERNS
 ];
