@@ -154,8 +154,8 @@ const ProductsPage = () => {
   // 处理操作 - 现在这些操作由ProductCard内部的认证守卫处理
   const handleAddToCart = (product: Product) => {
     console.log('Add to cart:', product);
-    // TODO: 实现添加到购物车逻辑
-    // 实际的购物车操作将在这里实现
+    // 购物车操作现在在ProductCard组件内部处理
+    // 这个回调主要用于额外的日志记录或分析
   };
 
   const handleInquire = (product: Product) => {

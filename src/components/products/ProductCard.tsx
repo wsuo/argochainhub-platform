@@ -1,7 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Star, Building2, Eye, ShoppingCart, MessageSquare, TestTube } from "lucide-react";
+import { Star, Building2, Eye, ShoppingCart, MessageSquare, TestTube, Check } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useLanguage } from "@/hooks/useLanguage";
 import { Product, MultiLanguageText } from "@/types/product";
@@ -9,6 +9,7 @@ import { Link } from "react-router-dom";
 import { CreateInquiryDialog } from "@/components/inquiries/CreateInquiryDialog";
 import { AuthDialog } from "@/components/auth/AuthDialog";
 import { useAuthGuard } from "@/hooks/useAuthGuard";
+import { useCart } from "@/contexts/CartContext";
 import { useState } from "react";
 
 interface ProductCardProps {
@@ -27,6 +28,7 @@ export const ProductCard = ({
   const { t } = useTranslation();
   const { currentLanguage } = useLanguage();
   const [showInquiryDialog, setShowInquiryDialog] = useState(false);
+  const { addToCart, isInCart } = useCart();
   
   // 使用认证守卫
   const {
@@ -36,6 +38,9 @@ export const ProductCard = ({
     handleAuthSuccess,
     closeAuthDialog
   } = useAuthGuard();
+
+  // Check if product is already in cart
+  const isProductInCart = isInCart(product.id);
 
   // 获取多语言文本的辅助函数
   const getLocalizedText = (text: MultiLanguageText | null): string => {
@@ -60,7 +65,14 @@ export const ProductCard = ({
 
   // 处理添加到购物车
   const handleAddToCart = () => {
-    executeWithAuth(() => {
+    if (isProductInCart) {
+      // If already in cart, do nothing or show a message
+      return;
+    }
+
+    executeWithAuth(async () => {
+      // Default quantity and unit - you could make these configurable
+      await addToCart(product, 1, 'kg');
       onAddToCart?.();
     }, {
       title: t('auth.loginToAddCart', { defaultValue: '登录以添加到购物车' }),
@@ -205,10 +217,14 @@ export const ProductCard = ({
               variant="outline"
               size="sm"
               onClick={handleAddToCart}
-              className="hover:bg-green-500 hover:text-white hover:border-green-500 transition-colors"
-              title={t('products.addToCart')}
+              disabled={isProductInCart}
+              className={isProductInCart 
+                ? "hover:bg-green-500 hover:text-white hover:border-green-500 transition-colors bg-green-500 text-white border-green-500" 
+                : "hover:bg-green-500 hover:text-white hover:border-green-500 transition-colors"
+              }
+              title={isProductInCart ? t('products.alreadyInCart') : t('products.addToCart')}
             >
-              <ShoppingCart className="h-3 w-3" />
+              {isProductInCart ? <Check className="h-3 w-3" /> : <ShoppingCart className="h-3 w-3" />}
             </Button>
             <Button
               variant="outline"
