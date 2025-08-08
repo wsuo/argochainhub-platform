@@ -87,10 +87,10 @@ export const Sidebar = ({ userType, activeItem, onItemClick }: SidebarProps) => 
       description: "管理我的产品"
     },
     {
-      id: "inquiry-responses",
-      label: "询价响应",
+      id: "quote-management",
+      label: "报价管理",
       icon: FileText,
-      description: "处理询价请求"
+      description: "管理报价业务"
     },
     {
       id: "sample-responses",
