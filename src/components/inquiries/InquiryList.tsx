@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { useLanguage } from "@/hooks/useLanguage";
 import { useAuth } from "@/contexts/MockAuthContext";
@@ -50,6 +50,10 @@ export const InquiryList = ({ filters }: InquiryListProps) => {
     action: 'read',
     resourceType: 'list'
   });
+
+  const handleViewInquiry = (inquiryId: string) => {
+    navigate(`/inquiries/${inquiryId}`);
+  };
 
   // 获取多语言文本的辅助函数
   const getLocalizedText = (text: MultiLanguageText): string => {
@@ -145,17 +149,16 @@ export const InquiryList = ({ filters }: InquiryListProps) => {
   if (!inquiries.length) {
     return (
       <Card>
-        <CardContent className="text-center py-8">
-          <Package className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-muted-foreground mb-2">
-            {t('inquiry.noInquiries')}
-          </h3>
-          <p className="text-muted-foreground mb-4">
-            {t('inquiry.noInquiriesDesc')}
-          </p>
-          <Button onClick={() => navigate('/products')}>
-            {t('inquiry.browseProducts')}
-          </Button>
+        <CardContent className="pt-6">
+          <div className="text-center py-8">
+            <Package className="mx-auto h-12 w-12 text-muted-foreground" />
+            <h3 className="mt-2 text-sm font-medium text-foreground">
+              {t('inquiry.noData', '暂无询价数据')}
+            </h3>
+            <p className="mt-1 text-sm text-muted-foreground">
+              {t('inquiry.noDataDesc', '没有找到符合条件的询价单')}
+            </p>
+          </div>
         </CardContent>
       </Card>
     );
@@ -241,26 +244,25 @@ export const InquiryList = ({ filters }: InquiryListProps) => {
                     </div>
                   </TableCell>
                   <TableCell>
-                    <div className="flex gap-1">
+                    <div className="flex items-center space-x-2">
                       <Button
-                        variant="ghost"
+                        variant="outline"
                         size="sm"
-                        asChild
+                        onClick={() => handleViewInquiry(inquiry.id)}
                       >
-                        <Link to={`/inquiries/${inquiry.id}`}>
-                          <Eye className="w-4 h-4 mr-2" />
-                          {t('inquiry.viewDetails')}
-                        </Link>
+                        <Eye className="h-4 w-4 mr-1" />
+                        {t('inquiry.viewDetails')}
                       </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        asChild
-                      >
-                        <Link to={`/inquiries/${inquiry.id}#messages`}>
-                          <MessageSquare className="w-4 h-4" />
-                        </Link>
-                      </Button>
+                      {inquiry.recentMessages && inquiry.recentMessages.length > 0 && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleViewInquiry(inquiry.id)}
+                        >
+                          <MessageSquare className="h-4 w-4 mr-1" />
+                          {inquiry.recentMessages.length}
+                        </Button>
+                      )}
                     </div>
                   </TableCell>
                 </TableRow>
