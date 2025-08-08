@@ -45,6 +45,22 @@ export const Header = ({ userType }: HeaderProps) => {
     navigate('/cart');
   };
 
+  const handleLogoClick = () => {
+    // 如果用户已登录，根据用户实际类型跳转到相应的工作台
+    if (isLoggedIn && user) {
+      // 根据用户实际类型决定跳转目标
+      const actualUserType = user.userType === 'supplier' ? 'supplier' : 'buyer';
+      if (actualUserType === 'supplier') {
+        navigate('/supplier');
+      } else {
+        navigate('/buyer');
+      }
+    } else {
+      // 游客默认跳转到采购端
+      navigate('/buyer');
+    }
+  };
+
   return (
     <header className="h-16 bg-background border-b border-border px-6 flex items-center justify-between">
       {/* Left side - Simple Logo - 从Sidebar移过来 */}
@@ -52,7 +68,8 @@ export const Header = ({ userType }: HeaderProps) => {
         <img 
           src="/logo.png" 
           alt="AgroChainHub Logo" 
-          className="h-8 w-auto object-contain"
+          className="h-8 w-auto object-contain cursor-pointer hover:opacity-80 transition-opacity"
+          onClick={handleLogoClick}
         />
       </div>
 

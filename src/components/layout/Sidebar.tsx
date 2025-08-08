@@ -81,18 +81,6 @@ export const Sidebar = ({ userType, activeItem, onItemClick }: SidebarProps) => 
 
   const supplierMenuItems = [
     {
-      id: "ai-query",
-      label: "AI农药查询",
-      icon: MessageSquare,
-      description: "智能问答服务"
-    },
-    {
-      id: "conversation-history",
-      label: "对话历史",
-      icon: History,
-      description: "查看AI对话记录"
-    },
-    {
       id: "my-products",
       label: "我的产品库",
       icon: Database,
