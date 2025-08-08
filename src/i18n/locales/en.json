@@ -84,6 +84,50 @@
     "coreBuyerFeatures": "Core Buyer Features",
     "coreSupplierFeatures": "Core Supplier Features"
   },
+  "dashboard": {
+    "buyer": {
+      "title": "Buyer Dashboard",
+      "subtitle": "Smart Procurement Management, Efficient Business Collaboration",
+      "verified": "Verified",
+      "management": {
+        "inquiry": "Inquiry Management",
+        "inquiryDesc": "Publish procurement inquiries and track quotation progress",
+        "products": "Product Management",
+        "productsDesc": "Maintain procurement catalog and manage requirement lists",
+        "suppliers": "Supplier Management",
+        "suppliersDesc": "Manage supplier relationships and evaluate partners",
+        "orders": "Order Management",
+        "ordersDesc": "Track procurement orders and manage delivery progress",
+        "samples": "Sample Management",
+        "samplesDesc": "Request product samples and track sample status",
+        "contracts": "Contract Management",
+        "contractsDesc": "Handle procurement contracts and manage legal documents",
+        "favorites": "My Favorites",
+        "favoritesDesc": "Bookmark products and suppliers of interest"
+      },
+      "stats": {
+        "pendingInquiries": "Pending Inquiries",
+        "todayViews": "Today's Views",
+        "sampleRequests": "Sample Requests",
+        "favorites": "Favorites Count"
+      },
+      "sections": {
+        "latestMessages": "Latest Messages",
+        "hotProducts": "Hot Product Recommendations",
+        "viewMore": "View More"
+      },
+      "empty": {
+        "noMessages": "No new messages",
+        "noMessagesDesc": "System messages and business notifications will appear here",
+        "noProducts": "No recommended products",
+        "noProductsDesc": "Based on your procurement preferences, we will recommend suitable products"
+      }
+    },
+    "supplier": {
+      "title": "Supplier Dashboard",
+      "subtitle": "Manage your business and expand cooperation opportunities"
+    }
+  },
   "stats": {
     "products": "Pesticide Products",
     "suppliers": "Quality Suppliers",

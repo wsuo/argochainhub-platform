@@ -84,6 +84,50 @@
     "coreBuyerFeatures": "Funciones principales del comprador",
     "coreSupplierFeatures": "Funciones principales del proveedor"
   },
+  "dashboard": {
+    "buyer": {
+      "title": "Panel del Comprador",
+      "subtitle": "Gestión inteligente de adquisiciones, colaboración empresarial eficiente",
+      "verified": "Verificado",
+      "management": {
+        "inquiry": "Gestión de Consultas",
+        "inquiryDesc": "Publicar consultas de adquisición y rastrear progreso de cotizaciones",
+        "products": "Gestión de Productos",
+        "productsDesc": "Mantener catálogo de adquisiciones y gestionar listas de requisitos",
+        "suppliers": "Gestión de Proveedores",
+        "suppliersDesc": "Administrar relaciones con proveedores y evaluar socios",
+        "orders": "Gestión de Pedidos",
+        "ordersDesc": "Rastrear pedidos de adquisición y gestionar progreso de entrega",
+        "samples": "Gestión de Muestras",
+        "samplesDesc": "Solicitar muestras de productos y rastrear estado de muestras",
+        "contracts": "Gestión de Contratos",
+        "contractsDesc": "Manejar contratos de adquisición y gestionar documentos legales",
+        "favorites": "Mis Favoritos",
+        "favoritesDesc": "Marcar productos y proveedores de interés"
+      },
+      "stats": {
+        "pendingInquiries": "Consultas Pendientes",
+        "todayViews": "Vistas de Hoy",
+        "sampleRequests": "Solicitudes de Muestras",
+        "favorites": "Cantidad de Favoritos"
+      },
+      "sections": {
+        "latestMessages": "Mensajes Recientes",
+        "hotProducts": "Recomendaciones de Productos Populares",
+        "viewMore": "Ver Más"
+      },
+      "empty": {
+        "noMessages": "No hay mensajes nuevos",
+        "noMessagesDesc": "Los mensajes del sistema y notificaciones comerciales aparecerán aquí",
+        "noProducts": "No hay productos recomendados",
+        "noProductsDesc": "Basado en sus preferencias de adquisición, recomendaremos productos adecuados"
+      }
+    },
+    "supplier": {
+      "title": "Panel del Proveedor",
+      "subtitle": "Gestione su negocio y expanda oportunidades de cooperación"
+    }
+  },
   "stats": {
     "products": "Productos pesticidas",
     "suppliers": "Proveedores de calidad",

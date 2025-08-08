@@ -112,6 +112,50 @@
     "coreBuyerFeatures": "核心采购功能",
     "coreSupplierFeatures": "核心供应商功能"
   },
+  "dashboard": {
+    "buyer": {
+      "title": "采购商工作台",
+      "subtitle": "智能采购管理，高效业务协同",
+      "verified": "已认证",
+      "management": {
+        "inquiry": "询价管理",
+        "inquiryDesc": "发布询价需求，跟踪报价进度",
+        "products": "产品管理",
+        "productsDesc": "维护采购产品目录，管理需求清单",
+        "suppliers": "供应商管理",
+        "suppliersDesc": "管理供应商关系，评估合作伙伴",
+        "orders": "订单管理",
+        "ordersDesc": "跟踪采购订单，管理交付进度",
+        "samples": "样品管理",
+        "samplesDesc": "申请产品样品，跟踪样品状态",
+        "contracts": "合同管理",
+        "contractsDesc": "处理采购合同，管理法务文档",
+        "favorites": "我的收藏",
+        "favoritesDesc": "收藏感兴趣的产品和供应商"
+      },
+      "stats": {
+        "pendingInquiries": "待处理询价",
+        "todayViews": "今日浏览",
+        "sampleRequests": "样品申请",
+        "favorites": "收藏数量"
+      },
+      "sections": {
+        "latestMessages": "最新消息",
+        "hotProducts": "热门产品推荐",
+        "viewMore": "查看更多"
+      },
+      "empty": {
+        "noMessages": "暂无新消息",
+        "noMessagesDesc": "系统消息和业务通知将在这里显示",
+        "noProducts": "暂无推荐产品",
+        "noProductsDesc": "基于您的采购偏好，我们将推荐合适的产品"
+      }
+    },
+    "supplier": {
+      "title": "供应商工作台",
+      "subtitle": "管理您的业务，拓展合作机会"
+    }
+  },
   "chat": {
     "aiQueryTitle": "AI农药智能查询",
     "aiQuerySubtitle": "基于专业农药知识库的智能问答",
