@@ -11,6 +11,7 @@ import { Suspense } from "react";
 import Index from "./pages/Index";
 import AuthPage from "./pages/AuthPage";
 import SupplierDashboard from "./pages/SupplierDashboard";
+import BuyerDashboard from "./pages/BuyerDashboard";
 import ProductsPage from "./pages/ProductsPage";
 import ProductDetailPage from "./pages/ProductDetailPage";
 import CartPage from "./pages/CartPage";
@@ -37,6 +38,7 @@ const App = () => (
                     <Routes>
                       <Route path="/" element={<Index />} />
                       <Route path="/auth" element={<AuthPage />} />
+                      <Route path="/buyer" element={<BuyerDashboard />} />
                       <Route path="/supplier" element={<SupplierDashboard />} />
                       <Route path="/products" element={<ProductsPage />} />
                       <Route path="/products/:id" element={<ProductDetailPage />} />

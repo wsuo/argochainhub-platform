@@ -58,6 +58,7 @@ export const Layout = ({ children, userType = "buyer" }: LayoutProps) => {
   const isExternalRoute = location.pathname.startsWith('/products') || 
                          location.pathname === '/auth' || 
                          location.pathname === '/supplier' || 
+                         location.pathname === '/buyer' ||
                          location.pathname === '/conversation-history' ||
                          location.pathname.startsWith('/inquiries') ||
                          location.pathname.startsWith('/inquiry-responses') ||
