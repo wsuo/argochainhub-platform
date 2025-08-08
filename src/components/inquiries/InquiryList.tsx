@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { useLanguage } from "@/hooks/useLanguage";
 import { useAuth } from "@/contexts/MockAuthContext";
 import { useQueryErrorHandler } from "@/hooks/useErrorHandler";
+import { useInquiryMessaging } from "@/hooks/useInquiryMessaging";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -43,12 +44,53 @@ export const InquiryList = ({ filters }: InquiryListProps) => {
   const { isLoggedIn } = useAuth();
   const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
+  const [inquiries, setInquiries] = useState<Inquiry[]>([]);
 
   // 错误处理Hook
   const errorHandler = useQueryErrorHandler({
     module: 'inquiry',
     action: 'read',
     resourceType: 'list'
+  });
+
+  // 初始化消息推送功能
+  useInquiryMessaging({
+    onListMessageUpdate: (inquiryId, messageData) => {
+      // 更新列表中的最新消息
+      setInquiries(prev => prev.map(inquiry => {
+        if (inquiry.id === inquiryId.toString()) {
+          return {
+            ...inquiry,
+            recentMessages: [
+              {
+                id: messageData.messageId.toString(),
+                relatedService: 'inquiry',
+                relatedId: messageData.inquiryId.toString(),
+                message: messageData.message,
+                senderId: messageData.senderId.toString(),
+                createdAt: messageData.timestamp,
+                sender: {
+                  id: messageData.senderId.toString(),
+                  name: messageData.senderName,
+                  userType: messageData.senderCompanyType as 'buyer' | 'supplier',
+                  company: {
+                    id: messageData.senderId.toString(),
+                    name: {
+                      'zh-CN': messageData.senderCompany,
+                      'en': messageData.senderCompany,
+                      'es': messageData.senderCompany
+                    },
+                    type: messageData.senderCompanyType as 'buyer' | 'supplier'
+                  }
+                }
+              },
+              ...inquiry.recentMessages?.slice(0, 4) || []
+            ]
+          };
+        }
+        return inquiry;
+      }));
+    }
   });
 
   const handleViewInquiry = (inquiryId: string) => {
@@ -86,8 +128,14 @@ export const InquiryList = ({ filters }: InquiryListProps) => {
     enabled: isLoggedIn, // 只在用户登录时启用查询
   });
 
-  const inquiries = inquiryResponse?.data || [];
   const meta = inquiryResponse?.meta;
+
+  // 同步服务器数据到本地状态
+  useEffect(() => {
+    if (inquiryResponse?.data) {
+      setInquiries(inquiryResponse.data);
+    }
+  }, [inquiryResponse?.data]);
 
   // 获取状态显示文本
   const getStatusLabel = (statusCode: string): string => {

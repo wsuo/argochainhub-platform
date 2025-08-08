@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Checkbox } from '@/components/ui/checkbox';
+import { useInquiryMessaging } from '@/hooks/useInquiryMessaging';
 import { 
   Table, 
   TableBody, 
@@ -53,10 +54,56 @@ export const QuoteList = ({ filters }: QuoteListProps) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedQuotes, setSelectedQuotes] = useState<string[]>([]);
   const [showBatchActions, setShowBatchActions] = useState(false);
+  const [quotes, setQuotes] = useState<Quote[]>([]);
   
   const { data, isLoading, error, refetch } = useQuotes(filters, currentPage, 10);
   const declineQuotesMutation = useDeclineQuotes();
   const updatePriorityMutation = useUpdatePriority();
+
+  // 初始化消息推送功能
+  useInquiryMessaging({
+    onListMessageUpdate: (inquiryId, messageData) => {
+      // 更新供应端报价列表中的最新消息
+      setQuotes(prev => prev.map(quote => {
+        if (quote.id === inquiryId.toString()) {
+          return {
+            ...quote,
+            recentMessages: [
+              {
+                id: messageData.messageId,
+                message: messageData.message,
+                createdAt: messageData.timestamp,
+                senderId: messageData.senderId,
+                sender: {
+                  id: messageData.senderId,
+                  name: messageData.senderName,
+                  userType: messageData.senderCompanyType as 'buyer' | 'supplier',
+                  company: {
+                    id: messageData.senderId,
+                    name: {
+                      'zh-CN': messageData.senderCompany,
+                      'en': messageData.senderCompany,
+                      'es': messageData.senderCompany
+                    },
+                    type: messageData.senderCompanyType as 'buyer' | 'supplier'
+                  }
+                }
+              },
+              ...quote.recentMessages?.slice(0, 4) || []
+            ]
+          };
+        }
+        return quote;
+      }));
+    }
+  });
+
+  // 同步服务器数据到本地状态
+  useEffect(() => {
+    if (data?.data) {
+      setQuotes(data.data);
+    }
+  }, [data?.data]);
 
   // 获取询价状态字典
   const { data: statusDict = [] } = useQuery({
@@ -153,8 +200,8 @@ export const QuoteList = ({ filters }: QuoteListProps) => {
   };
 
   const handleSelectAll = (checked: boolean) => {
-    if (checked && data?.data) {
-      setSelectedQuotes(data.data.map(quote => quote.id));
+    if (checked && quotes) {
+      setSelectedQuotes(quotes.map(quote => quote.id));
     } else {
       setSelectedQuotes([]);
     }
@@ -231,7 +278,7 @@ export const QuoteList = ({ filters }: QuoteListProps) => {
     );
   }
 
-  if (!data?.data || data.data.length === 0) {
+  if (!quotes || quotes.length === 0) {
     return (
       <Card>
         <CardContent className="pt-6">
@@ -249,7 +296,7 @@ export const QuoteList = ({ filters }: QuoteListProps) => {
     );
   }
 
-  const totalPages = data.meta.totalPages;
+  const totalPages = data?.meta?.totalPages || 0;
 
   return (
     <Card>
@@ -258,7 +305,7 @@ export const QuoteList = ({ filters }: QuoteListProps) => {
           <span>{t('quote.list', '报价列表')}</span>
           <div className="flex items-center gap-4">
             <Badge variant="secondary">
-              {t('quote.total', { count: data.meta.totalItems }, `共 ${data.meta.totalItems} 条`)}
+              {t('quote.total', { count: data?.meta?.totalItems || 0 }, `共 ${data?.meta?.totalItems || 0} 条`)}
             </Badge>
             {selectedQuotes.length > 0 && (
               <div className="flex items-center gap-2">
@@ -329,7 +376,7 @@ export const QuoteList = ({ filters }: QuoteListProps) => {
               <TableRow>
                 <TableHead className="w-12">
                   <Checkbox
-                    checked={selectedQuotes.length === data.data.length}
+                    checked={selectedQuotes.length === quotes.length}
                     onCheckedChange={handleSelectAll}
                   />
                 </TableHead>
@@ -344,7 +391,7 @@ export const QuoteList = ({ filters }: QuoteListProps) => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {data.data.map((quote: Quote) => (
+              {quotes.map((quote: Quote) => (
                 <TableRow key={quote.id}>
                   <TableCell>
                     <Checkbox
