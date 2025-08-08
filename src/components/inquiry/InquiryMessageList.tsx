@@ -104,8 +104,13 @@ export const InquiryMessageList = ({ messages, isLoading, className }: InquiryMe
 
   return (
     <ScrollArea className={`h-96 w-full pr-4 ${className}`}>
-      <div className="space-y-2">
-        {messages.map((message, index) => renderMessage(message, index))}
+      <div className="p-4">
+        <div className="space-y-2">
+          {/* 修复消息顺序：最新消息在下面 */}
+          {[...messages].reverse().map((message, index) => 
+            renderMessage(message, messages.length - 1 - index)
+          )}
+        </div>
       </div>
       <div ref={messagesEndRef} />
     </ScrollArea>

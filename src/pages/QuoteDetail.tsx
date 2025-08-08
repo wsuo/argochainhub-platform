@@ -241,66 +241,75 @@ const MessageSection = ({ inquiryId }: { inquiryId: string }) => {
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <MessageSquare className="h-5 w-5" />
-          {t('quote.messages.title', '沟通记录')}
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="p-0">
-        {/* 消息列表 */}
-        <ScrollArea className="h-96 w-full pr-4">
-          <div className="p-4">
-            {messages?.data && messages.data.length > 0 ? (
-              <div className="space-y-2">
-                {messages.data.map((message, index) => renderMessage(message, index))}
-              </div>
-            ) : (
-              <div className="text-center py-12 text-muted-foreground">
-                <MessageSquare className="h-12 w-12 mx-auto mb-3 opacity-50" />
-                <p className="font-medium">{t('quote.messages.empty', '暂无沟通记录')}</p>
-                <p className="text-sm mt-1">发送第一条消息开始沟通吧</p>
-              </div>
-            )}
-          </div>
-          <div ref={messagesEndRef} />
-        </ScrollArea>
-
-        {/* 发送消息表单 */}
-        <div className="border-t p-4 space-y-3">
-          <Textarea
-            placeholder={t('quote.messages.placeholder', '输入消息内容...')}
-            value={newMessage}
-            onChange={(e) => setNewMessage(e.target.value)}
-            onKeyDown={handleKeyDown}
-            className="min-h-[60px] resize-none border-gray-200 focus:border-green-500 focus:ring-green-500"
-            disabled={sendMessageMutation.isPending}
-            maxLength={1000}
-          />
-          
-          <div className="flex items-center justify-between">
-            <span className="text-xs text-muted-foreground">
-              {newMessage.length}/1000 · 按Enter发送，Shift+Enter换行
-            </span>
-            
-            <Button
-              onClick={handleSendMessage}
-              disabled={!newMessage.trim() || sendMessageMutation.isPending}
-              size="sm"
-              className="bg-green-600 hover:bg-green-700 text-white"
-            >
-              {sendMessageMutation.isPending ? (
-                <Loader2 className="h-4 w-4 animate-spin mr-2" />
+    <div className="space-y-6">
+      {/* 消息历史记录卡片 */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <MessageSquare className="h-5 w-5" />
+            {t('quote.messages.title', '沟通记录')}
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="p-0">
+          <ScrollArea className="h-96 w-full pr-4">
+            <div className="p-4">
+              {messages?.data && messages.data.length > 0 ? (
+                <div className="space-y-2">
+                  {/* 修复消息顺序：最新消息在下面 */}
+                  {[...messages.data].reverse().map((message, index) => 
+                    renderMessage(message, messages.data.length - 1 - index)
+                  )}
+                </div>
               ) : (
-                <Send className="h-4 w-4 mr-1" />
+                <div className="text-center py-12 text-muted-foreground">
+                  <MessageSquare className="h-12 w-12 mx-auto mb-3 opacity-50" />
+                  <p className="font-medium">{t('quote.messages.empty', '暂无沟通记录')}</p>
+                  <p className="text-sm mt-1">发送第一条消息开始沟通吧</p>
+                </div>
               )}
-              {t('quote.messages.send', '发送')}
-            </Button>
+            </div>
+            <div ref={messagesEndRef} />
+          </ScrollArea>
+        </CardContent>
+      </Card>
+      
+      {/* 发送消息表单卡片 - 分离式布局 */}
+      <Card>
+        <CardContent className="p-4">
+          <div className="space-y-3">
+            <Textarea
+              placeholder={t('quote.messages.placeholder', '输入消息内容...')}
+              value={newMessage}
+              onChange={(e) => setNewMessage(e.target.value)}
+              onKeyDown={handleKeyDown}
+              className="min-h-[60px] resize-none border-gray-200 focus:border-green-500 focus:ring-green-500"
+              disabled={sendMessageMutation.isPending}
+              maxLength={1000}
+            />
+            
+            <div className="flex items-center justify-between">
+              <span className="text-xs text-muted-foreground">
+                {newMessage.length}/1000 · 按Enter发送，Shift+Enter换行
+              </span>
+              
+              <Button
+                onClick={handleSendMessage}
+                disabled={!newMessage.trim() || sendMessageMutation.isPending}
+                size="sm"
+                className="bg-green-600 hover:bg-green-700 text-white"
+              >
+                {sendMessageMutation.isPending ? (
+                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                ) : (
+                  <Send className="h-4 w-4 mr-1" />
+                )}
+                {t('quote.messages.send', '发送')}
+              </Button>
+            </div>
           </div>
-        </div>
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
+    </div>
   );
 };
 
