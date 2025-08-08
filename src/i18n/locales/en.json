@@ -339,6 +339,8 @@
     "allStatus": "All Status",
     "noInquiries": "No Inquiries",
     "noInquiriesDesc": "You haven't made any inquiries yet, browse products first",
+    "noData": "No Inquiry Data",
+    "noDataDesc": "No inquiries found matching the criteria",
     "noInquiryResponses": "No Inquiry Requests",
     "noInquiryResponsesDesc": "No inquiry requests received yet",
     "browseProducts": "Browse Products",

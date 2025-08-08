@@ -380,6 +380,8 @@
     "allStatus": "全部状态",
     "noInquiries": "暂无询价记录",
     "noInquiriesDesc": "您还没有发起过询价，去产品库看看吧",
+    "noData": "暂无询价数据",
+    "noDataDesc": "没有找到符合条件的询价单",
     "noInquiryResponses": "暂无询价请求",
     "noInquiryResponsesDesc": "目前还没有收到询价请求",
     "browseProducts": "浏览产品",

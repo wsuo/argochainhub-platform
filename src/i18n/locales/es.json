@@ -339,6 +339,8 @@
     "allStatus": "Todos los estados",
     "noInquiries": "Sin consultas",
     "noInquiriesDesc": "Aún no has hecho consultas, navega productos primero",
+    "noData": "Sin datos de consulta",
+    "noDataDesc": "No se encontraron consultas que coincidan con los criterios",
     "noInquiryResponses": "Sin solicitudes de consulta",
     "noInquiryResponsesDesc": "Aún no se han recibido solicitudes de consulta",
     "browseProducts": "Explorar productos",
