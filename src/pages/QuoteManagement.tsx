@@ -56,15 +56,7 @@ export default function QuoteManagement() {
 
       {/* 筛选器 */}
       <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <span>{t('quote.filters', '筛选条件')}</span>
-          </CardTitle>
-          <CardDescription>
-            {t('quote.filters.description', '使用以下条件筛选报价单')}
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
+        <CardContent className="pt-6">
           <QuoteFilters
             filters={filters}
             onFiltersChange={handleFiltersChange}
