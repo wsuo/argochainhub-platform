@@ -251,7 +251,7 @@ export const CreateInquiryDialog: React.FC<CreateInquiryDialogProps> = ({
                       {product.supplier.rating}
                     </span>
                     {product.supplier.isTop100 && (
-                      <span className="text-xs bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded ml-2">
+                      <span className="text-xs bg-yellow-50 text-yellow-700 border border-yellow-200 px-2 py-0.5 rounded ml-2">
                         Top100
                       </span>
                     )}

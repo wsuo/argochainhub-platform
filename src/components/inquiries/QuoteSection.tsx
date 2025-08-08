@@ -84,7 +84,7 @@ export const QuoteSection = ({ inquiry }: QuoteSectionProps) => {
             <DollarSign className="w-5 h-5" />
             {t('inquiry.quoteDetails')}
           </CardTitle>
-          <Badge className="bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">
+          <Badge className="bg-green-50 text-green-700 border border-green-200 dark:bg-green-900/30 dark:text-green-400">
             <CheckCircle className="w-3 h-3 mr-1" />
             {t('inquiry.quoted')}
           </Badge>

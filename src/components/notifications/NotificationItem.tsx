@@ -163,52 +163,22 @@ export const NotificationItem: React.FC<NotificationItemProps> = ({
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between">
             <div className="flex-1 min-w-0">
-              {/* 标题和类型标签 */}
-              <div className="flex items-center space-x-2 mb-1">
-                <h4 className={cn(
-                  'text-sm font-medium truncate',
-                  isUnread ? 'text-gray-900' : 'text-gray-700'
-                )}>
-                  {notification.title}
-                </h4>
-                <Badge 
-                  variant="secondary" 
-                  className={cn(
-                    'text-xs px-2 py-0.5',
-                    colors.bg,
-                    colors.text
-                  )}
-                >
-                  {typeLabel}
-                </Badge>
-                {priority === 'high' && (
-                  <Badge variant="destructive" className="text-xs px-2 py-0.5">
-                    重要
-                  </Badge>
-                )}
-              </div>
+              {/* 标题 */}
+              <h4 className={cn(
+                'text-sm font-medium mb-1',
+                isUnread ? 'text-gray-900' : 'text-gray-700'
+              )}>
+                {notification.title}
+              </h4>
 
               {/* 内容 */}
-              {!compact && (
-                <p className="text-sm text-gray-600 line-clamp-2 mb-2">
-                  {notification.content}
-                </p>
-              )}
+              <p className="text-sm text-gray-600 line-clamp-2">
+                {notification.content}
+              </p>
 
-              {/* 时间和元信息 */}
-              <div className="flex items-center space-x-3 text-xs text-gray-500">
+              {/* 时间 */}
+              <div className="flex items-center mt-2 text-xs text-gray-500">
                 <span>{timeAgo}</span>
-                {notification.data?.relatedId && (
-                  <span className="flex items-center">
-                    <ExternalLink className="h-3 w-3 mr-1" />
-                    ID: {notification.data.relatedId}
-                  </span>
-                )}
-                {notification.data?.requiresTokenRefresh && (
-                  <Badge variant="outline" className="text-xs">
-                    需要刷新
-                  </Badge>
-                )}
               </div>
             </div>
 
