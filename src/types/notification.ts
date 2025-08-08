@@ -103,8 +103,42 @@ export interface WebSocketEvents {
   'connection-confirmed': (data: { message: string }) => void;
   'notification': (notification: NotificationItem) => void;
   'unread-count-update': (data: { count: number }) => void;
+  
+  // 询价消息相关事件
+  'inquiry_message_received': (data: InquiryMessageEvent) => void;
+  'inquiry_status_updated': (data: InquiryStatusUpdateEvent) => void;
+  
+  // 连接事件
   'connect_error': (error: Error) => void;
   'disconnect': (reason: string) => void;
+}
+
+// 询价消息事件接口
+export interface InquiryMessageEvent {
+  inquiryId: number;           // 询价单ID
+  messageId: number;           // 消息ID
+  senderId: number;            // 发送者用户ID
+  senderName: string;          // 发送者姓名
+  senderCompany: string;       // 发送者企业名称
+  senderCompanyType: string;   // 发送者企业类型 (buyer/supplier)
+  message: string;             // 消息内容
+  timestamp: string;           // 发送时间 (ISO格式)
+  inquiryNo: string;          // 询价单编号
+}
+
+// 询价状态更新事件接口
+export interface InquiryStatusUpdateEvent {
+  inquiryId: number;           // 询价单ID
+  inquiryNo: string;          // 询价单编号
+  oldStatus: string;          // 旧状态
+  newStatus: string;          // 新状态
+  timestamp: string;          // 更新时间
+  updatedBy: {                // 操作者信息
+    userId: number;
+    userName: string;
+    companyName: string;
+    companyType: string;
+  };
 }
 
 // 通知处理器接口

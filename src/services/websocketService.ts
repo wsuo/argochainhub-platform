@@ -1,5 +1,5 @@
 import { io, Socket } from 'socket.io-client';
-import { NotificationItem, WebSocketStatus, WebSocketEvents } from '@/types/notification';
+import { NotificationItem, WebSocketStatus, WebSocketEvents, InquiryMessageEvent, InquiryStatusUpdateEvent } from '@/types/notification';
 
 export interface WebSocketServiceConfig {
   url: string;
@@ -18,6 +18,10 @@ export interface WebSocketCallbacks {
   onError?: (error: Error) => void;
   onReconnect?: (attempt: number) => void;
   onReconnectError?: (error: Error) => void;
+  
+  // 询价消息相关回调
+  onInquiryMessageReceived?: (data: InquiryMessageEvent) => void;
+  onInquiryStatusUpdated?: (data: InquiryStatusUpdateEvent) => void;
 }
 
 export class WebSocketService {
@@ -160,6 +164,24 @@ export class WebSocketService {
       console.log('✅ Pong响应:', timestamp);
     };
 
+    // 收到询价消息
+    const onInquiryMessageReceived = (data: InquiryMessageEvent) => {
+      console.log('💬 收到询价消息:', data);
+      this.callbacks.onInquiryMessageReceived?.(data);
+      
+      // 播放消息提示音
+      this.playNotificationSound();
+    };
+
+    // 询价状态更新
+    const onInquiryStatusUpdated = (data: InquiryStatusUpdateEvent) => {
+      console.log('📋 询价状态更新:', data);
+      this.callbacks.onInquiryStatusUpdated?.(data);
+      
+      // 播放状态更新提示音
+      this.playNotificationSound();
+    };
+
     // 连接错误
     const onConnectError = (error: Error) => {
       console.error('❌ WebSocket连接失败:', error);
@@ -204,6 +226,8 @@ export class WebSocketService {
     this.socket.on('notification', onNotification);
     this.socket.on('unread-count-update', onUnreadCountUpdate);
     this.socket.on('pong', onPong);
+    this.socket.on('inquiry_message_received', onInquiryMessageReceived);
+    this.socket.on('inquiry_status_updated', onInquiryStatusUpdated);
     this.socket.on('connect_error', onConnectError);
     this.socket.on('disconnect', onDisconnect);
     this.socket.on('reconnect_attempt', onReconnectAttempt);
@@ -217,6 +241,8 @@ export class WebSocketService {
       () => this.socket?.off('notification', onNotification),
       () => this.socket?.off('unread-count-update', onUnreadCountUpdate),
       () => this.socket?.off('pong', onPong),
+      () => this.socket?.off('inquiry_message_received', onInquiryMessageReceived),
+      () => this.socket?.off('inquiry_status_updated', onInquiryStatusUpdated),
       () => this.socket?.off('connect_error', onConnectError),
       () => this.socket?.off('disconnect', onDisconnect),
       () => this.socket?.off('reconnect_attempt', onReconnectAttempt),
