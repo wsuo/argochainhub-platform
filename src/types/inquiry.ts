@@ -80,6 +80,7 @@ export interface Inquiry {
   supplier: InquiryCompany;
   items: InquiryItem[];
   recentMessages?: InquiryMessage[];
+  messageCount: number; // 消息数量
   createdAt: string;
   updatedAt: string;
 }
