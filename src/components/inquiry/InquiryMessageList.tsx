@@ -40,37 +40,39 @@ export const InquiryMessageList = ({ messages, isLoading, className }: InquiryMe
                     (new Date(messages[index + 1]?.createdAt).getTime() - new Date(message.createdAt).getTime()) > 5 * 60 * 1000; // 5分钟间隔
 
     return (
-      <div key={message.id} className={`flex ${isCurrentUser ? 'justify-end' : 'justify-start'} mb-3`}>
-        <div className={`max-w-[75%] ${isCurrentUser ? 'order-2' : 'order-1'}`}>
-          {/* 发送者信息 */}
-          {showSender && (
-            <div className={`mb-1 text-xs text-muted-foreground ${isCurrentUser ? 'text-right' : 'text-left'}`}>
-              <span className="font-medium">{message.sender.name}</span>
-              <span className="opacity-75 ml-1">
-                ({getLocalizedText(message.sender.company.name)})
+      <div key={message.id} className="mb-3">
+        <div className={`flex ${isCurrentUser ? 'justify-end' : 'justify-start'}`}>
+          <div className={`flex ${isCurrentUser ? 'flex-col items-end' : 'flex-col items-start'} max-w-[75%]`}>
+            {/* 发送者信息 */}
+            {showSender && (
+              <div className={`mb-1 text-xs text-muted-foreground ${isCurrentUser ? 'text-right' : 'text-left'}`}>
+                <span className="font-medium">{message.sender.name}</span>
+                <span className="opacity-75 ml-1">
+                  ({getLocalizedText(message.sender.company.name)})
+                </span>
+              </div>
+            )}
+            
+            {/* 消息内容 */}
+            <div
+              className={`rounded-lg px-3 py-2 shadow-sm text-sm leading-relaxed ${
+                isCurrentUser
+                  ? 'bg-green-600 text-white'
+                  : 'bg-gray-100 text-gray-800'
+              }`}
+            >
+              <span className="break-words">
+                {message.message}
               </span>
             </div>
-          )}
-          
-          {/* 消息内容 */}
-          <div
-            className={`rounded-lg px-3 py-2 shadow-sm text-sm leading-relaxed ${
-              isCurrentUser
-                ? 'bg-green-600 text-white ml-2'
-                : 'bg-gray-100 text-gray-800 mr-2'
-            }`}
-          >
-            <p className="whitespace-pre-wrap break-words">
-              {message.message}
-            </p>
+            
+            {/* 时间戳 */}
+            {showTime && (
+              <div className={`text-xs text-muted-foreground mt-1 ${isCurrentUser ? 'text-right' : 'text-left'}`}>
+                {InquiryService.formatDateTime(message.createdAt)}
+              </div>
+            )}
           </div>
-          
-          {/* 时间戳 */}
-          {showTime && (
-            <div className={`text-xs text-muted-foreground mt-1 ${isCurrentUser ? 'text-right mr-2' : 'text-left ml-2'}`}>
-              {InquiryService.formatDateTime(message.createdAt)}
-            </div>
-          )}
         </div>
       </div>
     );
