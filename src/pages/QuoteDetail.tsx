@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { useQuote } from '@/hooks/useQuote';
 import { useQuoteMessages, useSendMessage } from '@/hooks/useQuoteActions';
+import { useInquiryMessaging } from '@/hooks/useInquiryMessaging';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -163,13 +164,20 @@ const SupplierQuoteSection = ({ quote }: { quote: any }) => {
 };
 
 // 消息区块组件
-const MessageSection = ({ inquiryId }: { inquiryId: string }) => {
+const MessageSection = ({ inquiryId, onRefetchMessages }: { inquiryId: string; onRefetchMessages?: React.MutableRefObject<(() => void) | null> }) => {
   const { t } = useTranslation();
   const [newMessage, setNewMessage] = useState('');
   const { data: messages, refetch } = useQuoteMessages(inquiryId, 1, 20);
   const sendMessageMutation = useSendMessage(inquiryId);
   const { user } = useAuth();
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  
+  // 暴露refetch方法给父组件
+  useEffect(() => {
+    if (onRefetchMessages) {
+      onRefetchMessages.current = refetch;
+    }
+  }, [refetch, onRefetchMessages]);
   
   // 自动滚动到最新消息
   useEffect(() => {
@@ -318,6 +326,24 @@ export default function QuoteDetail() {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { data: quote, isLoading, error, refetch } = useQuote(id || '');
+  const refetchMessagesRef = useRef<(() => void) | null>(null);
+
+  // 初始化消息推送功能
+  useInquiryMessaging({
+    currentInquiryId: id,
+    onMessageReceived: (messageData) => {
+      console.log('📍 供应端收到新消息，刷新消息列表:', messageData);
+      // 刷新消息列表
+      if (refetchMessagesRef.current) {
+        refetchMessagesRef.current();
+      }
+    },
+    onStatusUpdated: (statusData) => {
+      console.log('📋 供应端询价状态更新，刷新页面数据');
+      // 刷新报价详情数据
+      refetch();
+    }
+  });
 
   // 错误处理
   const errorHandler = useErrorHandler({
@@ -417,7 +443,7 @@ export default function QuoteDetail() {
             <SupplierQuoteSection quote={quote} />
             
             {/* 消息沟通 */}
-            <MessageSection inquiryId={quote.id} />
+            <MessageSection inquiryId={quote.id} onRefetchMessages={refetchMessagesRef} />
           </div>
           
           {/* 右侧信息 */}

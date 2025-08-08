@@ -1,7 +1,8 @@
-import { useMemo } from "react";
+import { useMemo, useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "@/contexts/MockAuthContext";
+import { useInquiryMessaging } from "@/hooks/useInquiryMessaging";
 import { Layout } from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -23,6 +24,7 @@ const InquiryDetailPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const [messages, setMessages] = useState<any[]>([]);
 
   // 获取询价详情
   const {
@@ -40,7 +42,8 @@ const InquiryDetailPage = () => {
   // 获取消息列表
   const {
     data: messagesResponse,
-    isLoading: isMessagesLoading
+    isLoading: isMessagesLoading,
+    refetch: refetchMessages
   } = useQuery({
     queryKey: ['inquiry-messages', id],
     queryFn: () => InquiryService.getInquiryMessages(id!, { limit: 50, desc: false }),
@@ -48,8 +51,48 @@ const InquiryDetailPage = () => {
     staleTime: 10 * 1000,
   });
 
+  // 同步消息数据到本地状态
+  useEffect(() => {
+    if (messagesResponse?.data) {
+      setMessages(messagesResponse.data);
+    }
+  }, [messagesResponse?.data]);
+
+  // 初始化消息推送功能
+  useInquiryMessaging({
+    currentInquiryId: id,
+    onMessageReceived: (messageData) => {
+      console.log('📍 收到新消息，刷新消息列表:', messageData);
+      // 刷新消息列表查询，获取最新数据
+      refetchMessages();
+    },
+    onStatusUpdated: (statusData) => {
+      console.log('📋 询价状态更新，刷新页面数据');
+      // 刷新询价详情数据
+      refetch();
+    }
+  });
+
+  // 监听页面事件
+  useEffect(() => {
+    const handleInquiryMessageReceived = (event: CustomEvent) => {
+      console.log('🎯 页面事件：收到询价消息', event.detail);
+    };
+
+    const handleInquiryStatusUpdated = (event: CustomEvent) => {
+      console.log('🎯 页面事件：询价状态更新', event.detail);
+    };
+
+    window.addEventListener('newInquiryMessage', handleInquiryMessageReceived as EventListener);
+    window.addEventListener('inquiryStatusRefresh', handleInquiryStatusUpdated as EventListener);
+
+    return () => {
+      window.removeEventListener('newInquiryMessage', handleInquiryMessageReceived as EventListener);
+      window.removeEventListener('inquiryStatusRefresh', handleInquiryStatusUpdated as EventListener);
+    };
+  }, []);
+
   const inquiry = inquiryResponse?.data;
-  const messages = useMemo(() => messagesResponse?.data || [], [messagesResponse?.data]);
 
   // 错误状态
   if (error) {
