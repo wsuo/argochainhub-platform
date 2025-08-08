@@ -48,6 +48,8 @@ const App = () => (
                       <Route path="/inquiries/:id" element={<InquiryDetailPage />} />
                       <Route path="/inquiry-responses" element={<InquiryResponsePage />} />
                       <Route path="/inquiry-responses/:id" element={<InquiryDetailPage />} />
+                      <Route path="/quote-management" element={<SupplierDashboard />} />
+                      <Route path="/quote-management/:id" element={<SupplierDashboard />} />
                       {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                       <Route path="*" element={<NotFound />} />
                     </Routes>
