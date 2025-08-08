@@ -30,26 +30,26 @@ export const InquiryStatusBadge = ({ status, className }: InquiryStatusBadgeProp
   };
 
   const getVariant = (status: InquiryStatus) => {
-    switch (status) {
-      case 'pending_quote': return 'outline';
-      case 'quoted': return 'default';
-      case 'confirmed': return 'secondary';
-      case 'declined': return 'destructive';
-      case 'expired': return 'secondary';
-      case 'cancelled': return 'secondary';
-      default: return 'outline';
-    }
+    // 统一使用outline variant避免背景颜色冲突
+    return 'outline';
   };
 
   const getColor = () => {
     switch (status) {
-      case 'pending_quote': return 'border-orange-500 text-orange-600';
-      case 'quoted': return 'border-blue-500 text-blue-600';
-      case 'confirmed': return 'border-green-500 text-green-600';
-      case 'declined': return 'border-red-500 text-red-600';
-      case 'expired': return 'border-gray-500 text-gray-600';
-      case 'cancelled': return 'border-gray-500 text-gray-600';
-      default: return '';
+      case 'pending_quote': 
+        return 'bg-orange-50 border-orange-200 text-orange-700 hover:bg-orange-100';
+      case 'quoted': 
+        return 'bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100';
+      case 'confirmed': 
+        return 'bg-green-50 border-green-200 text-green-700 hover:bg-green-100';
+      case 'declined': 
+        return 'bg-red-50 border-red-200 text-red-700 hover:bg-red-100';
+      case 'expired': 
+        return 'bg-yellow-50 border-yellow-200 text-yellow-700 hover:bg-yellow-100';
+      case 'cancelled': 
+        return 'bg-gray-50 border-gray-200 text-gray-700 hover:bg-gray-100';
+      default: 
+        return 'bg-gray-50 border-gray-200 text-gray-700';
     }
   };
 
