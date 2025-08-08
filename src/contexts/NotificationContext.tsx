@@ -5,7 +5,9 @@ import {
   NotificationActions,
   WebSocketStatus,
   NotificationQueryParams,
-  NotificationType
+  NotificationType,
+  InquiryMessageEvent,
+  InquiryStatusUpdateEvent
 } from '@/types/notification';
 import { NotificationService } from '@/services/notificationService';
 import { webSocketService } from '@/services/websocketService';
@@ -238,8 +240,79 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
   }, []);
 
   /**
-   * 处理通知特殊逻辑
+   * 处理询价消息通知
    */
+  const handleInquiryMessageNotification = useCallback((messageData: InquiryMessageEvent) => {
+    console.log('📨 通知中心收到询价消息:', messageData);
+    
+    // 发送全局事件给useInquiryMessaging处理Toast和页面交互
+    window.dispatchEvent(new CustomEvent('inquiryMessageReceived', { detail: messageData }));
+    
+    // 创建通知项
+    const notification: NotificationItem = {
+      id: `inquiry_message_${messageData.messageId}_${Date.now()}`,
+      type: NotificationType.INQUIRY_NEW, // 使用现有的询价类型
+      title: `来自${messageData.senderCompany}的新消息`,
+      content: messageData.message.length > 100 
+        ? `${messageData.message.substring(0, 100)}...` 
+        : messageData.message,
+      status: 'unread' as const,
+      data: {
+        relatedId: messageData.inquiryId,
+        relatedType: 'inquiry',
+        actionUrl: messageData.senderCompanyType === 'buyer' 
+          ? `/quote-management/${messageData.inquiryId}`
+          : `/inquiries/${messageData.inquiryId}`
+      },
+      userId: messageData.senderId,
+      createdAt: messageData.timestamp,
+      updatedAt: messageData.timestamp
+    };
+    
+    console.log('📝 添加通知到列表:', notification);
+    // 添加到通知列表
+    dispatch({ type: 'ADD_NOTIFICATION', payload: notification });
+  }, []);
+
+  /**
+   * 处理询价状态更新通知
+   */
+  const handleInquiryStatusNotification = useCallback((statusData: InquiryStatusUpdateEvent) => {
+    console.log('📋 通知中心收到状态更新:', statusData);
+    
+    // 发送全局事件给useInquiryMessaging处理Toast和页面交互
+    window.dispatchEvent(new CustomEvent('inquiryStatusUpdated', { detail: statusData }));
+    
+    const statusLabels: Record<string, string> = {
+      quoted: '已报价',
+      confirmed: '已确认',
+      declined: '已拒绝',
+      cancelled: '已取消',
+      expired: '已过期'
+    };
+    
+    // 创建通知项
+    const notification: NotificationItem = {
+      id: `inquiry_status_${statusData.inquiryId}_${Date.now()}`,
+      type: NotificationType.INQUIRY_QUOTED, // 根据状态选择合适的类型
+      title: `询价单状态更新`,
+      content: `询价单 ${statusData.inquiryNo} 已${statusLabels[statusData.newStatus] || '更新'}`,
+      status: 'unread' as const,
+      data: {
+        relatedId: statusData.inquiryId,
+        relatedType: 'inquiry',
+        actionUrl: statusData.updatedBy.companyType === 'buyer' 
+          ? `/quote-management/${statusData.inquiryId}`
+          : `/inquiries/${statusData.inquiryId}`
+      },
+      userId: statusData.updatedBy.userId,
+      createdAt: statusData.timestamp,
+      updatedAt: statusData.timestamp
+    };
+    
+    // 添加到通知列表
+    dispatch({ type: 'ADD_NOTIFICATION', payload: notification });
+  }, []);
   const handleSpecialNotification = useCallback(async (notification: NotificationItem) => {
     // 企业认证通过需要刷新Token
     if (notification.type === NotificationType.COMPANY_APPROVED && 
@@ -304,6 +377,15 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       onReconnect: (attempt) => {
         console.log('WebSocket重连尝试:', attempt);
         dispatch({ type: 'SET_WS_STATUS', payload: WebSocketStatus.CONNECTING });
+      },
+      
+      // 新增询价消息事件处理
+      onInquiryMessageReceived: (messageData) => {
+        handleInquiryMessageNotification(messageData);
+      },
+      
+      onInquiryStatusUpdated: (statusData) => {
+        handleInquiryStatusNotification(statusData);
       }
     });
 
