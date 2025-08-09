@@ -229,6 +229,7 @@
     "pesticideName": "农药名称",
     "registrationNumber": "登记证号",
     "category": "产品分类",
+    "unknownCategory": "未知类别",
     "description": "产品描述",
     "supplierName": "供应商名称",
     "contactInfo": "联系信息",

@@ -188,6 +188,7 @@
     "pesticideName": "Pesticide Name",
     "registrationNumber": "Registration Number",
     "category": "Category",
+    "unknownCategory": "Unknown Category",
     "description": "Description",
     "supplierName": "Supplier Name",
     "contactInfo": "Contact Information",
