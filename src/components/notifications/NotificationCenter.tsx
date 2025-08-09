@@ -169,16 +169,16 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
 
   return (
     <div className={cn(
-      'bg-white border rounded-lg shadow-lg',
+      'bg-white rounded-lg shadow-lg overflow-hidden',
       compact ? 'w-80' : 'w-96'
     )}>
       {/* 头部 */}
-      <div className="flex items-center justify-between p-4 border-b">
-        <div className="flex items-center space-x-2">
+      <div className="flex items-center justify-between p-4 border-b bg-gray-50/50">
+        <div className="flex items-center gap-2">
           <Bell className="h-5 w-5 text-gray-600" />
           <h3 className="font-semibold text-gray-900">通知中心</h3>
           {unreadCount > 0 && (
-            <Badge variant="destructive" className="text-xs">
+            <Badge variant="destructive" className="text-xs px-1.5 py-0 h-5">
               {unreadCount}
             </Badge>
           )}
@@ -247,26 +247,28 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
 
       {/* 标签页 */}
       <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as 'all' | 'unread' | 'read')}>
-        <div className="px-4 pt-3">
-          <TabsList className="grid w-full grid-cols-3 h-8">
+        <div className="border-b bg-gray-50/30">
+          <TabsList className="w-full justify-start h-12 bg-transparent rounded-none p-0">
             <TabsTrigger 
               value="all" 
-              className="text-xs h-full flex items-center justify-center py-0 px-2 data-[state=active]:bg-background data-[state=active]:text-foreground"
-              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+              className="data-[state=active]:bg-white data-[state=active]:shadow-sm rounded-none border-b-2 border-transparent data-[state=active]:border-primary h-full px-6"
             >
               全部
             </TabsTrigger>
             <TabsTrigger 
               value="unread" 
-              className="text-xs h-full flex items-center justify-center py-0 px-2 data-[state=active]:bg-background data-[state=active]:text-foreground"
-              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+              className="data-[state=active]:bg-white data-[state=active]:shadow-sm rounded-none border-b-2 border-transparent data-[state=active]:border-primary h-full px-6"
             >
-              未读 ({unreadCount})
+              未读
+              {unreadCount > 0 && (
+                <Badge variant="secondary" className="ml-2 text-xs px-1.5 py-0 h-5">
+                  {unreadCount}
+                </Badge>
+              )}
             </TabsTrigger>
             <TabsTrigger 
               value="read" 
-              className="text-xs h-full flex items-center justify-center py-0 px-2 data-[state=active]:bg-background data-[state=active]:text-foreground"
-              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+              className="data-[state=active]:bg-white data-[state=active]:shadow-sm rounded-none border-b-2 border-transparent data-[state=active]:border-primary h-full px-6"
             >
               已读
             </TabsTrigger>
@@ -310,17 +312,21 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
             )}
 
             {filteredNotifications.length > 0 && (
-              <div className="divide-y divide-gray-100">
+              <div className="">
                 {filteredNotifications.map((notification, index) => (
-                  <NotificationItem
-                    key={notification.id}
-                    notification={notification}
-                    onMarkAsRead={markAsRead}
-                    onDelete={deleteNotification}
-                    onClick={handleNotificationClick}
-                    compact={compact}
-                    showActions={!compact}
-                  />
+                  <div key={notification.id}>
+                    <NotificationItem
+                      notification={notification}
+                      onMarkAsRead={markAsRead}
+                      onDelete={deleteNotification}
+                      onClick={handleNotificationClick}
+                      compact={compact}
+                      showActions={!compact}
+                    />
+                    {index < filteredNotifications.length - 1 && (
+                      <div className="border-b border-gray-100" />
+                    )}
+                  </div>
                 ))}
               </div>
             )}

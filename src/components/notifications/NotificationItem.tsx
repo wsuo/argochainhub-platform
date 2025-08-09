@@ -21,8 +21,13 @@ import {
   Package,
   AlertTriangle,
   CheckCircle,
+  CheckCircle2,
   XCircle,
-  Info
+  Info,
+  MessageSquare,
+  FileText,
+  AlertCircle,
+  TrendingUp
 } from 'lucide-react';
 import {
   DropdownMenu,
@@ -66,31 +71,74 @@ export const NotificationItem: React.FC<NotificationItemProps> = ({
     }
   };
 
-  // 获取通知图标
-  const getNotificationIcon = (type: NotificationType) => {
+  // 获取通知图标和颜色
+  const getNotificationIconAndColor = (type: NotificationType) => {
     switch (type) {
       case NotificationType.COMPANY_APPROVED:
-        return <CheckCircle className="h-5 w-5 text-green-600" />;
+        return { 
+          icon: <CheckCircle2 className="h-5 w-5" />,
+          bgColor: 'bg-green-50',
+          iconColor: 'text-green-600',
+          dotColor: 'bg-green-500'
+        };
       case NotificationType.COMPANY_REJECTED:
-        return <XCircle className="h-5 w-5 text-red-600" />;
+        return { 
+          icon: <XCircle className="h-5 w-5" />,
+          bgColor: 'bg-red-50',
+          iconColor: 'text-red-600',
+          dotColor: 'bg-red-500'
+        };
       case NotificationType.INQUIRY_NEW:
-        return <ShoppingCart className="h-5 w-5 text-blue-600" />;
       case NotificationType.INQUIRY_QUOTED:
-        return <Package className="h-5 w-5 text-purple-600" />;
+        return { 
+          icon: <MessageSquare className="h-5 w-5" />,
+          bgColor: 'bg-blue-50',
+          iconColor: 'text-blue-600',
+          dotColor: 'bg-blue-500'
+        };
       case NotificationType.INQUIRY_CONFIRMED:
-        return <CheckCircle className="h-5 w-5 text-green-600" />;
+        return { 
+          icon: <CheckCircle className="h-5 w-5" />,
+          bgColor: 'bg-green-50',
+          iconColor: 'text-green-600',
+          dotColor: 'bg-green-500'
+        };
       case NotificationType.INQUIRY_DECLINED:
-        return <XCircle className="h-5 w-5 text-red-600" />;
+        return { 
+          icon: <XCircle className="h-5 w-5" />,
+          bgColor: 'bg-orange-50',
+          iconColor: 'text-orange-600',
+          dotColor: 'bg-orange-500'
+        };
       case NotificationType.PRODUCT_APPROVED:
-        return <CheckCircle className="h-5 w-5 text-green-600" />;
       case NotificationType.PRODUCT_REJECTED:
-        return <XCircle className="h-5 w-5 text-red-600" />;
+        return { 
+          icon: <Package className="h-5 w-5" />,
+          bgColor: type === NotificationType.PRODUCT_APPROVED ? 'bg-green-50' : 'bg-red-50',
+          iconColor: type === NotificationType.PRODUCT_APPROVED ? 'text-green-600' : 'text-red-600',
+          dotColor: type === NotificationType.PRODUCT_APPROVED ? 'bg-green-500' : 'bg-red-500'
+        };
       case NotificationType.SYSTEM_MAINTENANCE:
-        return <AlertTriangle className="h-5 w-5 text-orange-600" />;
+        return { 
+          icon: <AlertTriangle className="h-5 w-5" />,
+          bgColor: 'bg-yellow-50',
+          iconColor: 'text-yellow-600',
+          dotColor: 'bg-yellow-500'
+        };
       case NotificationType.SYSTEM_UPDATE:
-        return <Info className="h-5 w-5 text-blue-600" />;
+        return { 
+          icon: <TrendingUp className="h-5 w-5" />,
+          bgColor: 'bg-blue-50',
+          iconColor: 'text-blue-600',
+          dotColor: 'bg-blue-500'
+        };
       default:
-        return <Info className="h-5 w-5 text-gray-600" />;
+        return { 
+          icon: <Info className="h-5 w-5" />,
+          bgColor: 'bg-gray-50',
+          iconColor: 'text-gray-600',
+          dotColor: 'bg-gray-500'
+        };
     }
   };
 
@@ -126,59 +174,100 @@ export const NotificationItem: React.FC<NotificationItemProps> = ({
     onDelete?.(notification.id);
   };
 
-  // 获取通知样式
-  const colors = NOTIFICATION_COLORS[notification.type as NotificationType] || {
-    bg: 'bg-gray-50',
-    text: 'text-gray-700',
-    border: 'border-gray-200'
-  };
-
   const isUnread = notification.status === 'unread';
   const timeAgo = NotificationService.formatNotificationTime(notification.createdAt);
   const typeLabel = getTypeLabel(notification.type as NotificationType);
   const priority = NotificationService.getNotificationPriority(notification);
+  const { icon, bgColor, iconColor, dotColor } = getNotificationIconAndColor(notification.type as NotificationType);
 
   return (
     <div
       className={cn(
-        'group relative border-l-4 bg-white hover:bg-gray-50 transition-colors cursor-pointer',
-        colors.border,
-        isUnread && 'bg-blue-50/30',
-        compact ? 'p-3' : 'p-4'
+        'group relative bg-white hover:bg-gray-50/50 transition-all cursor-pointer',
+        compact ? 'p-3' : 'p-4',
+        'hover:shadow-sm'
       )}
       onClick={handleClick}
     >
-      {/* 未读指示器 */}
-      {isUnread && (
-        <div className="absolute left-2 top-2 w-2 h-2 bg-blue-500 rounded-full"></div>
-      )}
-
-      <div className="flex items-start space-x-3">
-        {/* 通知图标 */}
-        <div className="flex-shrink-0 mt-0.5">
-          {getNotificationIcon(notification.type as NotificationType)}
+      <div className="flex items-start gap-3">
+        {/* 左侧图标区域 */}
+        <div className="relative flex-shrink-0">
+          <div className={cn(
+            'rounded-full p-2',
+            bgColor
+          )}>
+            <div className={iconColor}>
+              {icon}
+            </div>
+          </div>
+          {/* 未读状态点 */}
+          {isUnread && (
+            <div className={cn(
+              'absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full',
+              dotColor
+            )} />
+          )}
         </div>
 
         {/* 通知内容 */}
         <div className="flex-1 min-w-0">
-          <div className="flex items-start justify-between">
+          <div className="flex items-start justify-between gap-2">
             <div className="flex-1 min-w-0">
-              {/* 标题 */}
-              <h4 className={cn(
-                'text-sm font-medium mb-1',
-                isUnread ? 'text-gray-900' : 'text-gray-700'
-              )}>
-                {notification.title}
-              </h4>
+              {/* 标题行 - 包含标题和标签 */}
+              <div className="flex items-center gap-2 mb-1">
+                <h4 className={cn(
+                  'font-medium',
+                  isUnread ? 'text-gray-900' : 'text-gray-700',
+                  compact ? 'text-sm' : 'text-base'
+                )}>
+                  {notification.title}
+                </h4>
+                {/* 类型标签 */}
+                {!compact && (
+                  <Badge 
+                    variant="secondary" 
+                    className={cn(
+                      'text-xs px-2 py-0.5',
+                      isUnread && 'bg-blue-100 text-blue-700'
+                    )}
+                  >
+                    {typeLabel}
+                  </Badge>
+                )}
+              </div>
 
               {/* 内容 */}
-              <p className="text-sm text-gray-600 line-clamp-2">
+              <p className={cn(
+                'text-gray-600 line-clamp-2',
+                compact ? 'text-xs' : 'text-sm'
+              )}>
                 {notification.content}
               </p>
 
-              {/* 时间 */}
-              <div className="flex items-center mt-2 text-xs text-gray-500">
-                <span>{timeAgo}</span>
+              {/* 底部信息栏 */}
+              <div className="flex items-center gap-3 mt-2">
+                {/* 时间 */}
+                <span className={cn(
+                  'text-gray-500',
+                  compact ? 'text-xs' : 'text-sm'
+                )}>
+                  {timeAgo}
+                </span>
+                
+                {/* 优先级指示器 */}
+                {priority === 'high' && !compact && (
+                  <div className="flex items-center gap-1">
+                    <div className="w-1.5 h-1.5 bg-red-500 rounded-full" />
+                    <span className="text-xs text-red-600">重要</span>
+                  </div>
+                )}
+                
+                {/* 已读状态标签 */}
+                {!isUnread && !compact && (
+                  <Badge variant="outline" className="text-xs px-2 py-0">
+                    已读
+                  </Badge>
+                )}
               </div>
             </div>
 
@@ -220,10 +309,6 @@ export const NotificationItem: React.FC<NotificationItemProps> = ({
         </div>
       </div>
 
-      {/* 点击提示 */}
-      {NotificationService.getNotificationActionUrl(notification) && (
-        <div className="absolute inset-0 bg-transparent group-hover:bg-blue-50/10 transition-colors pointer-events-none" />
-      )}
     </div>
   );
 };
