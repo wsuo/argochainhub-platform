@@ -1,5 +1,5 @@
 import { useEffect, useCallback, useRef } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { useLanguage } from '@/hooks/useLanguage';
 import { InquiryMessageEvent, InquiryStatusUpdateEvent } from '@/types/notification';
@@ -44,6 +44,7 @@ export const useInquiryMessaging = (
 ): UseInquiryMessagingReturn => {
   const { toast } = useToast();
   const { currentLanguage } = useLanguage();
+  const navigate = useNavigate();
   const location = useLocation();
   const {
     currentInquiryId,
@@ -139,21 +140,36 @@ export const useInquiryMessaging = (
     } else {
       console.log('📱 用户不在询价详情页，显示Toast通知');
       
+      // 创建点击处理函数
+      const handleToastClick = async () => {
+        try {
+          // 跳转到对应页面
+          const targetUrl = data.senderCompanyType === 'buyer' 
+            ? `/quote-management/${data.inquiryId}`
+            : `/inquiries/${data.inquiryId}`;
+          
+          console.log('🔄 跳转到:', targetUrl);
+          navigate(targetUrl);
+          
+          // 跳转后，让通知中心自动处理相关通知的已读状态
+          // 通过全局事件通知，可以根据 inquiryId 和 messageId 来标记相关通知
+          emitPageEvent('markInquiryNotificationRead', { 
+            inquiryId: data.inquiryId, 
+            messageId: data.messageId 
+          });
+        } catch (error) {
+          console.error('处理Toast点击失败:', error);
+        }
+      };
+      
       // 显示Toast通知
       toast({
         title: `来自 ${data.senderCompany} 的新消息`,
         description: data.message.length > 50 
           ? `${data.message.substring(0, 50)}...` 
           : data.message,
-        duration: 5000,
-        action: {
-          label: "查看详情",
-          onClick: () => {
-            window.location.href = data.senderCompanyType === 'buyer' 
-              ? `/quote-management/${data.inquiryId}`
-              : `/inquiries/${data.inquiryId}`;
-          }
-        }
+        variant: "default",
+        onClick: handleToastClick
       });
 
       // 更新列表中的最新消息
@@ -165,7 +181,7 @@ export const useInquiryMessaging = (
       // 调用回调
       onMessageReceived?.(data);
     }
-  }, [isInInquiryDetail, emitPageEvent, onMessageReceived, onListMessageUpdate, toast]);
+  }, [isInInquiryDetail, emitPageEvent, onMessageReceived, onListMessageUpdate, toast, navigate]);
 
   /**
    * 处理询价状态更新
@@ -182,19 +198,33 @@ export const useInquiryMessaging = (
       
       const toastContent = getStatusUpdateToastContent(data);
       
+      // 创建点击处理函数
+      const handleToastClick = async () => {
+        try {
+          // 跳转到对应页面
+          const targetUrl = data.updatedBy.companyType === 'buyer' 
+            ? `/quote-management/${data.inquiryId}`
+            : `/inquiries/${data.inquiryId}`;
+          
+          console.log('🔄 跳转到:', targetUrl);
+          navigate(targetUrl);
+          
+          // 跳转后，让通知中心自动处理相关通知的已读状态
+          emitPageEvent('markInquiryStatusNotificationRead', { 
+            inquiryId: data.inquiryId, 
+            newStatus: data.newStatus 
+          });
+        } catch (error) {
+          console.error('处理状态Toast点击失败:', error);
+        }
+      };
+      
       // 显示Toast通知
       toast({
         title: toastContent.title,
         description: toastContent.description,
-        duration: 5000,
-        action: {
-          label: "查看详情",
-          onClick: () => {
-            window.location.href = data.updatedBy.companyType === 'buyer' 
-              ? `/quote-management/${data.inquiryId}`
-              : `/inquiries/${data.inquiryId}`;
-          }
-        }
+        variant: "default",
+        onClick: handleToastClick
       });
     }
 
@@ -203,7 +233,7 @@ export const useInquiryMessaging = (
     
     // 调用回调
     onStatusUpdated?.(data);
-  }, [isInInquiryDetail, emitPageEvent, onStatusUpdated, getStatusUpdateToastContent, toast]);
+  }, [isInInquiryDetail, emitPageEvent, onStatusUpdated, getStatusUpdateToastContent, toast, navigate]);
 
   // 注册全局事件监听器，与NotificationContext的WebSocket事件协作
   useEffect(() => {
