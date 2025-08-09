@@ -113,7 +113,7 @@ When adding new routes, always place them above the catch-all `*` route.
 All new pages should use the following background pattern for consistency:
 
 ```jsx
-<main className="flex-1 p-6 bg-gradient-to-br from-slate-50 via-agro-green-light/30 to-agro-blue-light/40 relative overflow-hidden">
+<main className="flex-1 p-6 bg-gradient-to-br from-slate-50 via-agro-green-light/30 to-agro-blue-light/40 relative overflow-auto">
   {/* 装饰性渐变叠层 */}
   <div className="absolute inset-0 bg-gradient-to-tr from-primary/5 via-transparent to-agro-blue/8 pointer-events-none" />
   <div className="absolute top-0 right-0 w-1/3 h-1/3 bg-gradient-radial from-primary/10 via-primary/5 to-transparent rounded-full blur-3xl pointer-events-none" />
@@ -293,3 +293,55 @@ if (errorHandler.hasError) {
 
 ### Translation Keys
 错误信息支持多语言，相关翻译键位于 `errors.*` 命名空间下。详见翻译文件结构。
+
+## 页面滚动规范 (Page Scrolling Guidelines)
+
+### 问题说明
+页面无法滚动通常是因为在 `main` 标签或主要内容容器上错误地使用了 `overflow-hidden` 类。这会导致内容超出视口时无法滚动查看。
+
+### 正确做法
+1. **主内容区域**：使用 `overflow-auto` 或不设置 overflow（默认为 visible）
+   ```jsx
+   // ✅ 正确
+   <main className="flex-1 p-6 ... overflow-auto">
+   
+   // ❌ 错误
+   <main className="flex-1 p-6 ... overflow-hidden">
+   ```
+
+2. **装饰性元素**：只在装饰性背景元素上使用 `overflow-hidden`
+   ```jsx
+   // 装饰性容器可以使用 overflow-hidden
+   <div className="absolute inset-0 overflow-hidden pointer-events-none">
+     {/* 装饰性内容 */}
+   </div>
+   ```
+
+3. **Layout 结构**：确保 Layout 组件的主要内容区域允许滚动
+   - Layout 组件通常处理整体页面结构
+   - 页面内容 (`main` 标签) 应该允许滚动
+   - 固定元素（如 Header、Sidebar）可以使用 fixed 或 sticky 定位
+
+### 检查清单
+开发新页面时，请确保：
+- [ ] `main` 标签使用 `overflow-auto` 或不设置 overflow
+- [ ] 只在装饰性背景容器上使用 `overflow-hidden`
+- [ ] 测试页面在内容超出视口时是否可以正常滚动
+- [ ] 移动端和桌面端都能正常滚动
+
+### 常见错误示例
+```jsx
+// ❌ 错误：主内容区域使用 overflow-hidden
+<Layout>
+  <main className="... overflow-hidden">
+    {/* 当内容超出视口时无法滚动 */}
+  </main>
+</Layout>
+
+// ✅ 正确：主内容区域使用 overflow-auto
+<Layout>
+  <main className="... overflow-auto">
+    {/* 内容可以正常滚动 */}
+  </main>
+</Layout>
+```

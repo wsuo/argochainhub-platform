@@ -98,7 +98,7 @@ const InquiryDetailPage = () => {
   if (error) {
     return (
       <Layout userType={currentUserType}>
-        <main className="flex-1 p-6 bg-gradient-to-br from-slate-50 via-agro-green-light/30 to-agro-blue-light/40 relative overflow-hidden">
+        <main className="flex-1 p-6 bg-gradient-to-br from-slate-50 via-agro-green-light/30 to-agro-blue-light/40 relative overflow-auto">
           <div className="absolute inset-0 bg-gradient-to-tr from-primary/5 via-transparent to-agro-blue/8 pointer-events-none" />
           <div className="relative z-10 max-w-4xl mx-auto">
             <Alert variant="destructive">
@@ -121,7 +121,7 @@ const InquiryDetailPage = () => {
   if (isLoading) {
     return (
       <Layout userType={currentUserType}>
-        <main className="flex-1 p-6 bg-gradient-to-br from-slate-50 via-agro-green-light/30 to-agro-blue-light/40 relative overflow-hidden">
+        <main className="flex-1 p-6 bg-gradient-to-br from-slate-50 via-agro-green-light/30 to-agro-blue-light/40 relative overflow-auto">
           <div className="absolute inset-0 bg-gradient-to-tr from-primary/5 via-transparent to-agro-blue/8 pointer-events-none" />
           <div className="relative z-10 max-w-6xl mx-auto space-y-6">
             <Skeleton className="h-10 w-40" />

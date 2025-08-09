@@ -155,7 +155,7 @@ const CartPage = () => {
   if (isLoading) {
     return (
       <Layout userType={currentUserType}>
-        <main className="flex-1 p-6 bg-gradient-to-br from-slate-50 via-agro-green-light/30 to-agro-blue-light/40 relative overflow-hidden">
+        <main className="flex-1 p-6 bg-gradient-to-br from-slate-50 via-agro-green-light/30 to-agro-blue-light/40 relative overflow-auto">
           <div className="absolute inset-0 bg-gradient-to-tr from-primary/5 via-transparent to-agro-blue/8 pointer-events-none" />
           <div className="relative z-10 max-w-7xl mx-auto space-y-8">
             <div className="space-y-4">
@@ -182,7 +182,7 @@ const CartPage = () => {
   if (totalItems === 0) {
     return (
       <Layout userType={currentUserType}>
-        <main className="flex-1 p-6 bg-gradient-to-br from-slate-50 via-agro-green-light/30 to-agro-blue-light/40 relative overflow-hidden">
+        <main className="flex-1 p-6 bg-gradient-to-br from-slate-50 via-agro-green-light/30 to-agro-blue-light/40 relative overflow-auto">
           <div className="absolute inset-0 bg-gradient-to-tr from-primary/5 via-transparent to-agro-blue/8 pointer-events-none" />
           <div className="relative z-10 max-w-7xl mx-auto">
             <div className="text-center py-16">
@@ -203,7 +203,7 @@ const CartPage = () => {
 
   return (
     <Layout userType={currentUserType}>
-      <main className="flex-1 p-6 bg-gradient-to-br from-slate-50 via-agro-green-light/30 to-agro-blue-light/40 relative overflow-hidden">
+      <main className="flex-1 p-6 bg-gradient-to-br from-slate-50 via-agro-green-light/30 to-agro-blue-light/40 relative overflow-auto">
         <div className="absolute inset-0 bg-gradient-to-tr from-primary/5 via-transparent to-agro-blue/8 pointer-events-none" />
         <div className="relative z-10 max-w-7xl mx-auto space-y-8">
           
@@ -250,7 +250,7 @@ const CartPage = () => {
                 const hasSelectedItems = supplierSelectedItems.length > 0;
                 
                 return (
-                  <Card key={group.supplier.id} className="overflow-hidden">
+                  <Card key={group.supplier.id} className="overflow-auto">
                     {/* Supplier Header */}
                     <CardHeader className="bg-muted/50 pb-4">
                       <div className="flex items-center gap-4">
