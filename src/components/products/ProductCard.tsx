@@ -133,7 +133,7 @@ export const ProductCard = ({
           <div className="flex justify-between">
             <span className="text-muted-foreground">{t('products.category')}:</span>
             <Badge variant="outline" className="text-xs">
-              {product.details.productCategory}
+              {product.details?.productCategory || t('products.unknownCategory', { defaultValue: '未知类别' })}
             </Badge>
           </div>
         </div>
@@ -195,7 +195,7 @@ export const ProductCard = ({
         </div>
 
         {/* 产品描述 */}
-        {product.details.description && (
+        {product.details?.description && (
           <div className="mb-4 flex-1">
             <p className="text-sm text-muted-foreground line-clamp-3">
               {product.details.description}
