@@ -427,6 +427,51 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     };
   }, [isLoggedIn, user, fetchNotifications, refreshUnreadCount, connectWebSocket, disconnectWebSocket]);
 
+  // 监听标记通知已读的事件
+  useEffect(() => {
+    const handleMarkInquiryNotificationRead = async (event: CustomEvent) => {
+      const { inquiryId, messageId } = event.detail;
+      console.log('🏷️ 收到标记询价通知已读事件:', { inquiryId, messageId });
+      
+      // 查找匹配的通知
+      const matchingNotification = state.notifications.find(notification => 
+        notification.data?.relatedId === inquiryId && 
+        notification.data?.relatedType === 'inquiry' &&
+        notification.content?.includes('新消息')
+      );
+      
+      if (matchingNotification) {
+        console.log('🎯 找到匹配的通知，标记为已读:', matchingNotification.id);
+        await markAsRead(matchingNotification.id);
+      }
+    };
+
+    const handleMarkInquiryStatusNotificationRead = async (event: CustomEvent) => {
+      const { inquiryId, newStatus } = event.detail;
+      console.log('🏷️ 收到标记询价状态通知已读事件:', { inquiryId, newStatus });
+      
+      // 查找匹配的通知
+      const matchingNotification = state.notifications.find(notification => 
+        notification.data?.relatedId === inquiryId && 
+        notification.data?.relatedType === 'inquiry' &&
+        notification.title?.includes('状态更新')
+      );
+      
+      if (matchingNotification) {
+        console.log('🎯 找到匹配的状态通知，标记为已读:', matchingNotification.id);
+        await markAsRead(matchingNotification.id);
+      }
+    };
+
+    window.addEventListener('markInquiryNotificationRead', handleMarkInquiryNotificationRead as EventListener);
+    window.addEventListener('markInquiryStatusNotificationRead', handleMarkInquiryStatusNotificationRead as EventListener);
+    
+    return () => {
+      window.removeEventListener('markInquiryNotificationRead', handleMarkInquiryNotificationRead as EventListener);
+      window.removeEventListener('markInquiryStatusNotificationRead', handleMarkInquiryStatusNotificationRead as EventListener);
+    };
+  }, [state.notifications, markAsRead]);
+
   // 组件卸载时清理
   useEffect(() => {
     return () => {
