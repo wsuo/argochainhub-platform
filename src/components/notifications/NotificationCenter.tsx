@@ -27,11 +27,14 @@ import {
   NotificationItem as NotificationItemType, 
   NotificationStatus, 
   NotificationType,
+  NotificationQueryParams,
   NOTIFICATION_TYPE_LABELS 
 } from '@/types/notification';
 import { useNotifications } from '@/contexts/NotificationContext';
 import { NotificationItem } from './NotificationItem';
 import { cn } from '@/lib/utils';
+import { dictionaryService, type DictionaryItem } from '@/services/dictionaryService';
+import { useLanguage } from '@/hooks/useLanguage';
 
 interface NotificationCenterProps {
   onClose?: () => void;
@@ -45,6 +48,7 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
   maxHeight = 500
 }) => {
   const { t } = useTranslation();
+  const { currentLanguage } = useLanguage();
   const {
     notifications,
     unreadCount,
@@ -58,24 +62,15 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
   } = useNotifications();
 
   const [searchQuery, setSearchQuery] = useState('');
-  const [filterType, setFilterType] = useState<NotificationType | 'all'>('all');
-  const [activeTab, setActiveTab] = useState<'all' | 'unread'>('all');
+  const [filterType, setFilterType] = useState<string>('all');
+  const [activeTab, setActiveTab] = useState<'all' | 'unread' | 'read'>('all');
+  const [notificationTypes, setNotificationTypes] = useState<DictionaryItem[]>([]);
 
-  // 过滤通知
+  // 过滤通知 - 仅处理搜索关键词的本地筛选，状态和类型筛选由API处理
   const filteredNotifications = React.useMemo(() => {
     let filtered = notifications;
 
-    // 按标签页筛选
-    if (activeTab === 'unread') {
-      filtered = filtered.filter(n => n.status === 'unread');
-    }
-
-    // 按类型筛选
-    if (filterType !== 'all') {
-      filtered = filtered.filter(n => n.type === filterType);
-    }
-
-    // 按搜索关键词筛选
+    // 按搜索关键词筛选（本地筛选）
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
       filtered = filtered.filter(n => 
@@ -85,20 +80,41 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
     }
 
     return filtered;
-  }, [notifications, activeTab, filterType, searchQuery]);
+  }, [notifications, searchQuery]);
 
-  // 获取通知类型选项
+  // 获取通知类型选项 - 使用字典数据
   const getTypeOptions = () => {
-    const types = Array.from(new Set(notifications.map(n => n.type)));
-    return types.map(type => ({
-      value: type,
-      label: NOTIFICATION_TYPE_LABELS[type as NotificationType]?.zh || type
+    const langMap: Record<string, 'zh-CN' | 'en' | 'es'> = {
+      'zh': 'zh-CN',
+      'en': 'en',
+      'es': 'es'
+    };
+    const lang = langMap[currentLanguage] || 'zh-CN';
+    
+    return notificationTypes.map(type => ({
+      value: type.code,
+      label: dictionaryService.getLocalizedName(type, lang)
     }));
   };
 
   // 处理刷新
   const handleRefresh = () => {
-    fetchNotifications();
+    const params: NotificationQueryParams = {
+      page: 1,
+      limit: 50
+    };
+    
+    if (activeTab === 'unread') {
+      params.status = 'unread';
+    } else if (activeTab === 'read') {
+      params.status = 'read';
+    }
+    
+    if (filterType !== 'all') {
+      params.type = filterType;
+    }
+    
+    fetchNotifications(params);
     refreshUnreadCount();
   };
 
@@ -115,11 +131,41 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
     }
   };
 
-  // 组件挂载时加载通知 - 只在首次挂载时执行
+  // 加载通知类型字典
   useEffect(() => {
-    fetchNotifications();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // 空依赖数组，只在组件挂载时执行一次
+    const loadNotificationTypes = async () => {
+      try {
+        const types = await dictionaryService.getNotificationTypes();
+        setNotificationTypes(types);
+      } catch (error) {
+        console.error('加载通知类型失败:', error);
+      }
+    };
+    loadNotificationTypes();
+  }, []);
+
+  // 根据Tab切换和筛选条件加载通知
+  useEffect(() => {
+    const params: NotificationQueryParams = {
+      page: 1,
+      limit: 50
+    };
+    
+    // 根据Tab设置状态筛选
+    if (activeTab === 'unread') {
+      params.status = 'unread';
+    } else if (activeTab === 'read') {
+      params.status = 'read';
+    }
+    // activeTab === 'all' 时不传status参数，获取全部
+    
+    // 根据类型筛选
+    if (filterType !== 'all') {
+      params.type = filterType;
+    }
+    
+    fetchNotifications(params);
+  }, [activeTab, filterType, fetchNotifications]);
 
   return (
     <div className={cn(
@@ -182,7 +228,7 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
           
           <Select
             value={filterType}
-            onValueChange={(value) => setFilterType(value as NotificationType | 'all')}
+            onValueChange={(value) => setFilterType(value)}
           >
             <SelectTrigger className="h-9">
               <SelectValue placeholder="筛选类型" />
@@ -200,15 +246,15 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
       )}
 
       {/* 标签页 */}
-      <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as 'all' | 'unread')}>
+      <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as 'all' | 'unread' | 'read')}>
         <div className="px-4 pt-3">
-          <TabsList className="grid w-full grid-cols-2 h-8">
+          <TabsList className="grid w-full grid-cols-3 h-8">
             <TabsTrigger 
               value="all" 
               className="text-xs h-full flex items-center justify-center py-0 px-2 data-[state=active]:bg-background data-[state=active]:text-foreground"
               style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
             >
-              全部 ({notifications.length})
+              全部
             </TabsTrigger>
             <TabsTrigger 
               value="unread" 
@@ -216,6 +262,13 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
               style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
             >
               未读 ({unreadCount})
+            </TabsTrigger>
+            <TabsTrigger 
+              value="read" 
+              className="text-xs h-full flex items-center justify-center py-0 px-2 data-[state=active]:bg-background data-[state=active]:text-foreground"
+              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+            >
+              已读
             </TabsTrigger>
           </TabsList>
         </div>
@@ -249,7 +302,9 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
               <div className="p-8 text-center">
                 <Bell className="h-8 w-8 text-gray-400 mx-auto mb-2" />
                 <p className="text-sm text-gray-500">
-                  {activeTab === 'unread' ? '暂无未读通知' : '暂无通知'}
+                  {activeTab === 'unread' ? '暂无未读通知' : 
+                   activeTab === 'read' ? '暂无已读通知' : 
+                   '暂无通知'}
                 </p>
               </div>
             )}

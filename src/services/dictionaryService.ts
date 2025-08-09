@@ -114,6 +114,71 @@ class DictionaryService {
     const item = items.find(item => item.key === key || item.value === key);
     return item?.label || key;
   }
+
+  /**
+   * 获取通知类型字典
+   * 从后端字典接口动态获取所有可用的通知类型
+   */
+  async getNotificationTypes(): Promise<DictionaryItem[]> {
+    try {
+      const url = `${API_BASE_URL}/admin/dictionaries/notification_type/items`;
+      const response = await this.makeRequest<DictionaryResponse>(url, {}, false); // 不需要认证
+      
+      // 转换后端数据格式为前端需要的格式
+      const transformedData = response.data.map(item => ({
+        ...item,
+        key: item.code,
+        value: item.code,
+        label: item.name['zh-CN'] || item.name.en || item.code
+      }));
+      
+      // 按排序字段排序
+      return transformedData.sort((a, b) => {
+        if (a.sortOrder !== undefined && b.sortOrder !== undefined) {
+          return a.sortOrder - b.sortOrder;
+        }
+        return a.code.localeCompare(b.code);
+      });
+    } catch (error) {
+      console.warn('Failed to fetch notification types:', error);
+      // 返回空数组作为回退
+      return [];
+    }
+  }
+
+  /**
+   * 根据当前语言获取字典项的本地化名称
+   */
+  getLocalizedName(item: DictionaryItem, language: 'zh-CN' | 'en' | 'es' = 'zh-CN'): string {
+    return item.name[language] || item.name['zh-CN'] || item.code;
+  }
+
+  /**
+   * 获取通知状态字典
+   */
+  async getNotificationStatuses(): Promise<DictionaryItem[]> {
+    try {
+      const url = `${API_BASE_URL}/admin/dictionaries/admin_notification_status/items`;
+      const response = await this.makeRequest<DictionaryResponse>(url, {}, false);
+      
+      const transformedData = response.data.map(item => ({
+        ...item,
+        key: item.code,
+        value: item.code,
+        label: item.name['zh-CN'] || item.name.en || item.code
+      }));
+      
+      return transformedData.sort((a, b) => {
+        if (a.sortOrder !== undefined && b.sortOrder !== undefined) {
+          return a.sortOrder - b.sortOrder;
+        }
+        return a.code.localeCompare(b.code);
+      });
+    } catch (error) {
+      console.warn('Failed to fetch notification statuses:', error);
+      return [];
+    }
+  }
 }
 
 export const dictionaryService = new DictionaryService();
