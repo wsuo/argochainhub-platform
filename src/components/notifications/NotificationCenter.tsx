@@ -247,28 +247,23 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
 
       {/* 标签页 */}
       <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as 'all' | 'unread' | 'read')}>
-        <div className="border-b bg-gray-50/30">
-          <TabsList className="w-full justify-start h-12 bg-transparent rounded-none p-0">
+        <div className="px-4 pt-3">
+          <TabsList className="grid w-full grid-cols-3 h-8">
             <TabsTrigger 
               value="all" 
-              className="data-[state=active]:bg-white data-[state=active]:shadow-sm rounded-none border-b-2 border-transparent data-[state=active]:border-primary h-full px-6"
+              className="text-xs h-full flex items-center justify-center py-0 px-2 data-[state=active]:bg-background data-[state=active]:text-foreground"
             >
               全部
             </TabsTrigger>
             <TabsTrigger 
               value="unread" 
-              className="data-[state=active]:bg-white data-[state=active]:shadow-sm rounded-none border-b-2 border-transparent data-[state=active]:border-primary h-full px-6"
+              className="text-xs h-full flex items-center justify-center py-0 px-2 data-[state=active]:bg-background data-[state=active]:text-foreground"
             >
-              未读
-              {unreadCount > 0 && (
-                <Badge variant="secondary" className="ml-2 text-xs px-1.5 py-0 h-5">
-                  {unreadCount}
-                </Badge>
-              )}
+              未读 ({unreadCount})
             </TabsTrigger>
             <TabsTrigger 
               value="read" 
-              className="data-[state=active]:bg-white data-[state=active]:shadow-sm rounded-none border-b-2 border-transparent data-[state=active]:border-primary h-full px-6"
+              className="text-xs h-full flex items-center justify-center py-0 px-2 data-[state=active]:bg-background data-[state=active]:text-foreground"
             >
               已读
             </TabsTrigger>
