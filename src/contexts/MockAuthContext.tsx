@@ -212,7 +212,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const loginOperation = async () => {
       const loginData: LoginRequest = { email, password };
-      const response = await AuthService.login(loginData);
+      
+      // 根据用户类型选择对应的登录接口
+      let response;
+      if (userType === 'buyer') {
+        response = await AuthService.buyerLogin(loginData);
+      } else {
+        response = await AuthService.supplierLogin(loginData);
+      }
       
       setUser(response.user);
       setCurrentUserType(userType);
@@ -275,7 +282,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // 注册成功后，如果是个人采购商，直接登录
       if (params.userType === 'buyer') {
         // 个人采购商注册后立即可用，尝试自动登录
-        return await login(params.email, params.password, params.userType);
+        // 使用专用的采购商登录接口
+        const loginData: LoginRequest = { email: params.email, password: params.password };
+        const loginResponse = await AuthService.buyerLogin(loginData);
+        
+        setUser(loginResponse.user);
+        setCurrentUserType(params.userType);
+        localStorage.setItem('agro_user_type', params.userType);
+        
+        return true;
       } else {
         // 供应商需要审核，不自动登录
         setError(`注册成功！${response.message}`);

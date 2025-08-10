@@ -22,6 +22,8 @@ export const Layout = ({ children, userType = "buyer" }: LayoutProps) => {
     if (pathname === '/conversation-history') return 'conversation-history';
     if (pathname.startsWith('/inquiries')) return 'inquiries';
     if (pathname.startsWith('/quote-management')) return 'quote-management';
+    if (pathname.startsWith('/samples')) return 'samples';
+    if (pathname.startsWith('/sample-responses')) return 'sample-responses';
     if (pathname === '/cart') return 'cart';
     return 'ai-query';
   };
@@ -34,6 +36,8 @@ export const Layout = ({ children, userType = "buyer" }: LayoutProps) => {
     if (pathname === '/conversation-history') return 'conversation-history';
     if (pathname.startsWith('/inquiries')) return 'inquiries';
     if (pathname.startsWith('/quote-management')) return 'quote-management';
+    if (pathname.startsWith('/samples')) return 'samples';
+    if (pathname.startsWith('/sample-responses')) return 'sample-responses';
     if (pathname === '/cart') return 'cart';
     return 'ai-query';
   };
@@ -54,6 +58,12 @@ export const Layout = ({ children, userType = "buyer" }: LayoutProps) => {
         break;
       case 'inquiries':
         navigate('/inquiries');
+        break;
+      case 'samples':
+        navigate('/samples');
+        break;
+      case 'sample-responses':
+        navigate('/sample-responses');
         break;
       case 'quote-management':
         // 导航到报价管理路由
@@ -76,6 +86,8 @@ export const Layout = ({ children, userType = "buyer" }: LayoutProps) => {
                          location.pathname === '/buyer' ||
                          location.pathname === '/conversation-history' ||
                          location.pathname.startsWith('/inquiries') ||
+                         location.pathname.startsWith('/samples') ||
+                         location.pathname.startsWith('/sample-responses') ||
                          location.pathname === '/cart';
   const currentActiveItem = getActiveItemFromPath(location.pathname);
 

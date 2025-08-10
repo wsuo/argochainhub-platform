@@ -179,6 +179,20 @@ class DictionaryService {
       return [];
     }
   }
+
+  /**
+   * 获取样品申请状态字典
+   */
+  async getSampleRequestStatuses(): Promise<DictionaryItem[]> {
+    return this.getDictionary('sample_request_status');
+  }
+
+  /**
+   * 获取运输方式字典
+   */
+  async getShippingMethods(): Promise<DictionaryItem[]> {
+    return this.getDictionary('shipping_method');
+  }
 }
 
 export const dictionaryService = new DictionaryService();

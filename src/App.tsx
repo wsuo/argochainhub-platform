@@ -20,6 +20,10 @@ import InquiryManagementPage from "./pages/InquiryManagementPage";
 import InquiryDetailPage from "./pages/InquiryDetailPage";
 import InquiryResponsePage from "./pages/InquiryResponsePage";
 import NotFound from "./pages/NotFound";
+import Samples from "./pages/Samples";
+import SampleDetail from "./pages/SampleDetail";
+import SampleResponses from "./pages/SampleResponses";
+import SampleResponseDetail from "./pages/SampleResponseDetail";
 
 const queryClient = new QueryClient();
 
@@ -50,6 +54,10 @@ const App = () => (
                       <Route path="/inquiry-responses/:id" element={<InquiryDetailPage />} />
                       <Route path="/quote-management" element={<SupplierDashboard />} />
                       <Route path="/quote-management/:id" element={<SupplierDashboard />} />
+                      <Route path="/samples" element={<Samples />} />
+                      <Route path="/samples/:id" element={<SampleDetail />} />
+                      <Route path="/sample-responses" element={<SampleResponses />} />
+                      <Route path="/sample-responses/:id" element={<SampleResponseDetail />} />
                       {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                       <Route path="*" element={<NotFound />} />
                     </Routes>

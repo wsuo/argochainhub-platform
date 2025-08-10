@@ -47,6 +47,7 @@ export interface User {
   role: UserRole;
   lastLoginAt?: string;
   type: 'user';
+  loginSource?: 'buyer' | 'supplier' | 'admin';
   company?: Company | null;
 }
 
@@ -280,6 +281,40 @@ export class AuthService {
   static async login(data: LoginRequest): Promise<LoginResponseData> {
     const response = await httpClient.post<ApiResponse<LoginResponseData>>(
       `${API_PREFIX}/login`,
+      data
+    );
+    
+    // 保存token到localStorage
+    if (response.data?.accessToken) {
+      localStorage.setItem('agro_access_token', response.data.accessToken);
+    }
+    
+    return response.data!;
+  }
+
+  /**
+   * 采购商专用登录
+   */
+  static async buyerLogin(data: LoginRequest): Promise<LoginResponseData> {
+    const response = await httpClient.post<ApiResponse<LoginResponseData>>(
+      `${API_PREFIX}/buyer/login`,
+      data
+    );
+    
+    // 保存token到localStorage
+    if (response.data?.accessToken) {
+      localStorage.setItem('agro_access_token', response.data.accessToken);
+    }
+    
+    return response.data!;
+  }
+
+  /**
+   * 供应商专用登录
+   */
+  static async supplierLogin(data: LoginRequest): Promise<LoginResponseData> {
+    const response = await httpClient.post<ApiResponse<LoginResponseData>>(
+      `${API_PREFIX}/supplier/login`,
       data
     );
     
