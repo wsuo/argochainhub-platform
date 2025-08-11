@@ -490,6 +490,7 @@
   "samples": {
     "title": "Sample Management",
     "description": "Manage sample requests and logistics status",
+    "createRequest": "Create Sample Request",
     "status": {
       "pendingApproval": "Pending Approval",
       "approved": "Approved",

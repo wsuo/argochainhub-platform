@@ -490,6 +490,7 @@
   "samples": {
     "title": "Gestión de Muestras",
     "description": "Gestionar solicitudes de muestras y estado de logística",
+    "createRequest": "Crear Solicitud de Muestra",
     "status": {
       "pendingApproval": "Pendiente de Aprobación",
       "approved": "Aprobado",

@@ -531,6 +531,7 @@
   "samples": {
     "title": "样品管理",
     "description": "管理样品申请与物流状态",
+    "createRequest": "创建样品申请",
     "status": {
       "pendingApproval": "待审核",
       "approved": "已批准",
