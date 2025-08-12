@@ -193,6 +193,34 @@ class DictionaryService {
   async getShippingMethods(): Promise<DictionaryItem[]> {
     return this.getDictionary('shipping_method');
   }
+
+  /**
+   * 获取登记状态字典
+   */
+  async getRegistrationStatuses(): Promise<DictionaryItem[]> {
+    return this.getDictionary('registration_request_status');
+  }
+
+  /**
+   * 获取国家字典
+   */
+  async getCountries(): Promise<DictionaryItem[]> {
+    return this.getDictionary('countries');
+  }
+
+  /**
+   * 获取文档类型字典
+   */
+  async getDocumentTypes(): Promise<DictionaryItem[]> {
+    return this.getDictionary('registration_document_type');
+  }
+
+  /**
+   * 获取货币字典
+   */
+  async getCurrencies(): Promise<DictionaryItem[]> {
+    return this.getDictionary('currencies');
+  }
 }
 
 export const dictionaryService = new DictionaryService();

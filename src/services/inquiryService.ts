@@ -9,6 +9,8 @@ import {
   MessageQueryParams,
   CreateInquiryRequest,
   ApiResponse,
+  BuyerInquiryStatsResponse,
+  SupplierQuoteStatsResponse,
 } from '@/types/inquiry';
 import { inquiryHttpClient } from './httpClient';
 import { BusinessErrorContext } from '@/types/error';
@@ -216,6 +218,38 @@ export class InquiryService {
     } catch {
       return deadline;
     }
+  }
+
+  /**
+   * 获取采购商询价统计数据
+   */
+  static async getBuyerInquiryStats(): Promise<BuyerInquiryStatsResponse> {
+    const businessContext: BusinessErrorContext = {
+      module: 'inquiry',
+      action: 'read',
+      resourceType: 'stats'
+    };
+
+    return inquiryHttpClient.get<BuyerInquiryStatsResponse>(
+      `${API_PREFIX}/inquiries/stats`,
+      businessContext
+    );
+  }
+
+  /**
+   * 获取供应商报价统计数据
+   */
+  static async getSupplierQuoteStats(): Promise<SupplierQuoteStatsResponse> {
+    const businessContext: BusinessErrorContext = {
+      module: 'inquiry',
+      action: 'read',
+      resourceType: 'stats'
+    };
+
+    return inquiryHttpClient.get<SupplierQuoteStatsResponse>(
+      `${API_PREFIX}/inquiries/supplier/quotes/stats`,
+      businessContext
+    );
   }
 }
 

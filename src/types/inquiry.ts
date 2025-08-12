@@ -189,3 +189,37 @@ export interface InquiryStatusLabels {
   'expired': string;
   'cancelled': string;
 }
+
+// 采购商询价统计数据
+export interface BuyerInquiryStats {
+  pendingQuoteCount: number;  // 待报价数量
+  quotedCount: number;        // 已报价数量
+  confirmedCount: number;     // 已确认数量
+  declinedCount: number;      // 已拒绝数量
+  cancelledCount: number;     // 已取消数量
+  totalCount: number;         // 总数量
+}
+
+// 供应商报价统计数据
+export interface SupplierQuoteStats {
+  pendingQuoteCount: number;  // 待报价数量
+  quotedCount: number;        // 已报价数量
+  confirmedCount: number;     // 已确认数量
+  declinedCount: number;      // 已拒绝数量
+  cancelledCount: number;     // 已取消数量
+  totalCount: number;         // 总数量
+}
+
+// 采购商询价统计响应
+export interface BuyerInquiryStatsResponse {
+  success: boolean;
+  message: string;
+  data: BuyerInquiryStats;
+}
+
+// 供应商报价统计响应
+export interface SupplierQuoteStatsResponse {
+  success: boolean;
+  message: string;
+  data: SupplierQuoteStats;
+}
