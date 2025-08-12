@@ -24,6 +24,7 @@ export const Layout = ({ children, userType = "buyer" }: LayoutProps) => {
     if (pathname.startsWith('/samples')) return 'samples';
     if (pathname.startsWith('/sample-responses')) return 'sample-responses';
     if (pathname === '/cart') return 'cart';
+    if (pathname === '/ai-search') return 'ai-search';
     return 'ai-query';
   };
 
@@ -40,6 +41,7 @@ export const Layout = ({ children, userType = "buyer" }: LayoutProps) => {
     if (pathname.startsWith('/samples')) return 'samples';
     if (pathname.startsWith('/sample-responses')) return 'sample-responses';
     if (pathname === '/cart') return 'cart';
+    if (pathname === '/ai-search') return 'ai-search';
     return 'ai-query';
   };
 
@@ -79,6 +81,9 @@ export const Layout = ({ children, userType = "buyer" }: LayoutProps) => {
       case 'ai-query':
         navigate('/');
         break;
+      case 'ai-search':
+        navigate('/ai-search');
+        break;
       default:
         // 其他菜单项暂时保持在当前页面
         console.log(`Menu item clicked: ${itemId}`);
@@ -87,11 +92,9 @@ export const Layout = ({ children, userType = "buyer" }: LayoutProps) => {
   };
 
   // 如果是特定路由，直接渲染children，不使用Layout的内部路由逻辑
-  const isExternalRoute = location.pathname.startsWith('/products') || 
-                         location.pathname === '/auth' || 
+  const isExternalRoute = location.pathname === '/auth' || 
                          location.pathname === '/supplier' || 
-                         location.pathname === '/buyer' ||
-                         location.pathname === '/cart';
+                         location.pathname === '/buyer';
   const currentActiveItem = getActiveItemFromPath(location.pathname);
 
   const renderContent = () => {
@@ -101,9 +104,17 @@ export const Layout = ({ children, userType = "buyer" }: LayoutProps) => {
 
     // 所有其他路由都使用统一的背景和包装
     return (
-      <main className="flex-1 p-3 md:p-4 xl:p-6 bg-gradient-to-br from-slate-50 via-agro-green-light/20 to-agro-blue-light/30 relative overflow-auto">
-        {/* 内容区域 */}
-        <div className="relative z-10">
+      <main className="flex-1 relative overflow-hidden">
+        {/* 固定的渐变背景层 - 不随内容滚动 */}
+        <div className="absolute inset-0 bg-gradient-to-br from-white/95 via-slate-50/60 to-slate-100/50" />
+        
+        {/* 装饰性渐变叠层 - 固定不动 */}
+        <div className="absolute inset-0 bg-gradient-to-tr from-emerald-200/20 via-transparent to-blue-200/15 pointer-events-none" />
+        <div className="absolute top-0 right-0 w-2/5 h-2/5 bg-gradient-radial from-emerald-300/30 via-emerald-200/15 to-transparent rounded-full blur-2xl pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-3/5 h-3/5 bg-gradient-radial from-blue-300/25 via-blue-200/10 to-transparent rounded-full blur-2xl pointer-events-none" />
+        
+        {/* 可滚动的内容区域 */}
+        <div className="relative z-10 h-full overflow-auto p-6">
           {children}
         </div>
       </main>
