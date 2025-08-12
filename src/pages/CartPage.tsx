@@ -155,25 +155,22 @@ const CartPage = () => {
   if (isLoading) {
     return (
       <Layout userType={currentUserType}>
-        <main className="flex-1 p-6 bg-gradient-to-br from-slate-50 via-agro-green-light/30 to-agro-blue-light/40 relative overflow-auto">
-          <div className="absolute inset-0 bg-gradient-to-tr from-primary/5 via-transparent to-agro-blue/8 pointer-events-none" />
-          <div className="relative z-10 max-w-7xl mx-auto space-y-8">
-            <div className="space-y-4">
-              <Skeleton className="h-8 w-48" />
-              <Skeleton className="h-4 w-96" />
+        <div className="max-w-7xl mx-auto space-y-8">
+          <div className="space-y-4">
+            <Skeleton className="h-8 w-48" />
+            <Skeleton className="h-4 w-96" />
+          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+            <div className="lg:col-span-3 space-y-6">
+              {[...Array(3)].map((_, index) => (
+                <Skeleton key={index} className="h-96 w-full" />
+              ))}
             </div>
-            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-              <div className="lg:col-span-3 space-y-6">
-                {[...Array(3)].map((_, index) => (
-                  <Skeleton key={index} className="h-96 w-full" />
-                ))}
-              </div>
-              <div className="lg:col-span-1">
-                <Skeleton className="h-64 w-full" />
-              </div>
+            <div className="lg:col-span-1">
+              <Skeleton className="h-64 w-full" />
             </div>
           </div>
-        </main>
+        </div>
       </Layout>
     );
   }
@@ -182,10 +179,8 @@ const CartPage = () => {
   if (totalItems === 0) {
     return (
       <Layout userType={currentUserType}>
-        <main className="flex-1 p-6 bg-gradient-to-br from-slate-50 via-agro-green-light/30 to-agro-blue-light/40 relative overflow-auto">
-          <div className="absolute inset-0 bg-gradient-to-tr from-primary/5 via-transparent to-agro-blue/8 pointer-events-none" />
-          <div className="relative z-10 max-w-7xl mx-auto">
-            <div className="text-center py-16">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center py-16">
               <ShoppingCart className="w-24 h-24 mx-auto text-muted-foreground mb-6" />
               <h2 className="text-2xl font-semibold text-foreground mb-4">购物车为空</h2>
               <p className="text-muted-foreground mb-8">
@@ -194,18 +189,15 @@ const CartPage = () => {
               <Button asChild>
                 <Link to="/products">浏览产品</Link>
               </Button>
-            </div>
           </div>
-        </main>
+        </div>
       </Layout>
     );
   }
 
   return (
     <Layout userType={currentUserType}>
-      <main className="flex-1 p-6 bg-gradient-to-br from-slate-50 via-agro-green-light/30 to-agro-blue-light/40 relative overflow-auto">
-        <div className="absolute inset-0 bg-gradient-to-tr from-primary/5 via-transparent to-agro-blue/8 pointer-events-none" />
-        <div className="relative z-10 max-w-7xl mx-auto space-y-8">
+      <div className="max-w-7xl mx-auto space-y-8">
           
           {/* Header */}
           <div className="mb-8">
@@ -474,8 +466,7 @@ const CartPage = () => {
             </div>
           </div>
         </div>
-      </main>
-
+      
       {/* Dialogs */}
       <CartInquiryDialog 
         open={showInquiryDialog}
