@@ -4,7 +4,7 @@ import { quoteApi } from "@/services/quoteApi";
 import type { QuoteFilters, QuoteListResponse } from "@/types/quote";
 
 export const useQuotes = (
-  filters: QuoteFilters = {},
+  filters: QuoteFilters | any = {},
   page: number = 1,
   limit: number = 10
 ) => {

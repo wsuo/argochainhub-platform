@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { useQuote } from '@/hooks/useQuote';
@@ -22,6 +22,7 @@ import { useAuth } from '@/contexts/MockAuthContext';
 import { dictionaryService } from '@/services/dictionaryService';
 import { format } from 'date-fns';
 import { zhCN, enUS, es } from 'date-fns/locale';
+import { Layout } from '@/components/layout/Layout';
 
 // 供应商报价区块组件
 const SupplierQuoteSection = ({ quote }: { quote: any }) => {
@@ -326,6 +327,7 @@ const MessageSection = ({ inquiryId, onRefetchMessages }: { inquiryId: string; o
 export default function QuoteDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const { t } = useTranslation();
   const { data: quote, isLoading, error, refetch } = useQuote(id || '');
   const refetchMessagesRef = useRef<(() => void) | null>(null);
@@ -368,55 +370,82 @@ export default function QuoteDetail() {
     document.title = title;
   }, [quote?.inquiryNo, t]);
 
+  // 处理锚点滚动 - 只有明确指定 #messages 时才滚动
+  useEffect(() => {
+    if (quote && location.hash === '#messages') {
+      // 延迟执行确保DOM已渲染
+      const timer = setTimeout(() => {
+        const messagesElement = document.getElementById('messages');
+        if (messagesElement) {
+          messagesElement.scrollIntoView({ 
+            behavior: 'smooth',
+            block: 'start'
+          });
+          // 清除hash，避免重复滚动
+          window.history.replaceState(null, '', window.location.pathname);
+        }
+      }, 200);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [quote, location.hash]);
+
   if (isLoading) {
     return (
-      <div className="space-y-4">
-        <Skeleton className="h-10 w-48" />
-        <Skeleton className="h-28 w-full" />
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2 space-y-6">
-            <Skeleton className="h-64 w-full" />
-            <Skeleton className="h-64 w-full" />
-          </div>
-          <div className="space-y-6">
-            <Skeleton className="h-60 w-full" />
-            <Skeleton className="h-60 w-full" />
+      <Layout userType="supplier">
+        <div className="space-y-4">
+          <Skeleton className="h-10 w-48" />
+          <Skeleton className="h-28 w-full" />
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2 space-y-6">
+              <Skeleton className="h-64 w-full" />
+              <Skeleton className="h-64 w-full" />
+            </div>
+            <div className="space-y-6">
+              <Skeleton className="h-60 w-full" />
+              <Skeleton className="h-60 w-full" />
+            </div>
           </div>
         </div>
-      </div>
+      </Layout>
     );
   }
 
   if (errorHandler.hasError) {
     return (
-      <ErrorBoundary
-        error={errorHandler.parsedError}
-        loading={isLoading}
-        onRetry={() => errorHandler.retry(refetch)}
-        onNavigateBack={() => errorHandler.navigateBack('/quote-management')}
-      />
+      <Layout userType="supplier">
+        <ErrorBoundary
+          error={errorHandler.parsedError}
+          loading={isLoading}
+          onRetry={() => errorHandler.retry(refetch)}
+          onNavigateBack={() => errorHandler.navigateBack('/quote-management')}
+        />
+      </Layout>
     );
   }
 
   if (!quote) {
     return (
-      <Card>
-        <CardContent className="py-10 text-center space-y-4">
-          <div className="text-muted-foreground">
-            {t('quote.detail.notFound', '未找到该报价，或加载失败。')}
-          </div>
-          <Button onClick={() => navigate('/quote-management')}>
-            <ArrowLeft className="h-4 w-4 mr-1" />
-            {t('quote.actions.backToList', '返回报价管理')}
-          </Button>
-        </CardContent>
-      </Card>
+      <Layout userType="supplier">
+        <Card>
+          <CardContent className="py-10 text-center space-y-4">
+            <div className="text-muted-foreground">
+              {t('quote.detail.notFound', '未找到该报价，或加载失败。')}
+            </div>
+            <Button onClick={() => navigate('/quote-management')}>
+              <ArrowLeft className="h-4 w-4 mr-1" />
+              {t('quote.actions.backToList', '返回报价管理')}
+            </Button>
+          </CardContent>
+        </Card>
+      </Layout>
     );
   }
 
   return (
-    <div className="space-y-6">
-      {/* 返回按钮和标题 */}
+    <Layout userType="supplier">
+      <div className="space-y-6">
+        {/* 返回按钮和标题 */}
         <div>
           <Button 
             variant="ghost" 
@@ -445,7 +474,9 @@ export default function QuoteDetail() {
             <SupplierQuoteSection quote={quote} />
             
             {/* 消息沟通 */}
-            <MessageSection inquiryId={quote.id} onRefetchMessages={refetchMessagesRef} />
+            <div id="messages">
+              <MessageSection inquiryId={quote.id} onRefetchMessages={refetchMessagesRef} />
+            </div>
           </div>
           
           {/* 右侧信息 */}
@@ -466,5 +497,6 @@ export default function QuoteDetail() {
           </div>
         </div>
       </div>
-    );
+    </Layout>
+  );
   }
