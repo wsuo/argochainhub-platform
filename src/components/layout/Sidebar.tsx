@@ -8,7 +8,8 @@ import {
   Building2,
   Users,
   Star,
-  History
+  History,
+  Bot
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -28,6 +29,12 @@ export const Sidebar = ({ userType, activeItem, onItemClick }: SidebarProps) => 
       label: "AI农药查询",
       icon: MessageSquare,
       description: "智能问答服务"
+    },
+    {
+      id: "ai-search",
+      label: "AI农药助手",
+      icon: Bot,
+      description: "专业AI搜索服务"
     },
     {
       id: "conversation-history",

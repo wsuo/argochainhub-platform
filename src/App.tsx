@@ -29,6 +29,7 @@ import Samples from "./pages/Samples";
 import SampleDetail from "./pages/SampleDetail";
 import SampleResponses from "./pages/SampleResponses";
 import SampleResponseDetail from "./pages/SampleResponseDetail";
+import AISearchPage from "./pages/AISearchPage";
 
 const queryClient = new QueryClient();
 
@@ -66,6 +67,7 @@ const App = () => (
                       <Route path="/samples/:id" element={<SampleDetail />} />
                       <Route path="/sample-responses" element={<SampleResponses />} />
                       <Route path="/sample-responses/:id" element={<SampleResponseDetail />} />
+                      <Route path="/ai-search" element={<AISearchPage />} />
                       {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                       <Route path="*" element={<NotFound />} />
                     </Routes>
