@@ -2,9 +2,6 @@ import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Header } from "./Header";
 import { Sidebar } from "./Sidebar";
-import { ConversationHistoryPage } from "@/pages/ConversationHistoryPage";
-import QuoteManagement from "@/pages/QuoteManagement";
-import QuoteDetail from "@/pages/QuoteDetail";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -22,6 +19,8 @@ export const Layout = ({ children, userType = "buyer" }: LayoutProps) => {
     if (pathname === '/conversation-history') return 'conversation-history';
     if (pathname.startsWith('/inquiries')) return 'inquiries';
     if (pathname.startsWith('/quote-management')) return 'quote-management';
+    if (pathname.startsWith('/registrations')) return 'registrations';
+    if (pathname.startsWith('/supplier-registrations')) return 'registration-responses';
     if (pathname.startsWith('/samples')) return 'samples';
     if (pathname.startsWith('/sample-responses')) return 'sample-responses';
     if (pathname === '/cart') return 'cart';
@@ -36,6 +35,8 @@ export const Layout = ({ children, userType = "buyer" }: LayoutProps) => {
     if (pathname === '/conversation-history') return 'conversation-history';
     if (pathname.startsWith('/inquiries')) return 'inquiries';
     if (pathname.startsWith('/quote-management')) return 'quote-management';
+    if (pathname.startsWith('/registrations')) return 'registrations';
+    if (pathname.startsWith('/supplier-registrations')) return 'registration-responses';
     if (pathname.startsWith('/samples')) return 'samples';
     if (pathname.startsWith('/sample-responses')) return 'sample-responses';
     if (pathname === '/cart') return 'cart';
@@ -58,6 +59,12 @@ export const Layout = ({ children, userType = "buyer" }: LayoutProps) => {
         break;
       case 'inquiries':
         navigate('/inquiries');
+        break;
+      case 'registrations':
+        navigate('/registrations');
+        break;
+      case 'registration-responses':
+        navigate('/supplier-registrations');
         break;
       case 'samples':
         navigate('/samples');
@@ -84,10 +91,6 @@ export const Layout = ({ children, userType = "buyer" }: LayoutProps) => {
                          location.pathname === '/auth' || 
                          location.pathname === '/supplier' || 
                          location.pathname === '/buyer' ||
-                         location.pathname === '/conversation-history' ||
-                         location.pathname.startsWith('/inquiries') ||
-                         location.pathname.startsWith('/samples') ||
-                         location.pathname.startsWith('/sample-responses') ||
                          location.pathname === '/cart';
   const currentActiveItem = getActiveItemFromPath(location.pathname);
 
@@ -96,82 +99,15 @@ export const Layout = ({ children, userType = "buyer" }: LayoutProps) => {
       return children;
     }
 
-    // 检查是否是报价管理相关路由
-    if (location.pathname.startsWith('/quote-management')) {
-      if (location.pathname.startsWith('/quote-management/')) {
-        return (
-          <main className="flex-1 p-3 md:p-4 xl:p-6 bg-gradient-to-br from-slate-50 via-agro-green-light/30 to-agro-blue-light/40 relative overflow-auto">
-            {/* 装饰性渐变叠层 */}
-            <div className="absolute inset-0 bg-gradient-to-tr from-primary/5 via-transparent to-agro-blue/8 pointer-events-none" />
-            <div className="absolute top-0 right-0 w-1/3 h-1/3 bg-gradient-radial from-primary/10 via-primary/5 to-transparent rounded-full blur-3xl pointer-events-none" />
-            <div className="absolute bottom-0 left-0 w-1/2 h-1/2 bg-gradient-radial from-agro-blue/8 via-agro-blue/4 to-transparent rounded-full blur-3xl pointer-events-none" />
-            
-            {/* 内容区域 */}
-            <div className="relative z-10">
-              <QuoteDetail />
-            </div>
-          </main>
-        );
-      }
-      return (
-        <main className="flex-1 p-3 md:p-4 xl:p-6 bg-gradient-to-br from-slate-50 via-agro-green-light/30 to-agro-blue-light/40 relative overflow-auto">
-          {/* 装饰性渐变叠层 */}
-          <div className="absolute inset-0 bg-gradient-to-tr from-primary/5 via-transparent to-agro-blue/8 pointer-events-none" />
-          <div className="absolute top-0 right-0 w-1/3 h-1/3 bg-gradient-radial from-primary/10 via-primary/5 to-transparent rounded-full blur-3xl pointer-events-none" />
-          <div className="absolute bottom-0 left-0 w-1/2 h-1/2 bg-gradient-radial from-agro-blue/8 via-agro-blue/4 to-transparent rounded-full blur-3xl pointer-events-none" />
-          
-          {/* 内容区域 */}
-          <div className="relative z-10">
-            <QuoteManagement />
-          </div>
-        </main>
-      );
-    }
-
-    switch (activeItem) {
-      case "conversation-history":
-        return (
-          <main className="flex-1 p-3 md:p-4 xl:p-6 bg-gradient-to-br from-slate-50 via-agro-green-light/30 to-agro-blue-light/40 relative overflow-auto">
-            {/* 装饰性渐变叠层 */}
-            <div className="absolute inset-0 bg-gradient-to-tr from-primary/5 via-transparent to-agro-blue/8 pointer-events-none" />
-            <div className="absolute top-0 right-0 w-1/3 h-1/3 bg-gradient-radial from-primary/10 via-primary/5 to-transparent rounded-full blur-3xl pointer-events-none" />
-            <div className="absolute bottom-0 left-0 w-1/2 h-1/2 bg-gradient-radial from-agro-blue/8 via-agro-blue/4 to-transparent rounded-full blur-3xl pointer-events-none" />
-            
-            {/* 内容区域 */}
-            <div className="relative z-10">
-              <ConversationHistoryPage />
-            </div>
-          </main>
-        );
-      case "quote-management":
-        return (
-          <main className="flex-1 p-3 md:p-4 xl:p-6 bg-gradient-to-br from-slate-50 via-agro-green-light/30 to-agro-blue-light/40 relative overflow-auto">
-            {/* 装饰性渐变叠层 */}
-            <div className="absolute inset-0 bg-gradient-to-tr from-primary/5 via-transparent to-agro-blue/8 pointer-events-none" />
-            <div className="absolute top-0 right-0 w-1/3 h-1/3 bg-gradient-radial from-primary/10 via-primary/5 to-transparent rounded-full blur-3xl pointer-events-none" />
-            <div className="absolute bottom-0 left-0 w-1/2 h-1/2 bg-gradient-radial from-agro-blue/8 via-agro-blue/4 to-transparent rounded-full blur-3xl pointer-events-none" />
-            
-            {/* 内容区域 */}
-            <div className="relative z-10">
-              <QuoteManagement />
-            </div>
-          </main>
-        );
-      default:
-        return (
-          <main className="flex-1 p-3 md:p-4 xl:p-6 bg-gradient-to-br from-slate-50 via-agro-green-light/30 to-agro-blue-light/40 relative overflow-auto">
-            {/* 装饰性渐变叠层 */}
-            <div className="absolute inset-0 bg-gradient-to-tr from-primary/5 via-transparent to-agro-blue/8 pointer-events-none" />
-            <div className="absolute top-0 right-0 w-1/3 h-1/3 bg-gradient-radial from-primary/10 via-primary/5 to-transparent rounded-full blur-3xl pointer-events-none" />
-            <div className="absolute bottom-0 left-0 w-1/2 h-1/2 bg-gradient-radial from-agro-blue/8 via-agro-blue/4 to-transparent rounded-full blur-3xl pointer-events-none" />
-            
-            {/* 内容区域 */}
-            <div className="relative z-10">
-              {children}
-            </div>
-          </main>
-        );
-    }
+    // 所有其他路由都使用统一的背景和包装
+    return (
+      <main className="flex-1 p-3 md:p-4 xl:p-6 bg-gradient-to-br from-slate-50 via-agro-green-light/20 to-agro-blue-light/30 relative overflow-auto">
+        {/* 内容区域 */}
+        <div className="relative z-10">
+          {children}
+        </div>
+      </main>
+    );
   };
 
   return (

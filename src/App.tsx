@@ -19,6 +19,11 @@ import ConversationHistoryPage from "./pages/ConversationHistoryPage";
 import InquiryManagementPage from "./pages/InquiryManagementPage";
 import InquiryDetailPage from "./pages/InquiryDetailPage";
 import InquiryResponsePage from "./pages/InquiryResponsePage";
+import RegistrationManagementPage from "./pages/RegistrationManagementPage";
+import SupplierRegistrationPage from "./pages/SupplierRegistrationPage";
+import RegistrationDetailPage from "./pages/RegistrationDetailPage";
+import QuoteManagement from "./pages/QuoteManagement";
+import QuoteDetail from "./pages/QuoteDetail";
 import NotFound from "./pages/NotFound";
 import Samples from "./pages/Samples";
 import SampleDetail from "./pages/SampleDetail";
@@ -52,8 +57,11 @@ const App = () => (
                       <Route path="/inquiries/:id" element={<InquiryDetailPage />} />
                       <Route path="/inquiry-responses" element={<InquiryResponsePage />} />
                       <Route path="/inquiry-responses/:id" element={<InquiryDetailPage />} />
-                      <Route path="/quote-management" element={<SupplierDashboard />} />
-                      <Route path="/quote-management/:id" element={<SupplierDashboard />} />
+                      <Route path="/quote-management" element={<QuoteManagement />} />
+                      <Route path="/quote-management/:id" element={<QuoteDetail />} />
+                      <Route path="/registrations" element={<RegistrationManagementPage />} />
+                      <Route path="/registrations/:id" element={<RegistrationDetailPage />} />
+                      <Route path="/supplier-registrations" element={<SupplierRegistrationPage />} />
                       <Route path="/samples" element={<Samples />} />
                       <Route path="/samples/:id" element={<SampleDetail />} />
                       <Route path="/sample-responses" element={<SampleResponses />} />
