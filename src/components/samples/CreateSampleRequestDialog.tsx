@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { useLanguage } from "@/hooks/useLanguage";
 import { 
@@ -29,6 +29,8 @@ import { cn } from "@/lib/utils";
 import { useCreateSampleRequest, useSampleFilters } from "@/hooks/useSample";
 import { ShippingMethod, type CreateSampleRequestForm } from "@/types/sample";
 import type { Product } from "@/types/product";
+import { SupplierSelector } from "./SupplierSelector";
+import { ProductSelector } from "./ProductSelector";
 
 interface Props {
   open: boolean;
@@ -36,6 +38,8 @@ interface Props {
   product?: Product;
   supplierId?: number;
   supplierName?: string;
+  // 是否允许选择不同的产品和供应商
+  allowSelection?: boolean;
 }
 
 export const CreateSampleRequestDialog = ({ 
@@ -43,12 +47,37 @@ export const CreateSampleRequestDialog = ({
   onOpenChange, 
   product, 
   supplierId,
-  supplierName 
+  supplierName,
+  allowSelection = true
 }: Props) => {
   const { t } = useTranslation();
   const { currentLanguage } = useLanguage();
   const { mutateAsync, isPending } = useCreateSampleRequest();
   const { data: filters } = useSampleFilters();
+  
+  // 获取本地化文本的函数
+  const getLocalizedText = useCallback((text: unknown): string => {
+    if (typeof text === 'string') {
+      // 尝试解析JSON字符串
+      try {
+        const parsed = JSON.parse(text);
+        if (typeof parsed === 'object' && parsed !== null) {
+          const langKey = currentLanguage === 'zh' ? 'zh-CN' : currentLanguage;
+          return parsed[langKey] || parsed['zh-CN'] || text;
+        }
+      } catch {
+        // 如果不是JSON字符串，直接返回
+        return text;
+      }
+      return text;
+    }
+    if (typeof text === 'object' && text !== null) {
+      const langKey = currentLanguage === 'zh' ? 'zh-CN' : currentLanguage;
+      const textObj = text as Record<string, string>;
+      return textObj[langKey] || textObj['zh-CN'] || '';
+    }
+    return '';
+  }, [currentLanguage]);
   
   // Form state
   const [formData, setFormData] = useState<Partial<CreateSampleRequestForm>>({
@@ -64,27 +93,55 @@ export const CreateSampleRequestDialog = ({
       willingnessToPay: {
         paid: false,
         amount: undefined
-      },
-      specialRequirements: ''
-    },
-    contactInfo: {
-      contactPerson: '',
-      phone: '',
-      email: ''
+      }
     }
   });
 
   const [deadlineDate, setDeadlineDate] = useState<Date>();
   const [isPaid, setIsPaid] = useState(false);
+  
+  // 选择器状态
+  const [selectedSupplierId, setSelectedSupplierId] = useState<string>(supplierId?.toString() || '');
+  const [selectedSupplierName, setSelectedSupplierName] = useState<string>(supplierName || '');
+  const [selectedProductId, setSelectedProductId] = useState<string>(product?.id?.toString() || '');
+  const [selectedProductName, setSelectedProductName] = useState<string>('');
 
   useEffect(() => {
     if (product) {
       setFormData(prev => ({ ...prev, productId: product.id }));
+      setSelectedProductId(product.id.toString());
+      const localizedName = getLocalizedText(product.name);
+      setSelectedProductName(localizedName);
     }
     if (supplierId) {
       setFormData(prev => ({ ...prev, supplierId }));
+      setSelectedSupplierId(supplierId.toString());
     }
-  }, [product, supplierId]);
+    if (supplierName) {
+      setSelectedSupplierName(supplierName);
+    }
+  }, [product, supplierId, supplierName, getLocalizedText]);
+
+  // 处理供应商选择
+  const handleSupplierChange = (supplierId: string, supplierName: string) => {
+    setSelectedSupplierId(supplierId);
+    setSelectedSupplierName(supplierName);
+    setFormData(prev => ({ ...prev, supplierId: Number(supplierId) }));
+    
+    // 清空已选产品（因为产品需要属于新选择的供应商）
+    if (selectedProductId) {
+      setSelectedProductId('');
+      setSelectedProductName('');
+      setFormData(prev => ({ ...prev, productId: undefined }));
+    }
+  };
+
+  // 处理产品选择
+  const handleProductChange = (productId: string, productName: string) => {
+    setSelectedProductId(productId);
+    setSelectedProductName(productName);
+    setFormData(prev => ({ ...prev, productId: Number(productId) }));
+  };
 
   const handleSubmit = async () => {
     if (!formData.productId || !formData.supplierId || !formData.quantity || !deadlineDate) {
@@ -103,14 +160,17 @@ export const CreateSampleRequestDialog = ({
           paid: isPaid,
           amount: isPaid ? formData.details?.willingnessToPay?.amount : undefined
         }
-      },
-      contactInfo: formData.contactInfo
+      }
     };
 
     await mutateAsync(submitData);
     onOpenChange(false);
     
     // Reset form
+    resetForm();
+  };
+
+  const resetForm = () => {
     setFormData({
       productId: undefined,
       supplierId: undefined,
@@ -124,39 +184,15 @@ export const CreateSampleRequestDialog = ({
         willingnessToPay: {
           paid: false,
           amount: undefined
-        },
-        specialRequirements: ''
-      },
-      contactInfo: {
-        contactPerson: '',
-        phone: '',
-        email: ''
+        }
       }
     });
     setDeadlineDate(undefined);
     setIsPaid(false);
-  };
-
-  const getLocalizedText = (text: any): string => {
-    if (typeof text === 'string') {
-      // 尝试解析JSON字符串
-      try {
-        const parsed = JSON.parse(text);
-        if (typeof parsed === 'object' && parsed !== null) {
-          const langKey = currentLanguage === 'zh' ? 'zh-CN' : currentLanguage;
-          return parsed[langKey] || parsed['zh-CN'] || text;
-        }
-      } catch {
-        // 如果不是JSON字符串，直接返回
-        return text;
-      }
-      return text;
-    }
-    if (typeof text === 'object' && text !== null) {
-      const langKey = currentLanguage === 'zh' ? 'zh-CN' : currentLanguage;
-      return text[langKey] || text['zh-CN'] || '';
-    }
-    return '';
+    setSelectedSupplierId('');
+    setSelectedSupplierName('');
+    setSelectedProductId('');
+    setSelectedProductName('');
   };
 
   return (
@@ -169,22 +205,61 @@ export const CreateSampleRequestDialog = ({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="grid gap-4 py-4">
-          {/* Product info */}
-          {product && (
-            <div className="bg-muted/50 p-3 rounded-lg">
-              <div className="font-medium">{getLocalizedText(product.name)}</div>
-              <div className="text-sm text-muted-foreground">
-                {getLocalizedText(product.pesticideName)} • {product.formulation} • {product.totalContent}
+        <div className="grid gap-4 py-4 relative">
+          {/* 供应商和产品选择 */}
+          {allowSelection ? (
+            <div className="space-y-4">
+              {/* 供应商和产品选择器 - 同一行 */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 relative z-[60]">
+                <SupplierSelector
+                  value={selectedSupplierId}
+                  onValueChange={handleSupplierChange}
+                  disabled={isPending}
+                />
+
+                <ProductSelector
+                  value={selectedProductId}
+                  onValueChange={handleProductChange}
+                  supplierId={selectedSupplierId}
+                  disabled={isPending}
+                />
               </div>
             </div>
+          ) : (
+            <div className="space-y-3">
+              {/* Product info */}
+              {product && (
+                <div className="bg-muted/50 p-3 rounded-lg">
+                  <div className="font-medium">{getLocalizedText(product.name)}</div>
+                  <div className="text-sm text-muted-foreground">
+                    {getLocalizedText(product.pesticideName)} • {product.formulation} • {product.totalContent}
+                  </div>
+                </div>
+              )}
+              
+              {/* Supplier info */}
+              {supplierName && (
+                <div className="bg-muted/50 p-3 rounded-lg">
+                  <div className="text-sm text-muted-foreground">{t('samples.createDialog.supplier')}</div>
+                  <div className="font-medium">{supplierName}</div>
+                </div>
+              )}
+            </div>
           )}
-          
-          {/* Supplier info */}
-          {supplierName && (
+
+          {/* 显示已选择的产品和供应商信息（当有选择器时） */}
+          {allowSelection && selectedProductName && selectedSupplierName && (
             <div className="bg-muted/50 p-3 rounded-lg">
-              <div className="text-sm text-muted-foreground">{t('samples.createDialog.supplier')}</div>
-              <div className="font-medium">{supplierName}</div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div>
+                  <div className="text-sm text-muted-foreground">{t('samples.createDialog.selectedSupplier')}</div>
+                  <div className="font-medium">{selectedSupplierName}</div>
+                </div>
+                <div>
+                  <div className="text-sm text-muted-foreground">{t('samples.createDialog.selectedProduct')}</div>
+                  <div className="font-medium">{selectedProductName}</div>
+                </div>
+              </div>
             </div>
           )}
 
@@ -335,62 +410,6 @@ export const CreateSampleRequestDialog = ({
                 />
               </div>
             )}
-          </div>
-
-          {/* Special requirements */}
-          <div>
-            <Label htmlFor="specialRequirements">{t('samples.createDialog.specialRequirements')}</Label>
-            <Textarea
-              id="specialRequirements"
-              placeholder={t('samples.createDialog.specialRequirementsPlaceholder')}
-              value={formData.details?.specialRequirements}
-              onChange={(e) => setFormData(prev => ({
-                ...prev,
-                details: { ...prev.details!, specialRequirements: e.target.value }
-              }))}
-            />
-          </div>
-
-          {/* Contact info */}
-          <div className="space-y-4">
-            <h3 className="font-medium">{t('samples.createDialog.contactInfo')}</h3>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="contactPerson">{t('samples.createDialog.contactPerson')}</Label>
-                <Input
-                  id="contactPerson"
-                  value={formData.contactInfo?.contactPerson}
-                  onChange={(e) => setFormData(prev => ({
-                    ...prev,
-                    contactInfo: { ...prev.contactInfo!, contactPerson: e.target.value }
-                  }))}
-                />
-              </div>
-              <div>
-                <Label htmlFor="phone">{t('samples.createDialog.phone')}</Label>
-                <Input
-                  id="phone"
-                  type="tel"
-                  value={formData.contactInfo?.phone}
-                  onChange={(e) => setFormData(prev => ({
-                    ...prev,
-                    contactInfo: { ...prev.contactInfo!, phone: e.target.value }
-                  }))}
-                />
-              </div>
-            </div>
-            <div>
-              <Label htmlFor="email">{t('samples.createDialog.email')}</Label>
-              <Input
-                id="email"
-                type="email"
-                value={formData.contactInfo?.email}
-                onChange={(e) => setFormData(prev => ({
-                  ...prev,
-                  contactInfo: { ...prev.contactInfo!, email: e.target.value }
-                }))}
-              />
-            </div>
           </div>
         </div>
 

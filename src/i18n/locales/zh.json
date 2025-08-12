@@ -36,6 +36,7 @@
     "submitting": "提交中...",
     "back": "返回",
     "loading": "加载中...",
+    "loadingMore": "正在加载更多...",
     "reset": "重置"
   },
   "auth": {
@@ -646,6 +647,16 @@
       "title": "发起样品申请",
       "description": "填写样品需求与收货信息",
       "supplier": "供应商",
+      "product": "产品",
+      "selectSupplier": "选择供应商",
+      "selectProduct": "选择产品",
+      "searchSupplier": "搜索供应商名称",
+      "searchProduct": "搜索产品名称",
+      "selectSupplierFirst": "请先选择供应商",
+      "noSuppliersFound": "未找到供应商",
+      "noProductsFound": "未找到产品",
+      "selectedSupplier": "已选供应商",
+      "selectedProduct": "已选产品",
       "quantity": "数量",
       "unit": "单位",
       "deadline": "期望截止日期",
@@ -657,13 +668,7 @@
       "shippingMethod": "运输方式",
       "willingToPay": "愿意付费",
       "amount": "费用金额",
-      "amountPlaceholder": "请输入愿意支付的金额",
-      "specialRequirements": "特殊要求",
-      "specialRequirementsPlaceholder": "如有特殊要求请在此说明",
-      "contactInfo": "联系信息",
-      "contactPerson": "联系人",
-      "phone": "联系电话",
-      "email": "邮箱"
+      "amountPlaceholder": "请输入愿意支付的金额"
     },
     "detail": {
       "title": "样品申请详情",

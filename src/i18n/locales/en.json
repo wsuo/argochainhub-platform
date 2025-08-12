@@ -33,6 +33,7 @@
     "submitting": "Submitting...",
     "back": "Back",
     "loading": "Loading...",
+    "loadingMore": "Loading more...",
     "reset": "Reset"
   },
   "auth": {
@@ -605,6 +606,16 @@
       "title": "Create Sample Request",
       "description": "Fill in sample requirements and shipping information",
       "supplier": "Supplier",
+      "product": "Product",
+      "selectSupplier": "Select Supplier",
+      "selectProduct": "Select Product",
+      "searchSupplier": "Search supplier name",
+      "searchProduct": "Search product name",
+      "selectSupplierFirst": "Please select supplier first",
+      "noSuppliersFound": "No suppliers found",
+      "noProductsFound": "No products found",
+      "selectedSupplier": "Selected Supplier",
+      "selectedProduct": "Selected Product",
       "quantity": "Quantity",
       "unit": "Unit",
       "deadline": "Expected Deadline",
@@ -616,13 +627,7 @@
       "shippingMethod": "Shipping Method",
       "willingToPay": "Willing to Pay",
       "amount": "Amount",
-      "amountPlaceholder": "Enter the amount willing to pay",
-      "specialRequirements": "Special Requirements",
-      "specialRequirementsPlaceholder": "Please specify any special requirements",
-      "contactInfo": "Contact Information",
-      "contactPerson": "Contact Person",
-      "phone": "Phone",
-      "email": "Email"
+      "amountPlaceholder": "Enter the amount willing to pay"
     },
     "detail": {
       "title": "Sample Request Details",

@@ -33,6 +33,7 @@
     "submitting": "Enviando...",
     "back": "Volver",
     "loading": "Cargando...",
+    "loadingMore": "Cargando más...",
     "reset": "Restablecer"
   },
   "auth": {
@@ -605,6 +606,16 @@
       "title": "Crear Solicitud de Muestra",
       "description": "Complete los requisitos de muestra e información de envío",
       "supplier": "Proveedor",
+      "product": "Producto",
+      "selectSupplier": "Seleccionar Proveedor",
+      "selectProduct": "Seleccionar Producto",
+      "searchSupplier": "Buscar nombre del proveedor",
+      "searchProduct": "Buscar nombre del producto",
+      "selectSupplierFirst": "Por favor seleccione el proveedor primero",
+      "noSuppliersFound": "No se encontraron proveedores",
+      "noProductsFound": "No se encontraron productos",
+      "selectedSupplier": "Proveedor Seleccionado",
+      "selectedProduct": "Producto Seleccionado",
       "quantity": "Cantidad",
       "unit": "Unidad",
       "deadline": "Fecha Límite Esperada",
@@ -616,13 +627,7 @@
       "shippingMethod": "Método de Envío",
       "willingToPay": "Dispuesto a Pagar",
       "amount": "Monto",
-      "amountPlaceholder": "Ingrese el monto dispuesto a pagar",
-      "specialRequirements": "Requisitos Especiales",
-      "specialRequirementsPlaceholder": "Especifique cualquier requisito especial",
-      "contactInfo": "Información de Contacto",
-      "contactPerson": "Persona de Contacto",
-      "phone": "Teléfono",
-      "email": "Correo Electrónico"
+      "amountPlaceholder": "Ingrese el monto dispuesto a pagar"
     },
     "detail": {
       "title": "Detalles de Solicitud de Muestra",
