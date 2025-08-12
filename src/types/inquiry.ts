@@ -90,6 +90,7 @@ export interface ApiResponse<T = unknown> {
   success: boolean;
   message: string;
   data?: T;
+  meta?: PaginationMeta; // 添加可选的分页元数据
 }
 
 // 分页元信息
@@ -98,6 +99,9 @@ export interface PaginationMeta {
   currentPage: number;
   totalPages: number;
   itemsPerPage: number;
+  hasNextPage: boolean;  // 新增：是否有下一页
+  hasPrevPage: boolean;  // 新增：是否有上一页
+  itemCount: number;     // 新增：当前页实际数据量
 }
 
 // 询价列表响应

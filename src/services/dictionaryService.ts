@@ -1,4 +1,6 @@
 // 字典服务
+import { httpClient } from './httpClient';
+
 export interface DictionaryItem {
   id: string;
   code: string;
@@ -22,53 +24,22 @@ export interface DictionaryResponse {
   data: DictionaryItem[];
 }
 
-const API_BASE_URL = 'http://localhost:3050/api/v1';
+// API路径前缀
+const API_PREFIX = '/api/v1';
 
 class DictionaryService {
-  private getAuthToken(): string | null {
-    // 使用与AuthService一致的token存储键
-    const token = localStorage.getItem('agro_access_token');
-    return token;
-  }
-
-  private async makeRequest<T>(url: string, options: RequestInit = {}, requireAuth: boolean = true): Promise<T> {
-    const token = this.getAuthToken();
-    
-    // 如果需要认证但没有token，抛出错误
-    if (requireAuth && !token) {
-      throw new Error('未找到认证token，请先登录');
-    }
-    
-    const headers: Record<string, string> = {
-      'Content-Type': 'application/json',
-      ...options.headers as Record<string, string>
-    };
-
-    // 只在有token时才添加Authorization header
-    if (token) {
-      headers.Authorization = `Bearer ${token}`;
-    }
-    
-    const response = await fetch(url, {
-      ...options,
-      headers
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    return response.json() as Promise<T>;
-  }
-
   /**
    * 获取字典数据
    * @param dictType 字典类型，如 'product_category'
    */
   async getDictionary(dictType: string): Promise<DictionaryItem[]> {
     try {
-      const url = `${API_BASE_URL}/dictionaries/${dictType}`;
-      const response = await this.makeRequest<DictionaryResponse>(url, {}, false); // 字典数据不需要认证
+      const url = `${API_PREFIX}/dictionaries/${dictType}`;
+      const response = await httpClient.get<DictionaryResponse>(url, {
+        module: 'dictionary',
+        action: 'read',
+        resourceType: dictType,
+      });
       
       // 转换后端数据格式为前端需要的格式
       const transformedData = response.data.map(item => ({
@@ -121,8 +92,12 @@ class DictionaryService {
    */
   async getNotificationTypes(): Promise<DictionaryItem[]> {
     try {
-      const url = `${API_BASE_URL}/admin/dictionaries/notification_type/items`;
-      const response = await this.makeRequest<DictionaryResponse>(url, {}, false); // 不需要认证
+      const url = `${API_PREFIX}/admin/dictionaries/notification_type/items`;
+      const response = await httpClient.get<DictionaryResponse>(url, {
+        module: 'dictionary',
+        action: 'read',
+        resourceType: 'notification_type',
+      });
       
       // 转换后端数据格式为前端需要的格式
       const transformedData = response.data.map(item => ({
@@ -158,8 +133,12 @@ class DictionaryService {
    */
   async getNotificationStatuses(): Promise<DictionaryItem[]> {
     try {
-      const url = `${API_BASE_URL}/admin/dictionaries/admin_notification_status/items`;
-      const response = await this.makeRequest<DictionaryResponse>(url, {}, false);
+      const url = `${API_PREFIX}/admin/dictionaries/admin_notification_status/items`;
+      const response = await httpClient.get<DictionaryResponse>(url, {
+        module: 'dictionary',
+        action: 'read',
+        resourceType: 'admin_notification_status',
+      });
       
       const transformedData = response.data.map(item => ({
         ...item,

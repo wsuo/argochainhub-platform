@@ -127,12 +127,6 @@ export interface CreateSampleRequestForm {
       paid: boolean;
       amount?: number;
     };
-    specialRequirements?: string;
-  };
-  contactInfo?: {
-    contactPerson?: string;
-    phone?: string;
-    email?: string;
   };
 }
 
