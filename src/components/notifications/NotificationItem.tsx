@@ -42,6 +42,7 @@ interface NotificationItemProps {
   onMarkAsRead?: (id: string) => void;
   onDelete?: (id: string) => void;
   onClick?: (notification: NotificationItemType) => void;
+  onClose?: () => void;
   showActions?: boolean;
   compact?: boolean;
 }
@@ -51,6 +52,7 @@ export const NotificationItem: React.FC<NotificationItemProps> = ({
   onMarkAsRead,
   onDelete,
   onClick,
+  onClose,
   showActions = true,
   compact = false
 }) => {
@@ -149,23 +151,33 @@ export const NotificationItem: React.FC<NotificationItemProps> = ({
       onMarkAsRead(notification.id);
     }
 
-    // 执行自定义点击处理
+    // 执行自定义点击处理（不关闭通知中心）
     if (onClick) {
       onClick(notification);
       return;
     }
 
-    // 默认跳转逻辑
-    const actionUrl = NotificationService.getNotificationActionUrl(notification);
-    if (actionUrl) {
-      navigate(actionUrl);
-    }
+    // 默认情况下不再自动跳转页面，让用户在通知中心内继续操作
+    // 如果用户想要跳转，可以通过右键菜单或其他方式实现
   };
 
   // 处理标记已读
   const handleMarkAsRead = (e: React.MouseEvent) => {
     e.stopPropagation();
     onMarkAsRead?.(notification.id);
+  };
+
+  // 处理查看详情
+  const handleViewDetails = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const actionUrl = NotificationService.getNotificationActionUrl(notification);
+    if (actionUrl) {
+      navigate(actionUrl);
+      // 跳转后关闭通知中心
+      if (onClose) {
+        onClose();
+      }
+    }
   };
 
   // 处理删除
@@ -286,6 +298,11 @@ export const NotificationItem: React.FC<NotificationItemProps> = ({
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
+                    {/* 查看详情选项 */}
+                    <DropdownMenuItem onClick={handleViewDetails}>
+                      <ExternalLink className="h-4 w-4 mr-2" />
+                      查看详情
+                    </DropdownMenuItem>
                     {isUnread && onMarkAsRead && (
                       <DropdownMenuItem onClick={handleMarkAsRead}>
                         <Check className="h-4 w-4 mr-2" />

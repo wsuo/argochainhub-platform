@@ -125,10 +125,8 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
 
   // 处理通知点击
   const handleNotificationClick = (notification: NotificationItemType) => {
-    // 如果是紧凑模式，点击后关闭通知中心
-    if (compact && onClose) {
-      onClose();
-    }
+    // 点击通知时不再自动关闭通知中心，让用户可以继续浏览和操作
+    // 如果需要跳转页面或执行其他操作，由 NotificationItem 内部处理
   };
 
   // 加载通知类型字典
@@ -272,7 +270,7 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
 
         {/* 通知列表 */}
         <TabsContent value={activeTab} className="mt-0">
-          <ScrollArea className="h-auto" style={{ maxHeight }}>
+          <ScrollArea className="h-[400px]">
             {error && (
               <div className="p-4 text-center">
                 <AlertCircle className="h-8 w-8 text-red-500 mx-auto mb-2" />
@@ -315,6 +313,7 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
                       onMarkAsRead={markAsRead}
                       onDelete={deleteNotification}
                       onClick={handleNotificationClick}
+                      onClose={onClose}
                       compact={compact}
                       showActions={!compact}
                     />

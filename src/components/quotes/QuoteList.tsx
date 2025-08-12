@@ -57,6 +57,7 @@ export const QuoteList = ({ filters }: QuoteListProps) => {
   const [quotes, setQuotes] = useState<Quote[]>([]);
   
   const { data, isLoading, error, refetch } = useQuotes(filters, currentPage, 10);
+  
   const declineQuotesMutation = useDeclineQuotes();
   const updatePriorityMutation = useUpdatePriority();
 
@@ -64,37 +65,40 @@ export const QuoteList = ({ filters }: QuoteListProps) => {
   useInquiryMessaging({
     onListMessageUpdate: (inquiryId, messageData) => {
       // 更新供应端报价列表中的最新消息
-      setQuotes(prev => prev.map(quote => {
-        if (quote.id === inquiryId.toString()) {
-          return {
-            ...quote,
-            recentMessages: [
-              {
-                id: messageData.messageId,
-                message: messageData.message,
-                createdAt: messageData.timestamp,
-                senderId: messageData.senderId,
-                sender: {
-                  id: messageData.senderId,
-                  name: messageData.senderName,
-                  userType: messageData.senderCompanyType as 'buyer' | 'supplier',
-                  company: {
+      setQuotes(prev => {
+        const updated = prev.map(quote => {
+          if (quote.id === inquiryId.toString()) {
+            return {
+              ...quote,
+              recentMessages: [
+                {
+                  id: messageData.messageId,
+                  message: messageData.message,
+                  createdAt: messageData.timestamp,
+                  senderId: messageData.senderId,
+                  sender: {
                     id: messageData.senderId,
-                    name: {
-                      'zh-CN': messageData.senderCompany,
-                      'en': messageData.senderCompany,
-                      'es': messageData.senderCompany
-                    },
-                    type: messageData.senderCompanyType as 'buyer' | 'supplier'
+                    name: messageData.senderName,
+                    userType: messageData.senderCompanyType as 'buyer' | 'supplier',
+                    company: {
+                      id: messageData.senderId,
+                      name: {
+                        'zh-CN': messageData.senderCompany,
+                        'en': messageData.senderCompany,
+                        'es': messageData.senderCompany
+                      },
+                      type: messageData.senderCompanyType as 'buyer' | 'supplier'
+                    }
                   }
-                }
-              },
-              ...quote.recentMessages?.slice(0, 4) || []
-            ]
-          };
-        }
-        return quote;
-      }));
+                },
+                ...quote.recentMessages?.slice(0, 4) || []
+              ]
+            };
+          }
+          return quote;
+        });
+        return updated;
+      });
     }
   });
 
@@ -111,6 +115,7 @@ export const QuoteList = ({ filters }: QuoteListProps) => {
     queryFn: () => dictionaryService.getInquiryStatuses(),
     staleTime: 10 * 60 * 1000, // 10分钟缓存
   });
+  
 
   // 根据当前语言获取状态显示文本
   const getStatusLabel = (statusCode: string): string => {

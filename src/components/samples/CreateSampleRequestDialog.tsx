@@ -138,7 +138,20 @@ export const CreateSampleRequestDialog = ({
   };
 
   const getLocalizedText = (text: any): string => {
-    if (typeof text === 'string') return text;
+    if (typeof text === 'string') {
+      // 尝试解析JSON字符串
+      try {
+        const parsed = JSON.parse(text);
+        if (typeof parsed === 'object' && parsed !== null) {
+          const langKey = currentLanguage === 'zh' ? 'zh-CN' : currentLanguage;
+          return parsed[langKey] || parsed['zh-CN'] || text;
+        }
+      } catch {
+        // 如果不是JSON字符串，直接返回
+        return text;
+      }
+      return text;
+    }
     if (typeof text === 'object' && text !== null) {
       const langKey = currentLanguage === 'zh' ? 'zh-CN' : currentLanguage;
       return text[langKey] || text['zh-CN'] || '';
@@ -162,7 +175,7 @@ export const CreateSampleRequestDialog = ({
             <div className="bg-muted/50 p-3 rounded-lg">
               <div className="font-medium">{getLocalizedText(product.name)}</div>
               <div className="text-sm text-muted-foreground">
-                {product.category} • {product.activeIngredient} {product.content}
+                {getLocalizedText(product.pesticideName)} • {product.formulation} • {product.totalContent}
               </div>
             </div>
           )}
@@ -282,7 +295,7 @@ export const CreateSampleRequestDialog = ({
               <SelectContent>
                 {filters?.data.shippingMethods.map(method => (
                   <SelectItem key={method.value} value={method.value}>
-                    {method.label}
+                    {getLocalizedText(method.label)}
                   </SelectItem>
                 ))}
               </SelectContent>

@@ -69,7 +69,7 @@ export function SampleTable({ loading, items, userType }: SampleTableProps) {
               <TableHead>{t('samples.table.quantity')}</TableHead>
               <TableHead>{t('samples.table.deadline')}</TableHead>
               <TableHead>{t('samples.table.status')}</TableHead>
-              <TableHead className="text-right">{t('samples.table.actions')}</TableHead>
+              <TableHead>{t('samples.table.actions')}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -117,7 +117,7 @@ export function SampleTable({ loading, items, userType }: SampleTableProps) {
             <TableHead>{t('samples.table.quantity')}</TableHead>
             <TableHead>{t('samples.table.deadline')}</TableHead>
             <TableHead>{t('samples.table.status')}</TableHead>
-            <TableHead className="text-right">{t('samples.table.actions')}</TableHead>
+            <TableHead>{t('samples.table.actions')}</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -156,9 +156,9 @@ export function SampleTable({ loading, items, userType }: SampleTableProps) {
               <TableCell>
                 <SampleStatusBadge status={item.status} />
               </TableCell>
-              <TableCell className="text-right">
+              <TableCell>
                 <Button
-                  variant="ghost"
+                  variant="outline"
                   size="sm"
                   onClick={() => handleView(item.id)}
                 >
