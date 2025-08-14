@@ -36,6 +36,63 @@
     "loadingMore": "Cargando más...",
     "reset": "Restablecer"
   },
+  "suppliers": {
+    "title": "Directorio de Proveedores",
+    "subtitle": "Descubra proveedores de calidad y construya asociaciones a largo plazo",
+    "tabs": {
+      "all": "Todos los Proveedores",
+      "top100": "Top 100"
+    },
+    "search": {
+      "placeholder": "Buscar nombre o descripción del proveedor...",
+      "noResults": "No se encontraron proveedores que coincidan con los filtros actuales. Por favor, intente ajustar sus criterios de búsqueda.",
+      "noSuppliersYet": "Aún no hay proveedores en el sistema. Por favor, inténtelo más tarde.",
+      "clearFilters": "Limpiar filtros",
+      "resetFilters": "Restablecer filtros"
+    },
+    "filters": {
+      "country": "Seleccionar país",
+      "allCountries": "Todos los países",
+      "companySize": "Tamaño de la empresa",
+      "allSizes": "Todos los tamaños",
+      "sortBy": "Ordenar por",
+      "sortOrder": "Orden",
+      "ascending": "Ascendente",
+      "descending": "Descendente"
+    },
+    "companySizes": {
+      "small": "Pequeña",
+      "medium": "Mediana", 
+      "large": "Grande"
+    },
+    "sortOptions": {
+      "createdAt": "Tiempo de registro",
+      "productCount": "Cantidad de productos",
+      "name": "Nombre de la empresa"
+    },
+    "status": {
+      "active": "Activo",
+      "inactive": "Inactivo"
+    },
+    "actions": {
+      "favorite": "Favorito",
+      "unfavorite": "Quitar favorito",
+      "viewDetails": "Ver detalles",
+      "viewProducts": "Ver productos"
+    },
+    "stats": {
+      "found": "Se encontraron {{count}} {{type}}proveedores",
+      "pagination": "Página {{current}} de {{total}}"
+    },
+    "empty": {
+      "allSuppliers": "Sin proveedores",
+      "top100Suppliers": "Sin proveedores Top 100"
+    },
+    "badges": {
+      "top100": "Top 100",
+      "verified": "Verificado"
+    }
+  },
   "auth": {
     "loginToContinue": "Inicia sesión para continuar",
     "loginRequired": "Por favor inicia sesión primero",
@@ -90,6 +147,8 @@
     "top100SuppliersDesc": "Clasificación de proveedores premium",
     "myProducts": "Mis productos",
     "myProductsDesc": "Administrar mis productos",
+    "conversationHistory": "Historial de IA",
+    "conversationHistoryDesc": "Ver registros de consultas de IA",
     "inquiryResponse": "Respuesta a consultas",
     "inquiryResponseDesc": "Manejar solicitudes de consulta",
     "sampleResponse": "Respuesta de muestras",
@@ -199,6 +258,7 @@
     "top100Badge": "Top100",
     "viewMore": "Ver más",
     "backToList": "Volver a la lista",
+    "backToSupplier": "Volver a detalles del proveedor",
     "productDetail": "Detalles del producto",
     "basicInfo": "Información básica",
     "supplierInfo": "Información del proveedor",

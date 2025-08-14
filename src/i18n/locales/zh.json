@@ -39,6 +39,66 @@
     "loadingMore": "正在加载更多...",
     "reset": "重置"
   },
+  "suppliers": {
+    "title": "供应商列表",
+    "subtitle": "发现优质供应商，建立长期合作伙伴关系",
+    "tabs": {
+      "all": "全部供应商",
+      "top100": "Top 100",
+      "favorites": "收藏供应商"
+    },
+    "search": {
+      "placeholder": "搜索供应商名称或描述...",
+      "noResults": "当前筛选条件下没有找到匹配的供应商，请尝试调整筛选条件。",
+      "noSuppliersYet": "系统中还没有供应商信息，请稍后再试。",
+      "clearFilters": "清空筛选条件",
+      "resetFilters": "重置筛选条件"
+    },
+    "filters": {
+      "country": "选择国家",
+      "allCountries": "全部国家",
+      "companySize": "企业规模",
+      "allSizes": "全部规模",
+      "sortBy": "排序方式",
+      "sortOrder": "排序方向",
+      "ascending": "升序",
+      "descending": "降序"
+    },
+    "companySizes": {
+      "small": "小型企业",
+      "medium": "中型企业", 
+      "large": "大型企业"
+    },
+    "sortOptions": {
+      "createdAt": "注册时间",
+      "productCount": "产品数量",
+      "name": "公司名称"
+    },
+    "status": {
+      "active": "营业中",
+      "inactive": "已停业"
+    },
+    "actions": {
+      "favorite": "收藏",
+      "unfavorite": "取消收藏",
+      "viewDetails": "查看详情",
+      "viewProducts": "查看产品"
+    },
+    "stats": {
+      "found": "找到 {{count}} 个{{type}}供应商",
+      "pagination": "第 {{current}} 页，共 {{total}} 页"
+    },
+    "empty": {
+      "allSuppliers": "暂无供应商",
+      "top100Suppliers": "暂无Top 100供应商",
+      "favoriteSuppliers": "暂无收藏的供应商",
+      "noFavoritesYet": "您还没有收藏任何供应商，去供应商列表收藏感兴趣的供应商吧！"
+    },
+    "badges": {
+      "top100": "Top 100",
+      "verified": "已认证"
+    }
+  },
   "auth": {
     "welcomeTitle": "欢迎来到AgroChainHub",
     "welcomeSubtitle": "您的智慧农化采购伙伴",
@@ -118,6 +178,8 @@
     "top100SuppliersDesc": "优质供应商排名",
     "myProducts": "我的产品库",
     "myProductsDesc": "管理我的产品",
+    "conversationHistory": "AI对话历史",
+    "conversationHistoryDesc": "查看AI咨询记录",
     "inquiryResponse": "询价响应",
     "inquiryResponseDesc": "处理询价请求",
     "sampleResponse": "样品响应",
@@ -240,6 +302,7 @@
     "top100Badge": "Top100",
     "viewMore": "查看更多",
     "backToList": "返回列表",
+    "backToSupplier": "返回供应商详情",
     "productDetail": "产品详情",
     "basicInfo": "基本信息",
     "supplierInfo": "供应商信息",

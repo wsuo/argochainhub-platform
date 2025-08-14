@@ -36,6 +36,66 @@
     "loadingMore": "Loading more...",
     "reset": "Reset"
   },
+  "suppliers": {
+    "title": "Supplier Directory",
+    "subtitle": "Discover quality suppliers and build long-term partnerships",
+    "tabs": {
+      "all": "All Suppliers",
+      "top100": "Top 100",
+      "favorites": "Favorite Suppliers"
+    },
+    "search": {
+      "placeholder": "Search supplier name or description...",
+      "noResults": "No suppliers found matching the current filters. Please try adjusting your search criteria.",
+      "noSuppliersYet": "No suppliers in the system yet. Please try again later.",
+      "clearFilters": "Clear filters",
+      "resetFilters": "Reset filters"
+    },
+    "filters": {
+      "country": "Select country",
+      "allCountries": "All countries",
+      "companySize": "Company size",
+      "allSizes": "All sizes",
+      "sortBy": "Sort by",
+      "sortOrder": "Sort order",
+      "ascending": "Ascending",
+      "descending": "Descending"
+    },
+    "companySizes": {
+      "small": "Small",
+      "medium": "Medium", 
+      "large": "Large"
+    },
+    "sortOptions": {
+      "createdAt": "Registration time",
+      "productCount": "Product count",
+      "name": "Company name"
+    },
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "actions": {
+      "favorite": "Favorite",
+      "unfavorite": "Unfavorite",
+      "viewDetails": "View details",
+      "viewProducts": "View products"
+    },
+    "stats": {
+      "found": "Found {{count}} {{type}}suppliers",
+      "pagination": "Page {{current}} of {{total}}"
+    },
+    "empty": {
+      "allSuppliers": "No suppliers",
+      "top100Suppliers": "No Top 100 suppliers",
+      "favoriteSuppliers": "No favorite suppliers",
+      "noFavoritesYet": "You haven't favorited any suppliers yet. Go to the supplier list to favorite suppliers you're interested in!"
+    },
+    "badges": {
+      "top100": "Top 100",
+      "verified": "Verified"
+    }
+  },
   "auth": {
     "loginToContinue": "Login to continue",
     "loginRequired": "Please login first",
@@ -90,6 +150,8 @@
     "top100SuppliersDesc": "Premium Supplier Rankings",
     "myProducts": "My Products",
     "myProductsDesc": "Manage My Products",
+    "conversationHistory": "AI Chat History",
+    "conversationHistoryDesc": "View AI consultation records",
     "inquiryResponse": "Inquiry Response",
     "inquiryResponseDesc": "Handle Inquiry Requests",
     "sampleResponse": "Sample Response",
@@ -199,6 +261,7 @@
     "top100Badge": "Top100",
     "viewMore": "View More",
     "backToList": "Back to List",
+    "backToSupplier": "Back to Supplier Details",
     "productDetail": "Product Details",
     "basicInfo": "Basic Information",
     "supplierInfo": "Supplier Information",
