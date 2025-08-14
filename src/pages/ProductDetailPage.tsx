@@ -23,7 +23,7 @@ import {
 import { useTranslation } from "react-i18next";
 import { useLanguage } from "@/hooks/useLanguage";
 import { useAuth } from "@/contexts/MockAuthContext";
-import { useParams, useNavigate, Link } from "react-router-dom";
+import { useParams, useNavigate, Link, useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { productService } from "@/services/productService";
 import { Product, MultiLanguageText } from "@/types/product";
@@ -40,8 +40,13 @@ const ProductDetailPage = () => {
   const { currentUserType } = useAuth();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { addToCart, isInCart } = useCart();
   const [showInquiryDialog, setShowInquiryDialog] = useState(false);
+
+  // 获取来源信息
+  const from = searchParams.get('from');
+  const supplierId = searchParams.get('supplierId');
 
   // 使用认证守卫
   const {
@@ -83,6 +88,21 @@ const ProductDetailPage = () => {
 
   // Check if product is already in cart
   const isProductInCart = product ? isInCart(product.id) : false;
+
+  // 获取返回路径和文本
+  const getBackPath = () => {
+    if (from === 'supplier' && supplierId) {
+      return `/suppliers/${supplierId}`;
+    }
+    return '/products';
+  };
+
+  const getBackText = () => {
+    if (from === 'supplier') {
+      return t('products.backToSupplier', { defaultValue: '返回供应商详情' });
+    }
+    return t('products.backToList');
+  };
 
   // 处理操作
   const handleAddToCart = () => {
@@ -177,8 +197,8 @@ const ProductDetailPage = () => {
         <p className="text-muted-foreground mb-4">
           {t('products.noResultsDesc')}
         </p>
-        <Button onClick={() => navigate('/products')}>
-          {t('products.backToList')}
+        <Button onClick={() => navigate(getBackPath())}>
+          {getBackText()}
         </Button>
         </div>
       </Layout>
@@ -195,11 +215,11 @@ const ProductDetailPage = () => {
         {/* 返回按钮 */}
         <Button
         variant="ghost"
-        onClick={() => navigate('/products')}
+        onClick={() => navigate(getBackPath())}
         className="mb-6"
         >
         <ArrowLeft className="h-4 w-4 mr-2" />
-        {t('products.backToList')}
+        {getBackText()}
         </Button>
 
         {/* 产品概览卡片 */}
