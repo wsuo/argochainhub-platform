@@ -30,6 +30,8 @@ import SampleDetail from "./pages/SampleDetail";
 import SampleResponses from "./pages/SampleResponses";
 import SampleResponseDetail from "./pages/SampleResponseDetail";
 import AISearchPage from "./pages/AISearchPage";
+import SuppliersPage from "./pages/SuppliersPage";
+import SupplierDetailPage from "./pages/SupplierDetailPage";
 
 const queryClient = new QueryClient();
 
@@ -46,7 +48,7 @@ const App = () => (
                 <BrowserRouter>
                   <ErrorBoundary>
                     <Routes>
-                      <Route path="/" element={<Index />} />
+                      <Route path="/" element={<AISearchPage />} />
                       <Route path="/auth" element={<AuthPage />} />
                       <Route path="/buyer" element={<BuyerDashboard />} />
                       <Route path="/supplier" element={<SupplierDashboard />} />
@@ -68,6 +70,8 @@ const App = () => (
                       <Route path="/sample-responses" element={<SampleResponses />} />
                       <Route path="/sample-responses/:id" element={<SampleResponseDetail />} />
                       <Route path="/ai-search" element={<AISearchPage />} />
+                      <Route path="/suppliers" element={<SuppliersPage />} />
+                      <Route path="/suppliers/:id" element={<SupplierDetailPage />} />
                       {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                       <Route path="*" element={<NotFound />} />
                     </Routes>
