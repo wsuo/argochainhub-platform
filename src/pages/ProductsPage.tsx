@@ -1,7 +1,7 @@
 import { Layout } from "@/components/layout/Layout";
-import { ProductSearchBar } from "@/components/products/ProductSearchBar";
 import { ProductCard } from "@/components/products/ProductCard";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -13,7 +13,7 @@ import {
   PaginationNext, 
   PaginationPrevious 
 } from "@/components/ui/pagination";
-import { AlertCircle, RefreshCw } from "lucide-react";
+import { AlertCircle, RefreshCw, Database, Search, Star, Award, TrendingUp, ChevronLeft, ChevronRight } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useLanguage } from "@/hooks/useLanguage";
 import { useState, useEffect, useMemo } from "react";
@@ -70,7 +70,18 @@ const ProductsPage = () => {
   });
 
   // 提取分类标签用于显示
-  const categories = categoryDict.map(item => item.label);
+  const categories = categoryDict.map(item => ({
+    key: item.key,
+    label: item.label
+  }));
+
+  // 多语言文本处理
+  const getLocalizedText = (text: any): string => {
+    if (!text) return '';
+    if (typeof text === 'string') return text;
+    const langKey = currentLanguage as keyof typeof text;
+    return text[langKey] || text['zh-CN'] || text['en'] || '';
+  };
 
   // 构建查询参数
   const queryParams = useMemo(() => {
@@ -84,15 +95,12 @@ const ProductsPage = () => {
     }
     
     if (filters.category && filters.category !== 'all') {
-      // 找到对应的字典key
-      const categoryItem = categoryDict.find(item => item.label === filters.category);
-      if (categoryItem) {
-        params.category = categoryItem.key;
-      }
+      // 直接使用key作为category参数
+      params.category = filters.category;
     }
     
     return params;
-  }, [searchQuery, filters, currentPage, categoryDict]);
+  }, [searchQuery, filters, currentPage]);
 
   // 获取产品列表
   const {
@@ -172,52 +180,114 @@ const ProductsPage = () => {
   return (
     <Layout userType={currentUserType}>
       <div className="max-w-7xl mx-auto space-y-8">
-        {/* 页面标题 */}
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-foreground mb-3">
+        {/* 页面头部 */}
+        <div className="text-center">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-green-500 to-emerald-600 rounded-3xl mb-6 shadow-2xl shadow-green-500/20">
+            <Database className="w-8 h-8 text-white" />
+          </div>
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-gray-900 via-green-600 to-emerald-600 bg-clip-text text-transparent mb-3">
             {t('products.title')}
           </h1>
-          <p className="text-lg text-muted-foreground">
+          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
             {t('products.subtitle')}
           </p>
         </div>
           
-          {/* 搜索栏 */}
-          <div className="mb-8">
-            <ProductSearchBar
-              searchQuery={searchQuery}
-              onSearchChange={setSearchQuery}
-              filters={filters}
-              onFiltersChange={setFilters}
-              categories={categories}
-              isLoading={isLoading}
-            />
-          </div>
-
-          {/* 结果信息和排序 */}
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
-            <div className="flex items-center space-x-4">
-              {productsResponse && (
-                <span className="text-base font-medium text-foreground">
-                  {getProductCountText(productsResponse.meta.totalItems)}
-                </span>
-              )}
+        {/* 搜索和筛选区域 */}
+        <div className="bg-white/80 backdrop-blur-sm border border-white/30 rounded-2xl p-6 shadow-lg">
+          <div className="space-y-4">
+            {/* 搜索栏 */}
+            <div className="relative max-w-md mx-auto">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <Input
+                placeholder="搜索农药产品名称或描述..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10 bg-white/90 border-gray-300 hover:border-green-400 focus:border-green-500 focus:ring-2 focus:ring-green-500/20 rounded-xl"
+              />
             </div>
-            
-            <div className="flex items-center space-x-3">
-              <span className="text-sm font-medium text-muted-foreground">{t('products.sortBy')}:</span>
-              <Select value={sortBy} onValueChange={setSortBy}>
-                <SelectTrigger className="w-44 h-10">
-                  <SelectValue />
+
+            {/* 筛选器 */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {/* 产品分类筛选 */}
+              <Select 
+                value={filters.category === 'all' ? 'all' : filters.category || 'all'} 
+                onValueChange={(value) => setFilters(prev => ({ ...prev, category: value }))}
+              >
+                <SelectTrigger className="bg-white/90 border-gray-300 rounded-xl">
+                  <Database className="w-4 h-4 mr-2" />
+                  <SelectValue placeholder="产品分类" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="relevance">{t('products.sortByRelevance')}</SelectItem>
-                  <SelectItem value="rating">{t('products.sortByRating')}</SelectItem>
-                  <SelectItem value="name">{t('products.sortByName')}</SelectItem>
+                  <SelectItem value="all">全部分类</SelectItem>
+                  {categories.map((category) => (
+                    <SelectItem key={category.key} value={category.key}>
+                      {getLocalizedText(category.label)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+
+              {/* 供应商评级筛选 */}
+              <Select 
+                value={filters.supplierRating === 'all' ? 'all' : filters.supplierRating || 'all'} 
+                onValueChange={(value) => setFilters(prev => ({ ...prev, supplierRating: value }))}
+              >
+                <SelectTrigger className="bg-white/90 border-gray-300 rounded-xl">
+                  <Star className="w-4 h-4 mr-2" />
+                  <SelectValue placeholder="供应商评级" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">全部评级</SelectItem>
+                  <SelectItem value="4">4星以上</SelectItem>
+                  <SelectItem value="3">3星以上</SelectItem>
+                </SelectContent>
+              </Select>
+
+              {/* Top100筛选 */}
+              <Select 
+                value={filters.isTop100 === null ? 'all' : filters.isTop100.toString()} 
+                onValueChange={(value) => setFilters(prev => ({ ...prev, isTop100: value === 'all' ? null : value === 'true' }))}
+              >
+                <SelectTrigger className="bg-white/90 border-gray-300 rounded-xl">
+                  <Award className="w-4 h-4 mr-2" />
+                  <SelectValue placeholder="Top 100" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">全部供应商</SelectItem>
+                  <SelectItem value="true">仅Top 100</SelectItem>
                 </SelectContent>
               </Select>
             </div>
+
+            {/* 重置按钮 */}
+            <div className="flex justify-center">
+              <Button 
+                variant="ghost" 
+                onClick={() => {
+                  setFilters({ category: 'all', supplierRating: 'all', isTop100: null });
+                  setSearchQuery('');
+                }} 
+                className="text-gray-600 hover:text-green-600"
+              >
+                重置筛选条件
+              </Button>
+            </div>
           </div>
+        </div>
+
+          {/* 结果统计 */}
+          {productsResponse && (
+            <div className="flex items-center justify-between text-sm text-gray-600">
+              <div className="flex items-center space-x-2">
+                <TrendingUp className="w-4 h-4" />
+                <span>找到 {productsResponse.meta.totalItems} 个产品</span>
+              </div>
+              <div>
+                第 {productsResponse.meta.currentPage || currentPage} 页，共 {productsResponse.meta.totalPages || totalPages} 页
+              </div>
+            </div>
+          )}
 
           {/* 内容区域 */}
           {error ? (
@@ -273,38 +343,58 @@ const ProductsPage = () => {
 
               {/* 分页 */}
               {totalPages > 1 && (
-                <div className="flex justify-center pt-8">
-                  <Pagination>
-                    <PaginationContent>
-                      <PaginationItem>
-                        <PaginationPrevious
-                          onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-                          disabled={currentPage === 1}
-                        />
-                      </PaginationItem>
+                <div className="flex items-center justify-center gap-3 mt-8">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={currentPage <= 1 || isLoading}
+                    onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                    className="bg-white/60 border-white/30 hover:bg-white/80 rounded-xl"
+                  >
+                    <ChevronLeft className="w-4 h-4 mr-1" />
+                    上一页
+                  </Button>
+                  
+                  <div className="flex items-center space-x-2">
+                    {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                      let page;
+                      if (totalPages <= 5) {
+                        page = i + 1;
+                      } else if (currentPage <= 3) {
+                        page = i + 1;
+                      } else if (currentPage >= totalPages - 2) {
+                        page = totalPages - 4 + i;
+                      } else {
+                        page = currentPage - 2 + i;
+                      }
                       
-                      {[...Array(Math.min(5, totalPages))].map((_, index) => {
-                        const pageNumber = index + 1;
-                        return (
-                          <PaginationItem key={pageNumber}>
-                            <PaginationLink
-                              onClick={() => setCurrentPage(pageNumber)}
-                              isActive={currentPage === pageNumber}
-                            >
-                              {pageNumber}
-                            </PaginationLink>
-                          </PaginationItem>
-                        );
-                      })}
-                      
-                      <PaginationItem>
-                        <PaginationNext
-                          onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
-                          disabled={currentPage === totalPages}
-                        />
-                      </PaginationItem>
-                    </PaginationContent>
-                  </Pagination>
+                      return (
+                        <Button
+                          key={page}
+                          variant={currentPage === page ? "default" : "outline"}
+                          size="sm"
+                          onClick={() => setCurrentPage(page)}
+                          className={currentPage === page 
+                            ? "bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl" 
+                            : "bg-white/60 border-white/30 hover:bg-white/80 rounded-xl"
+                          }
+                        >
+                          {page}
+                        </Button>
+                      );
+                    })}
+                  </div>
+                  
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={currentPage >= totalPages || isLoading}
+                    onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                    className="bg-white/60 border-white/30 hover:bg-white/80 rounded-xl"
+                  >
+                    下一页
+                    <ChevronRight className="w-4 h-4 ml-1" />
+                  </Button>
                 </div>
               )}
             </>
