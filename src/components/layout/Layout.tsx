@@ -15,6 +15,7 @@ export const Layout = ({ children, userType = "buyer" }: LayoutProps) => {
   // 根据当前路径确定初始活跃菜单项
   const getInitialActiveItem = () => {
     const pathname = location.pathname;
+    if (pathname === '/buyer' || pathname === '/supplier') return ''; // 工作台页面不选中任何菜单项
     if (pathname.startsWith('/products')) return 'products';
     if (pathname === '/conversation-history') return 'conversation-history';
     if (pathname.startsWith('/inquiries')) return 'inquiries';
@@ -25,13 +26,16 @@ export const Layout = ({ children, userType = "buyer" }: LayoutProps) => {
     if (pathname.startsWith('/sample-responses')) return 'sample-responses';
     if (pathname === '/cart') return 'cart';
     if (pathname === '/ai-search') return 'ai-search';
-    return 'ai-query';
+    if (pathname === '/suppliers') return 'suppliers';
+    if (pathname === '/') return 'ai-search'; // 默认页面也是AI农药助手
+    return 'ai-search'; // 默认回退到AI农药助手
   };
 
   const [activeItem, setActiveItem] = useState(getInitialActiveItem());
 
   // 根据当前路径确定活跃菜单项
   const getActiveItemFromPath = (pathname: string) => {
+    if (pathname === '/buyer' || pathname === '/supplier') return ''; // 工作台页面不选中任何菜单项
     if (pathname.startsWith('/products')) return 'products';
     if (pathname === '/conversation-history') return 'conversation-history';
     if (pathname.startsWith('/inquiries')) return 'inquiries';
@@ -42,7 +46,9 @@ export const Layout = ({ children, userType = "buyer" }: LayoutProps) => {
     if (pathname.startsWith('/sample-responses')) return 'sample-responses';
     if (pathname === '/cart') return 'cart';
     if (pathname === '/ai-search') return 'ai-search';
-    return 'ai-query';
+    if (pathname === '/suppliers') return 'suppliers';
+    if (pathname === '/') return 'ai-search'; // 默认页面也是AI农药助手
+    return 'ai-search'; // 默认回退到AI农药助手
   };
 
   const handleItemClick = (itemId: string) => {
@@ -78,11 +84,19 @@ export const Layout = ({ children, userType = "buyer" }: LayoutProps) => {
         // 导航到报价管理路由
         navigate('/quote-management');
         break;
-      case 'ai-query':
-        navigate('/');
-        break;
       case 'ai-search':
         navigate('/ai-search');
+        break;
+      case 'suppliers':
+        navigate('/suppliers');
+        break;
+      case 'dashboard':
+        // 根据用户类型跳转到对应的工作台
+        if (userType === 'supplier') {
+          navigate('/supplier');
+        } else {
+          navigate('/buyer');
+        }
         break;
       default:
         // 其他菜单项暂时保持在当前页面
@@ -92,9 +106,7 @@ export const Layout = ({ children, userType = "buyer" }: LayoutProps) => {
   };
 
   // 如果是特定路由，直接渲染children，不使用Layout的内部路由逻辑
-  const isExternalRoute = location.pathname === '/auth' || 
-                         location.pathname === '/supplier' || 
-                         location.pathname === '/buyer';
+  const isExternalRoute = location.pathname === '/auth';
   const currentActiveItem = getActiveItemFromPath(location.pathname);
 
   const renderContent = () => {
