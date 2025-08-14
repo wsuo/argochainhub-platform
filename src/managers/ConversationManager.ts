@@ -250,7 +250,8 @@ export class ConversationManager {
         finalAnswer: conversation.finalAnswer || undefined,
         usageStats: conversation.usageStats,
         workflowData: conversation.workflowData,
-        streamMessages: conversation.streamMessages,
+        // 移除 streamMessages 字段以减少请求体大小，避免413错误
+        // streamMessages: conversation.streamMessages, // 移除这行
         duration,
       };
 

@@ -88,6 +88,10 @@ export interface StoreConversationRequest {
 export interface ConversationListParams {
   page?: number;
   limit?: number;
+  search?: string;
+  startDate?: string;
+  endDate?: string;
+  userType?: 'user' | 'guest';
 }
 
 /**
@@ -114,7 +118,7 @@ export class ConversationService {
   }
 
   /**
-   * 获取访客对话列表
+   * 获取访客对话列表（支持搜索）
    */
   static async getGuestConversations(
     guestId: string,
@@ -123,6 +127,10 @@ export class ConversationService {
     const searchParams = new URLSearchParams();
     if (params.page) searchParams.append('page', params.page.toString());
     if (params.limit) searchParams.append('limit', params.limit.toString());
+    if (params.search) searchParams.append('search', params.search);
+    if (params.startDate) searchParams.append('startDate', params.startDate);
+    if (params.endDate) searchParams.append('endDate', params.endDate);
+    if (params.userType) searchParams.append('userType', params.userType);
 
     const url = `${API_BASE_URL}${API_PREFIX}/ai/conversations/guest/${guestId}?${searchParams}`;
     const response = await fetch(url);
@@ -149,6 +157,58 @@ export class ConversationService {
     }
 
     return response.json();
+  }
+
+  /**
+   * 搜索用户对话记录（需要认证）
+   */
+  static async searchUserConversations(
+    params: ConversationListParams = {},
+    token?: string
+  ): Promise<ApiResponse<ConversationSummary[]>> {
+    const searchParams = new URLSearchParams();
+    if (params.page) searchParams.append('page', params.page.toString());
+    if (params.limit) searchParams.append('limit', params.limit.toString());
+    if (params.search) searchParams.append('search', params.search);
+    if (params.startDate) searchParams.append('startDate', params.startDate);
+    if (params.endDate) searchParams.append('endDate', params.endDate);
+    if (params.userType) searchParams.append('userType', params.userType);
+
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+    };
+    
+    if (token) {
+      headers.Authorization = `Bearer ${token}`;
+    }
+
+    const url = `${API_BASE_URL}${API_PREFIX}/ai/conversations?${searchParams}`;
+    const response = await fetch(url, { headers });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    return response.json();
+  }
+
+  /**
+   * 智能搜索对话记录（自动选择用户或访客API）
+   */
+  static async searchConversations(
+    params: ConversationListParams = {},
+    guestId?: string,
+    token?: string
+  ): Promise<ApiResponse<ConversationSummary[]>> {
+    if (token) {
+      // 已登录用户，使用用户搜索API
+      return this.searchUserConversations(params, token);
+    } else if (guestId) {
+      // 访客用户，使用访客搜索API
+      return this.getGuestConversations(guestId, params);
+    } else {
+      throw new Error('Either token or guestId must be provided');
+    }
   }
 
   /**
