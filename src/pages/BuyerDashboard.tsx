@@ -15,7 +15,14 @@ import {
   TrendingUp,
   ChevronRight,
   Calendar,
-  CheckCircle2
+  CheckCircle2,
+  Bot,
+  History,
+  Database,
+  ShoppingCart,
+  Star,
+  Activity,
+  Sparkles
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "@/contexts/MockAuthContext";
@@ -33,62 +40,76 @@ const BuyerDashboard = () => {
     }
   }, [isLoggedIn, user, navigate]);
   
+  const quickAccessItems = [
+    {
+      id: "ai-search",
+      title: "AI农药助手",
+      description: "智能问答服务，快速获取专业建议",
+      icon: Bot,
+      color: "from-emerald-500 to-emerald-600",
+      textColor: "text-emerald-600",
+      bgColor: "bg-emerald-50",
+      onClick: () => navigate('/ai-search')
+    },
+    {
+      id: "products",
+      title: "农药产品库",
+      description: "浏览优质农药产品，对接可靠供应商",
+      icon: Database,
+      color: "from-blue-500 to-blue-600",
+      textColor: "text-blue-600",
+      bgColor: "bg-blue-50",
+      onClick: () => navigate('/products')
+    },
+    {
+      id: "cart",
+      title: "购物车",
+      description: "管理已选产品，批量询价采购",
+      icon: ShoppingCart,
+      color: "from-orange-500 to-orange-600",
+      textColor: "text-orange-600",
+      bgColor: "bg-orange-50",
+      onClick: () => navigate('/cart')
+    },
+    {
+      id: "conversation-history",
+      title: "对话历史",
+      description: "查看AI咨询记录，回顾专业建议",
+      icon: History,
+      color: "from-purple-500 to-purple-600",
+      textColor: "text-purple-600",
+      bgColor: "bg-purple-50",
+      onClick: () => navigate('/conversation-history')
+    }
+  ];
+
   const managementItems = [
     {
       id: "inquiry",
-      title: t("dashboard.buyer.management.inquiry"),
-      description: t("dashboard.buyer.management.inquiryDesc"),
+      title: "询价管理",
+      description: "发布询价需求，跟踪报价进度",
       icon: FileText,
       color: "text-blue-600",
-      bgColor: "bg-blue-50"
-    },
-    {
-      id: "products", 
-      title: t("dashboard.buyer.management.products"),
-      description: t("dashboard.buyer.management.productsDesc"),
-      icon: Package,
-      color: "text-green-600",
-      bgColor: "bg-green-50"
-    },
-    {
-      id: "suppliers",
-      title: t("dashboard.buyer.management.suppliers"), 
-      description: t("dashboard.buyer.management.suppliersDesc"),
-      icon: Users,
-      color: "text-orange-600",
-      bgColor: "bg-orange-50"
-    },
-    {
-      id: "orders",
-      title: t("dashboard.buyer.management.orders"),
-      description: t("dashboard.buyer.management.ordersDesc"),
-      icon: ShoppingBag,
-      color: "text-purple-600", 
-      bgColor: "bg-purple-50"
+      bgColor: "bg-blue-50",
+      onClick: () => navigate('/inquiries')
     },
     {
       id: "samples",
-      title: t("dashboard.buyer.management.samples"),
-      description: t("dashboard.buyer.management.samplesDesc"),
+      title: "样品管理",
+      description: "申请产品样品，跟踪样品状态",
       icon: TestTube,
       color: "text-indigo-600",
-      bgColor: "bg-indigo-50"
+      bgColor: "bg-indigo-50",
+      onClick: () => navigate('/samples')
     },
     {
-      id: "contracts",
-      title: t("dashboard.buyer.management.contracts"), 
-      description: t("dashboard.buyer.management.contractsDesc"),
+      id: "registrations",
+      title: "登记管理",
+      description: "管理产品登记申请，跟踪登记进度",
       icon: ScrollText,
       color: "text-teal-600",
-      bgColor: "bg-teal-50"
-    },
-    {
-      id: "favorites",
-      title: t("dashboard.buyer.management.favorites"),
-      description: t("dashboard.buyer.management.favoritesDesc"), 
-      icon: Heart,
-      color: "text-red-600",
-      bgColor: "bg-red-50"
+      bgColor: "bg-teal-50",
+      onClick: () => navigate('/registrations')
     }
   ];
 
@@ -104,159 +125,185 @@ const BuyerDashboard = () => {
 
   return (
     <Layout userType="buyer">
-      <main className="flex-1 p-6 bg-gradient-to-br from-slate-50 via-agro-green-light/30 to-agro-blue-light/40 relative overflow-auto">
-        {/* 装饰性渐变叠层 */}
-        <div className="absolute inset-0 bg-gradient-to-tr from-primary/5 via-transparent to-agro-blue/8 pointer-events-none" />
-        <div className="absolute top-0 right-0 w-1/3 h-1/3 bg-gradient-radial from-primary/10 via-primary/5 to-transparent rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 left-0 w-1/2 h-1/2 bg-gradient-radial from-agro-blue/8 via-agro-blue/4 to-transparent rounded-full blur-3xl pointer-events-none" />
-        
-        {/* 内容区域 */}
-        <div className="relative z-10 space-y-6">
-          {/* Header */}
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-foreground">{t("dashboard.buyer.title")}</h1>
-              <p className="text-muted-foreground mt-1">{t("dashboard.buyer.subtitle")}</p>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Badge variant="secondary" className="text-sm">
+      <div className="max-w-7xl mx-auto space-y-8">
+        {/* 页面头部 */}
+        <div className="text-center">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-primary to-agro-blue rounded-3xl mb-6 shadow-2xl shadow-primary/20">
+            <Activity className="w-8 h-8 text-white" />
+          </div>
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-gray-900 via-primary to-agro-blue bg-clip-text text-transparent mb-3">
+            采购商工作台
+          </h1>
+          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+            智能采购管理，高效业务协同
+          </p>
+          {isLoggedIn && (
+            <div className="mt-4">
+              <Badge variant="secondary" className="bg-emerald-50 text-emerald-700 border-emerald-200">
                 <CheckCircle2 className="w-3 h-3 mr-1" />
-                {t("dashboard.buyer.verified")}
+                已认证用户 • 欢迎回来，{user?.name}
               </Badge>
             </div>
-          </div>
+          )}
+        </div>
 
-          {/* Management Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            {managementItems.map((item) => {
+        {/* 快速访问区域 */}
+        <div>
+          <div className="flex items-center space-x-3 mb-6">
+            <Sparkles className="w-6 h-6 text-primary" />
+            <h2 className="text-2xl font-bold text-gray-900">快速访问</h2>
+            <p className="text-gray-600">常用功能，一键直达</p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {quickAccessItems.map((item) => {
               const Icon = item.icon;
               return (
-                <Card key={item.id} className="cursor-pointer hover:shadow-md transition-shadow">
-                  <CardContent className="p-4">
-                    <div className="flex items-start space-x-3">
-                      <div className={`p-2 rounded-lg ${item.bgColor}`}>
-                        <Icon className={`w-5 h-5 ${item.color}`} />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <h3 className="font-medium text-foreground text-sm">{item.title}</h3>
-                        <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
-                          {item.description}
-                        </p>
-                      </div>
-                      <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                <div
+                  key={item.id}
+                  className="group bg-white/80 backdrop-blur-sm border border-white/30 hover:border-primary/30 hover:bg-white/90 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer"
+                  onClick={item.onClick}
+                >
+                  <div className="space-y-4">
+                    <div className={`w-12 h-12 bg-gradient-to-r ${item.color} rounded-2xl flex items-center justify-center shadow-lg`}>
+                      <Icon className="w-6 h-6 text-white" />
                     </div>
-                  </CardContent>
-                </Card>
+                    <div>
+                      <h3 className={`font-semibold text-gray-900 group-hover:${item.textColor} transition-colors mb-2`}>
+                        {item.title}
+                      </h3>
+                      <p className="text-gray-600 text-sm leading-relaxed">
+                        {item.description}
+                      </p>
+                    </div>
+                  </div>
+                </div>
               );
             })}
           </div>
+        </div>
 
-          {/* Dashboard Content Grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Left Column - Messages and Hot Products */}
-            <div className="lg:col-span-2 space-y-6">
-              {/* Latest Messages */}
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-                  <CardTitle className="text-lg font-medium flex items-center">
-                    <Bell className="w-5 h-5 mr-2 text-blue-600" />
-                    {t("dashboard.buyer.sections.latestMessages")}
-                  </CardTitle>
-                  <Button variant="ghost" size="sm" className="text-blue-600">
-                    {t("dashboard.buyer.sections.viewMore")}
-                    <ChevronRight className="w-4 h-4 ml-1" />
-                  </Button>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  {notifications.length > 0 ? (
-                    notifications.map((notification) => (
-                      <div key={notification.id} className="flex items-start justify-between p-3 bg-blue-50 rounded-lg">
-                        <div className="flex-1">
-                          <div className="flex items-center space-x-2 mb-1">
-                            <Calendar className="w-4 h-4 text-muted-foreground" />
-                            <span className="text-xs text-muted-foreground">{notification.time}</span>
-                          </div>
-                          <h4 className="font-medium text-foreground text-sm">{notification.title}</h4>
-                          <p className="text-xs text-muted-foreground mt-1">{notification.description}</p>
-                        </div>
-                        <Button size="sm" variant="outline" className="ml-3">
-                          {t("common.view")}
-                        </Button>
-                      </div>
-                    ))
-                  ) : (
-                    <div className="flex flex-col items-center justify-center py-8 text-muted-foreground">
-                      <Bell className="w-8 h-8 mb-2 text-muted-foreground/50" />
-                      <p className="text-sm font-medium">{t("dashboard.buyer.empty.noMessages")}</p>
-                      <p className="text-xs text-center mt-1">{t("dashboard.buyer.empty.noMessagesDesc")}</p>
+        {/* 业务管理区域 */}
+        <div>
+          <div className="flex items-center space-x-3 mb-6">
+            <FileText className="w-6 h-6 text-agro-blue" />
+            <h2 className="text-2xl font-bold text-gray-900">业务管理</h2>
+            <p className="text-gray-600">专业采购工具</p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {managementItems.map((item) => {
+              const Icon = item.icon;
+              return (
+                <div
+                  key={item.id}
+                  className="group bg-white/80 backdrop-blur-sm border border-white/30 hover:border-primary/30 hover:bg-white/90 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer"
+                  onClick={item.onClick}
+                >
+                  <div className="flex items-start space-x-4">
+                    <div className={`p-3 rounded-2xl ${item.bgColor}`}>
+                      <Icon className={`w-6 h-6 ${item.color}`} />
                     </div>
-                  )}
-                </CardContent>
-              </Card>
-
-              {/* Hot Product Recommendations */}
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-                  <CardTitle className="text-lg font-medium flex items-center">
-                    <TrendingUp className="w-5 h-5 mr-2 text-green-600" />
-                    {t("dashboard.buyer.sections.hotProducts")}
-                  </CardTitle>
-                  <Button variant="ghost" size="sm" className="text-blue-600">
-                    {t("dashboard.buyer.sections.viewMore")}
-                    <ChevronRight className="w-4 h-4 ml-1" />
-                  </Button>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex flex-col items-center justify-center py-8 text-muted-foreground">
-                    <Package className="w-8 h-8 mb-2 text-muted-foreground/50" />
-                    <p className="text-sm font-medium">{t("dashboard.buyer.empty.noProducts")}</p>
-                    <p className="text-xs text-center mt-1">{t("dashboard.buyer.empty.noProductsDesc")}</p>
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-gray-900 mb-2">
+                        {item.title}
+                      </h3>
+                      <p className="text-gray-600 text-sm leading-relaxed">
+                        {item.description}
+                      </p>
+                      <ChevronRight className="w-4 h-4 text-gray-400 group-hover:text-primary transition-colors mt-2" />
+                    </div>
                   </div>
-                </CardContent>
-              </Card>
-            </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
 
-            {/* Right Column - Quick Stats */}
-            <div className="space-y-6">
-              {/* Quick Stats */}
-              <div className="grid grid-cols-2 gap-3">
-                <Card>
-                  <CardContent className="p-4 text-center">
-                    <div className="text-2xl font-bold text-blue-600">0</div>
-                    <div className="text-xs text-muted-foreground mt-1">
-                      {t("dashboard.buyer.stats.pendingInquiries")}
-                    </div>
-                  </CardContent>
-                </Card>
-                <Card>
-                  <CardContent className="p-4 text-center">
-                    <div className="text-2xl font-bold text-green-600">0</div>
-                    <div className="text-xs text-muted-foreground mt-1">
-                      {t("dashboard.buyer.stats.todayViews")}
-                    </div>
-                  </CardContent>
-                </Card>
-                <Card>
-                  <CardContent className="p-4 text-center">
-                    <div className="text-2xl font-bold text-orange-600">0</div>
-                    <div className="text-xs text-muted-foreground mt-1">
-                      {t("dashboard.buyer.stats.sampleRequests")}
-                    </div>
-                  </CardContent>
-                </Card>
-                <Card>
-                  <CardContent className="p-4 text-center">
-                    <div className="text-2xl font-bold text-purple-600">0</div>
-                    <div className="text-xs text-muted-foreground mt-1">
-                      {t("dashboard.buyer.stats.favorites")}
-                    </div>
-                  </CardContent>
-                </Card>
+        {/* 统计概览 */}
+        <div>
+          <div className="flex items-center space-x-3 mb-6">
+            <TrendingUp className="w-6 h-6 text-emerald-600" />
+            <h2 className="text-2xl font-bold text-gray-900">数据概览</h2>
+            <p className="text-gray-600">业务统计信息</p>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            <div className="bg-white/80 backdrop-blur-sm border border-white/30 rounded-2xl p-6 shadow-lg text-center">
+              <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-3">
+                <FileText className="w-6 h-6 text-white" />
               </div>
+              <div className="text-2xl font-bold text-blue-600 mb-1">0</div>
+              <div className="text-sm text-gray-600">待处理询价</div>
+            </div>
+            
+            <div className="bg-white/80 backdrop-blur-sm border border-white/30 rounded-2xl p-6 shadow-lg text-center">
+              <div className="w-12 h-12 bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-2xl flex items-center justify-center mx-auto mb-3">
+                <Star className="w-6 h-6 text-white" />
+              </div>
+              <div className="text-2xl font-bold text-emerald-600 mb-1">0</div>
+              <div className="text-sm text-gray-600">收藏产品</div>
+            </div>
+            
+            <div className="bg-white/80 backdrop-blur-sm border border-white/30 rounded-2xl p-6 shadow-lg text-center">
+              <div className="w-12 h-12 bg-gradient-to-r from-orange-500 to-orange-600 rounded-2xl flex items-center justify-center mx-auto mb-3">
+                <TestTube className="w-6 h-6 text-white" />
+              </div>
+              <div className="text-2xl font-bold text-orange-600 mb-1">0</div>
+              <div className="text-sm text-gray-600">样品申请</div>
+            </div>
+            
+            <div className="bg-white/80 backdrop-blur-sm border border-white/30 rounded-2xl p-6 shadow-lg text-center">
+              <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-3">
+                <Activity className="w-6 h-6 text-white" />
+              </div>
+              <div className="text-2xl font-bold text-purple-600 mb-1">0</div>
+              <div className="text-sm text-gray-600">今日访问</div>
             </div>
           </div>
         </div>
-      </main>
+
+        {/* 最新动态 */}
+        <div className="bg-white/80 backdrop-blur-sm border border-white/30 rounded-2xl shadow-xl p-6">
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center space-x-3">
+              <Bell className="w-6 h-6 text-blue-600" />
+              <h2 className="text-xl font-bold text-gray-900">最新动态</h2>
+            </div>
+            <Button variant="ghost" size="sm" className="text-blue-600 hover:text-blue-700">
+              查看更多
+              <ChevronRight className="w-4 h-4 ml-1" />
+            </Button>
+          </div>
+          
+          {notifications.length > 0 ? (
+            <div className="space-y-4">
+              {notifications.map((notification) => (
+                <div key={notification.id} className="bg-blue-50/80 rounded-xl p-4 border border-blue-100">
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <div className="flex items-center space-x-2 mb-2">
+                        <Calendar className="w-4 h-4 text-gray-500" />
+                        <span className="text-sm text-gray-500">{notification.time}</span>
+                      </div>
+                      <h4 className="font-medium text-gray-900 mb-1">{notification.title}</h4>
+                      <p className="text-sm text-gray-600">{notification.description}</p>
+                    </div>
+                    <Button size="sm" variant="outline" className="ml-4">
+                      查看
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12">
+              <div className="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <Bell className="w-8 h-8 text-gray-400" />
+              </div>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">暂无新动态</h3>
+              <p className="text-gray-600">系统消息和业务通知将显示在这里</p>
+            </div>
+          )}
+        </div>
+      </div>
     </Layout>
   );
 };
