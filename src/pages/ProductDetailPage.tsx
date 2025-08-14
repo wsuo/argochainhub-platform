@@ -223,7 +223,7 @@ const ProductDetailPage = () => {
         </Button>
 
         {/* 产品概览卡片 */}
-        <Card className="mb-6">
+        <Card className="mb-6 bg-white/80 backdrop-blur-sm border border-white/30 rounded-2xl shadow-lg">
           <CardHeader>
             <div className="flex flex-col lg:flex-row justify-between items-start gap-4">
               <div className="flex-1">
@@ -248,19 +248,26 @@ const ProductDetailPage = () => {
                   onClick={handleAddToCart} 
                   variant="outline"
                   disabled={isProductInCart}
-                  className={isProductInCart 
+                  className={`rounded-xl ${isProductInCart 
                     ? "bg-green-500 text-white border-green-500 hover:bg-green-600" 
-                    : "hover:bg-green-500 hover:text-white hover:border-green-500 transition-colors"
-                  }
+                    : "text-green-600 border-green-200 hover:bg-green-500 hover:text-white hover:border-green-500"
+                  } transition-colors`}
                 >
                   {isProductInCart ? <Check className="h-4 w-4 mr-2" /> : <ShoppingCart className="h-4 w-4 mr-2" />}
                   {isProductInCart ? t('products.alreadyInCart') : t('products.addToCart')}
                 </Button>
-                <Button onClick={handleInquire}>
+                <Button 
+                  onClick={handleInquire}
+                  className="rounded-xl bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 transition-all shadow-md"
+                >
                   <MessageSquare className="h-4 w-4 mr-2" />
                   {t('products.inquireNow')}
                 </Button>
-                <Button onClick={handleRequestSample} variant="outline">
+                <Button 
+                  onClick={handleRequestSample} 
+                  variant="outline"
+                  className="rounded-xl text-purple-600 border-purple-200 hover:bg-purple-500 hover:text-white hover:border-purple-500 transition-colors"
+                >
                   <TestTube className="h-4 w-4 mr-2" />
                   {t('products.requestSample')}
                 </Button>
@@ -272,7 +279,7 @@ const ProductDetailPage = () => {
         {/* 详情内容 */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
           {/* 产品基本信息 */}
-          <Card>
+          <Card className="bg-white/80 backdrop-blur-sm border border-white/30 rounded-2xl shadow-lg">
             <CardHeader>
               <CardTitle>{t('products.basicInfo')}</CardTitle>
             </CardHeader>
@@ -348,7 +355,7 @@ const ProductDetailPage = () => {
           </Card>
 
           {/* 供应商信息 */}
-          <Card>
+          <Card className="bg-white/80 backdrop-blur-sm border border-white/30 rounded-2xl shadow-lg">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Building2 className="h-5 w-5" />
@@ -457,7 +464,7 @@ const ProductDetailPage = () => {
 
         {/* 相关产品 */}
         {relatedProducts.length > 0 && (
-          <Card>
+          <Card className="bg-white/80 backdrop-blur-sm border border-white/30 rounded-2xl shadow-lg">
             <CardHeader>
               <CardTitle>{t('products.relatedProducts')}</CardTitle>
             </CardHeader>
@@ -476,7 +483,7 @@ const ProductDetailPage = () => {
             </CardContent>
           </Card>
         )}
-      </div>
+        </div>
 
       {/* 询价弹窗 */}
       {product && (
