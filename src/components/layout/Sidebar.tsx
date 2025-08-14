@@ -43,6 +43,12 @@ export const Sidebar = ({ userType, activeItem, onItemClick }: SidebarProps) => 
       description: "浏览所有产品"
     },
     {
+      id: "suppliers",
+      label: "供应商列表",
+      icon: Building2,
+      description: "查看供应商"
+    },
+    {
       id: "cart",
       label: "购物车",
       icon: ShoppingCart,
@@ -65,12 +71,6 @@ export const Sidebar = ({ userType, activeItem, onItemClick }: SidebarProps) => 
       label: "登记管理",
       icon: ClipboardList,
       description: "管理登记申请"
-    },
-    {
-      id: "suppliers",
-      label: "供应商列表",
-      icon: Building2,
-      description: "查看供应商"
     }
   ];
 
