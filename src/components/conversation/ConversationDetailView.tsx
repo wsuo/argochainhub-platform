@@ -1,11 +1,8 @@
 import { useState, useEffect } from "react";
 import { ArrowLeft, User, Bot, Clock, DollarSign, MessageSquare, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Separator } from "@/components/ui/separator";
 import { useTranslation } from "react-i18next";
 import { ConversationService, ConversationDetail } from "@/services/conversationService";
 import { getOrCreateGuestId } from "@/utils/guestId";
@@ -86,10 +83,11 @@ export const ConversationDetailView = ({
 
   if (loading) {
     return (
-      <div className={`flex items-center justify-center py-8 ${className}`}>
+      <div className="flex items-center justify-center py-16">
         <div className="text-center">
-          <div className="w-8 h-8 border-4 border-primary/30 border-t-primary rounded-full animate-spin mx-auto mb-2"></div>
-          <p className="text-muted-foreground">加载对话详情中...</p>
+          <div className="w-16 h-16 border-4 border-primary/20 border-t-primary rounded-full animate-spin mx-auto mb-4"></div>
+          <h3 className="text-lg font-medium text-gray-900 mb-2">加载对话详情中...</h3>
+          <p className="text-gray-600">正在获取完整的对话记录</p>
         </div>
       </div>
     );
@@ -97,14 +95,19 @@ export const ConversationDetailView = ({
 
   if (error || !conversation) {
     return (
-      <div className={className}>
-        <div className="flex items-center mb-4">
-          <Button variant="ghost" size="sm" onClick={onBack}>
+      <div className="space-y-6">
+        <div className="flex items-center space-x-4">
+          <Button 
+            variant="outline" 
+            onClick={onBack}
+            className="bg-white/60 backdrop-blur-sm border-white/30 hover:bg-white/80"
+          >
             <ArrowLeft className="w-4 h-4 mr-2" />
-            返回
+            {t('common.back') || '返回'}
           </Button>
+          <h1 className="text-2xl font-bold text-gray-900">加载失败</h1>
         </div>
-        <Alert variant="destructive">
+        <Alert variant="destructive" className="bg-red-50/80 backdrop-blur-sm border-red-200/50">
           <AlertDescription>
             {error || '对话详情加载失败'}
             <Button 
@@ -122,151 +125,166 @@ export const ConversationDetailView = ({
   }
 
   return (
-    <div className={`${className} flex flex-col`}>
-      {/* 头部 - 固定不滚动 */}
-      <div className="flex items-center justify-between mb-4 lg:mb-6 flex-shrink-0">
-        <div className="flex items-center">
-          <Button variant="ghost" size="sm" onClick={onBack} className="mr-3">
+    <div className="flex flex-col h-full">
+      {/* 头部 - 返回按钮和标题 */}
+      <div className="flex items-center justify-between mb-6 flex-shrink-0">
+        <div className="flex items-center space-x-4">
+          <Button 
+            variant="outline" 
+            onClick={onBack}
+            className="bg-white/60 backdrop-blur-sm border-white/30 hover:bg-white/80"
+          >
             <ArrowLeft className="w-4 h-4 mr-2" />
-            返回
+            {t('common.back') || '返回'}
           </Button>
-          <div>
-            <h2 className="text-lg lg:text-xl font-semibold text-foreground">
-              {conversation.title || "AI对话详情"}
-            </h2>
-            <p className="text-sm text-muted-foreground">
-              {formatTime(conversation.createdAt)}
-            </p>
+          <div className="flex items-center space-x-3">
+            <div className="w-10 h-10 bg-gradient-to-r from-primary to-agro-blue rounded-2xl flex items-center justify-center shadow-lg">
+              <MessageSquare className="w-5 h-5 text-white" />
+            </div>
+            <div>
+              <h1 className="text-2xl font-bold bg-gradient-to-r from-gray-900 via-primary to-agro-blue bg-clip-text text-transparent">
+                {conversation.title || "AI对话详情"}
+              </h1>
+              <p className="text-gray-600">
+                {formatTime(conversation.createdAt)}
+              </p>
+            </div>
           </div>
         </div>
       </div>
 
       {/* 可滚动内容区域 */}
-      <div className="flex-1 overflow-y-auto space-y-4 lg:space-y-6 pr-2">{/* 添加右边距避免滚动条遮挡内容 */}
+      <div className="flex-1 overflow-y-auto space-y-6">
 
         {/* 统计信息卡片 */}
-        <Card className="p-3 lg:p-4">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4">
-          <div className="text-center">
-            <div className="flex items-center justify-center w-10 h-10 bg-primary/10 rounded-lg mx-auto mb-2">
-              <MessageSquare className="w-5 h-5 text-primary" />
+        <div className="bg-white/40 backdrop-blur-sm border-0 rounded-2xl p-6 shadow-lg">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="text-center">
+              <div className="flex items-center justify-center w-12 h-12 bg-primary/10 backdrop-blur-sm rounded-2xl mx-auto mb-3">
+                <MessageSquare className="w-6 h-6 text-primary" />
+              </div>
+              <p className="text-2xl font-bold text-gray-900">{conversation.totalMessages}</p>
+              <p className="text-sm text-gray-600 mt-1">消息数量</p>
             </div>
-            <p className="text-2xl font-bold text-foreground">{conversation.totalMessages}</p>
-            <p className="text-xs text-muted-foreground">消息数量</p>
-          </div>
-          <div className="text-center">
-            <div className="flex items-center justify-center w-10 h-10 bg-agro-blue/10 rounded-lg mx-auto mb-2">
-              <Zap className="w-5 h-5 text-agro-blue" />
+            <div className="text-center">
+              <div className="flex items-center justify-center w-12 h-12 bg-agro-blue/10 backdrop-blur-sm rounded-2xl mx-auto mb-3">
+                <Zap className="w-6 h-6 text-agro-blue" />
+              </div>
+              <p className="text-2xl font-bold text-gray-900">{conversation.totalTokens}</p>
+              <p className="text-sm text-gray-600 mt-1">消耗Tokens</p>
             </div>
-            <p className="text-2xl font-bold text-foreground">{conversation.totalTokens}</p>
-            <p className="text-xs text-muted-foreground">消耗Tokens</p>
-          </div>
-          <div className="text-center">
-            <div className="flex items-center justify-center w-10 h-10 bg-green-500/10 rounded-lg mx-auto mb-2">
-              <DollarSign className="w-5 h-5 text-green-500" />
+            <div className="text-center">
+              <div className="flex items-center justify-center w-12 h-12 bg-emerald-500/10 backdrop-blur-sm rounded-2xl mx-auto mb-3">
+                <DollarSign className="w-6 h-6 text-emerald-600" />
+              </div>
+              <p className="text-2xl font-bold text-gray-900">{formatCost(conversation.totalCost)}</p>
+              <p className="text-sm text-gray-600 mt-1">总费用</p>
             </div>
-            <p className="text-2xl font-bold text-foreground">{formatCost(conversation.totalCost)}</p>
-            <p className="text-xs text-muted-foreground">总费用</p>
-          </div>
-          <div className="text-center">
-            <div className="flex items-center justify-center w-10 h-10 bg-orange-500/10 rounded-lg mx-auto mb-2">
-              <Clock className="w-5 h-5 text-orange-500" />
+            <div className="text-center">
+              <div className="flex items-center justify-center w-12 h-12 bg-amber-500/10 backdrop-blur-sm rounded-2xl mx-auto mb-3">
+                <Clock className="w-6 h-6 text-amber-600" />
+              </div>
+              <p className="text-2xl font-bold text-gray-900">{formatDuration(conversation.duration)}</p>
+              <p className="text-sm text-gray-600 mt-1">对话时长</p>
             </div>
-            <p className="text-2xl font-bold text-foreground">{formatDuration(conversation.duration)}</p>
-            <p className="text-xs text-muted-foreground">对话时长</p>
           </div>
         </div>
-      </Card>
 
         {/* 对话消息 */}
-        <Card className="flex-1 min-h-0">
-          <div className="p-3 lg:p-4 border-b border-border">
-            <h3 className="font-medium text-foreground">对话内容</h3>
+        <div className="bg-white/40 backdrop-blur-sm border-0 rounded-2xl shadow-lg overflow-hidden">
+          <div className="p-6 bg-white/20 backdrop-blur-sm">
+            <h3 className="text-lg font-semibold text-gray-900 flex items-center">
+              <MessageSquare className="w-5 h-5 mr-2 text-primary" />
+              对话内容
+            </h3>
           </div>
-          <ScrollArea className="h-[50vh] lg:h-[60vh]">
-            <div className="p-3 lg:p-4 space-y-3 lg:space-y-4">
-            {conversation.messages.map((message, index) => (
-              <div
-                key={message.id}
-                className={`flex ${message.messageType === 'user_query' ? 'justify-end' : 'justify-start'}`}
-              >
-                <div className={`flex items-start space-x-2 max-w-[85%] lg:max-w-[80%] ${
-                  message.messageType === 'user_query' ? 'flex-row-reverse space-x-reverse' : ''
-                }`}>
-                  {/* 头像 */}
-                  <div className={`w-6 h-6 lg:w-8 lg:h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
-                    message.messageType === 'user_query' 
-                      ? 'bg-primary text-primary-foreground' 
-                      : 'bg-muted'
-                  }`}>
-                    {message.messageType === 'user_query' ? (
-                      <User className="w-3 h-3 lg:w-4 lg:h-4" />
-                    ) : (
-                      <Bot className="w-3 h-3 lg:w-4 lg:h-4" />
-                    )}
-                  </div>
-                  
-                  {/* 消息内容 */}
-                  <div className={`rounded-lg p-2 lg:p-3 ${
-                    message.messageType === 'user_query'
-                      ? 'bg-primary text-primary-foreground'
-                      : 'bg-muted'
-                  }`}>
-                    <MessageContent 
-                      content={message.content}
-                      sender={message.messageType === 'user_query' ? 'user' : 'ai'}
-                      useTypewriter={false}
-                    />
-                    <div className="text-xs mt-2 opacity-70">
-                      {formatTime(message.createdAt)}
+          <ScrollArea className="h-[60vh]">
+            <div className="p-6 space-y-6">
+              {conversation.messages.map((message, index) => (
+                <div
+                  key={message.id}
+                  className={`flex ${message.messageType === 'user_query' ? 'justify-end' : 'justify-start'}`}
+                >
+                  <div className={`flex items-start space-x-3 max-w-[85%] ${message.messageType === 'user_query' ? 'flex-row-reverse space-x-reverse' : ''}`}>
+                    {/* 头像 */}
+                    <div className={`w-10 h-10 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg ${
+                      message.messageType === 'user_query' 
+                        ? 'bg-gradient-to-r from-primary to-agro-blue text-white' 
+                        : 'bg-gradient-to-r from-emerald-400 to-emerald-600 text-white'
+                    }`}>
+                      {message.messageType === 'user_query' ? (
+                        <User className="w-5 h-5" />
+                      ) : (
+                        <Bot className="w-5 h-5" />
+                      )}
+                    </div>
+                    
+                    {/* 消息内容 */}
+                    <div className={`rounded-2xl p-4 shadow-lg ${
+                      message.messageType === 'user_query'
+                        ? 'bg-gradient-to-r from-primary to-agro-blue text-white'
+                        : 'bg-white/80 backdrop-blur-sm text-gray-900'
+                    }`}>
+                      <MessageContent 
+                        content={message.content}
+                        sender={message.messageType === 'user_query' ? 'user' : 'ai'}
+                        useTypewriter={false}
+                      />
+                      <div className={`text-xs mt-3 ${
+                        message.messageType === 'user_query' ? 'text-white/70' : 'text-gray-500'
+                      }`}>
+                        {formatTime(message.createdAt)}
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
-        </ScrollArea>
-      </Card>
+              ))}
+            </div>
+          </ScrollArea>
+        </div>
 
-      {/* 使用统计详情 */}
-      {conversation.usageStatistics && conversation.usageStatistics.length > 0 && (
-        <Card className="mt-6">
-          <div className="p-4 border-b border-border">
-            <h3 className="font-medium text-foreground">使用统计</h3>
-          </div>
-          <div className="p-4">
-            {conversation.usageStatistics.map((usage, index) => (
-              <div key={usage.id} className="mb-4 last:mb-0">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-2 lg:gap-3 text-xs lg:text-sm">
-                  <div>
-                    <span className="text-muted-foreground">输入Tokens:</span>
-                    <span className="ml-2 font-medium">{usage.promptTokens}</span>
+        {/* 使用统计详情 */}
+        {conversation.usageStatistics && conversation.usageStatistics.length > 0 && (
+          <div className="bg-white/40 backdrop-blur-sm border-0 rounded-2xl shadow-lg">
+            <div className="p-6 bg-white/20 backdrop-blur-sm">
+              <h3 className="text-lg font-semibold text-gray-900 flex items-center">
+                <Zap className="w-5 h-5 mr-2 text-agro-blue" />
+                使用统计
+              </h3>
+            </div>
+            <div className="p-6">
+              {conversation.usageStatistics.map((usage, index) => (
+                <div key={usage.id} className="mb-6 last:mb-0">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 text-sm">
+                    <div className="bg-white/60 backdrop-blur-sm rounded-xl p-3">
+                      <span className="text-gray-600 block text-xs mb-1">输入Tokens</span>
+                      <span className="font-semibold text-gray-900">{usage.promptTokens}</span>
+                    </div>
+                    <div className="bg-white/60 backdrop-blur-sm rounded-xl p-3">
+                      <span className="text-gray-600 block text-xs mb-1">输出Tokens</span>
+                      <span className="font-semibold text-gray-900">{usage.completionTokens}</span>
+                    </div>
+                    <div className="bg-white/60 backdrop-blur-sm rounded-xl p-3">
+                      <span className="text-gray-600 block text-xs mb-1">总计</span>
+                      <span className="font-semibold text-gray-900">{usage.totalTokens}</span>
+                    </div>
+                    <div className="bg-white/60 backdrop-blur-sm rounded-xl p-3">
+                      <span className="text-gray-600 block text-xs mb-1">费用</span>
+                      <span className="font-semibold text-gray-900">{formatCost(usage.totalPrice)}</span>
+                    </div>
+                    <div className="bg-white/60 backdrop-blur-sm rounded-xl p-3">
+                      <span className="text-gray-600 block text-xs mb-1">延迟</span>
+                      <span className="font-semibold text-gray-900">{formatLatency(usage.latency)}</span>
+                    </div>
                   </div>
-                  <div>
-                    <span className="text-muted-foreground">输出Tokens:</span>
-                    <span className="ml-2 font-medium">{usage.completionTokens}</span>
-                  </div>
-                  <div>
-                    <span className="text-muted-foreground">总计:</span>
-                    <span className="ml-2 font-medium">{usage.totalTokens}</span>
-                  </div>
-                  <div>
-                    <span className="text-muted-foreground">费用:</span>
-                    <span className="ml-2 font-medium">{formatCost(usage.totalPrice)}</span>
-                  </div>
-                  <div>
-                    <span className="text-muted-foreground">延迟:</span>
-                    <span className="ml-2 font-medium">{formatLatency(usage.latency)}</span>
-                  </div>
+                  {index < conversation.usageStatistics.length - 1 && (
+                    <div className="h-px bg-white/30 my-4" />
+                  )}
                 </div>
-                {index < conversation.usageStatistics.length - 1 && (
-                  <Separator className="mt-3" />
-                )}
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </Card>
-      )}
+        )}
       
       </div> {/* 结束滚动容器 */}
     </div>
