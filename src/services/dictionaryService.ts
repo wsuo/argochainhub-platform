@@ -7,14 +7,19 @@ export interface DictionaryItem {
   name: {
     'zh-CN': string;
     en: string;
-    es: string;
+    es?: string;
   };
   description?: string;
   sortOrder: number;
   isActive: boolean;
+  flag?: string; // 国家标志字段
   // 为了兼容现有代码，添加计算属性
   key: string;
-  label: string;
+  label: {
+    'zh-CN': string;
+    en: string;
+    es?: string;
+  };
   value: string;
 }
 
@@ -46,7 +51,7 @@ class DictionaryService {
         ...item,
         key: item.code,
         value: item.code,
-        label: item.name['zh-CN'] || item.name.en || item.code
+        label: item.name // 保持多语言对象结构
       }));
       
       // 按排序字段排序，如果没有则按code排序
@@ -104,7 +109,7 @@ class DictionaryService {
         ...item,
         key: item.code,
         value: item.code,
-        label: item.name['zh-CN'] || item.name.en || item.code
+        label: item.name
       }));
       
       // 按排序字段排序
@@ -144,7 +149,7 @@ class DictionaryService {
         ...item,
         key: item.code,
         value: item.code,
-        label: item.name['zh-CN'] || item.name.en || item.code
+        label: item.name
       }));
       
       return transformedData.sort((a, b) => {
